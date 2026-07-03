@@ -11,6 +11,13 @@ import { Blog, Category } from '@/types/microcms';
 import { getBlogBySlug, getBlogById, getAllCategories, getLatestBlogs } from '@/lib/microcms';
 import { withBasePath } from '@/lib/basePath';
 import { getRelatedBlogs } from '@/lib/blogHelpers';
+import {
+  blogPostingLd,
+  breadcrumbLd,
+  blogPath,
+  htmlToDescription,
+  ldJson,
+} from '@/lib/structuredData';
 
 interface BlogDetailPageProps {
   params: Promise<{
@@ -21,22 +28,39 @@ interface BlogDetailPageProps {
 // メタデータ生成
 export async function generateMetadata({ params }: BlogDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const blog = await getBlogBySlug(slug);
-  
+  const blog = await getBlogBySlug(slug) || await getBlogById(slug);
+
   if (!blog) {
     return {
       title: '記事が見つかりません',
-      description: '指定された記事は存在しないか、削除された可能性があります。'
+      description: '指定された記事は存在しないか、削除された可能性があります。',
+      robots: { index: false, follow: false },
     };
   }
 
+  // 本文は blog.html 優先描画のため、description も content→html の順でフォールバック
+  const description = htmlToDescription(blog.content || blog.html, blog.title, 140);
+  const canonical = blogPath(blog); // metadataBase(=本番ドメイン) 起点。basePath /media は明示付与
+  const images = blog.eyecatch?.url ? [blog.eyecatch.url] : ['/media/OGP.png'];
+
   return {
     title: blog.title,
-    description: blog.content ? blog.content.substring(0, 160).replace(/<[^>]*>/g, '') : blog.title,
+    description,
+    alternates: { canonical: `/media${canonical}` },
     openGraph: {
       title: blog.title,
-      description: blog.content ? blog.content.substring(0, 160).replace(/<[^>]*>/g, '') : blog.title,
-      images: blog.eyecatch ? [blog.eyecatch.url] : [],
+      description,
+      type: 'article',
+      url: `/media${canonical}`,
+      images,
+      publishedTime: blog.publishedAt,
+      modifiedTime: blog.updatedAt || blog.revisedAt || blog.publishedAt,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: blog.title,
+      description,
+      images,
     },
   };
 }
@@ -115,11 +139,29 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     notFound();
   }
 
+  const structuredData = [
+    blogPostingLd(blog),
+    breadcrumbLd([
+      { name: 'メディアトップ', url: '/' },
+      ...(blog.category?.name
+        ? [{ name: blog.category.name, url: `/blog?category=${blog.category.id}` }]
+        : []),
+      { name: blog.title },
+    ]),
+  ];
+
   return (
     <div className="font-sans min-h-screen">
+      {structuredData.map((data, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: ldJson(data) }}
+        />
+      ))}
       <Header />
-      <Breadcrumbs 
-        pageName={blog.title} 
+      <Breadcrumbs
+        pageName={blog.title}
       />
       
       {/* メインコンテンツ - 背景画像付きセクション */}

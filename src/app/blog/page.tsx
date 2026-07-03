@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 import { withBasePath } from '@/lib/basePath';
 import Header from '@/components/Header';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -7,6 +8,14 @@ import BlogClientPage from '@/components/BlogClientPage';
 import BlogCTASection from '@/components/BlogCTASection';
 import { Blog, Category } from '@/types/microcms';
 import { getLatestBlogs, getAllCategories } from '@/lib/microcms';
+
+export const metadata: Metadata = {
+  title: '記事一覧',
+  description:
+    'タクシー・自動車整備士・ドライバー業界の仕事や転職に役立つ記事を配信するRIDE JOB Mediaの記事一覧です。',
+  // ?category パラメータ付きURLも記事一覧本体へ集約する
+  alternates: { canonical: '/media/blog' },
+};
 
 export default async function BlogPage() {
   // サーバーサイドでデータ取得
