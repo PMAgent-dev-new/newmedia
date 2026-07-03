@@ -72,11 +72,11 @@ export default function Header() {
             {/* Desktop CTAs (right side) */}
             <div className="hidden md:flex items-center space-x-4">
               <a
-                href="https://ridejob.pmagent.jp/"
+                href="https://ridejob.jp/entry"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-[#04acdb] text-white px-6 py-2 rounded-[10px] font-bold text-base shadow-sm hover:bg-[#0398c0] transition-colors"
-                aria-label="まずお話を聞く（外部サイト）"
+                aria-label="まずお話を聞く"
               >
                 まずお話を聞く
               </a>

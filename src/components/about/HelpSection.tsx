@@ -79,8 +79,8 @@ export function HelpSection() {
 働き方の相談まで丁寧に対応します。"
         buttonText="相談する"
         buttonColor="#19bbfb"
-        href="https://ridejob.pmagent.jp/"
-        ariaLabel="相談する（外部サイト）"
+        href="https://ridejob.jp/entry"
+        ariaLabel="相談する"
       />
       
       <HelpCard
