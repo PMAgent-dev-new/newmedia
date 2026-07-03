@@ -7,6 +7,11 @@ import NewJobSection from "@/components/NewJobSection";
 import NewInterviewSection from "@/components/NewInterviewSection";
 import Footer from "@/components/Footer";
 import { Category } from '@/types/microcms';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/media' },
+};
 
 export default function Home() {
   // Figmaデザインに合わせた固定カテゴリ（Headerコンポーネントと同じデータ）

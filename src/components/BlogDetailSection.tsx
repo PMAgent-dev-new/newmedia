@@ -79,10 +79,21 @@ export default function BlogDetailSection({ blog }: BlogDetailSectionProps) {
         </h1>
 
         {/* 公開日 */}
-        <div className="text-sm text-gray-500 mb-6">
-          <time dateTime={blog.publishedAt}>
-            {formatDate(blog.publishedAt)}
-          </time>
+        <div className="text-sm text-gray-500 mb-6 flex flex-wrap gap-x-4 gap-y-1">
+          <span>
+            公開日:{' '}
+            <time dateTime={blog.publishedAt}>
+              {formatDate(blog.publishedAt)}
+            </time>
+          </span>
+          {blog.updatedAt && blog.updatedAt !== blog.publishedAt && (
+            <span>
+              更新日:{' '}
+              <time dateTime={blog.updatedAt}>
+                {formatDate(blog.updatedAt)}
+              </time>
+            </span>
+          )}
         </div>
 
         {/* アイキャッチ画像 */}
