@@ -28,7 +28,7 @@ export default function BlogCTASection() {
               未経験でも安心、面接対策や<br />
               働き方の相談まで丁寧に対応します。
             </p>
-            <a href="https://ridejob.pmagent.jp/" target="_blank" rel="noopener noreferrer" className="w-full bg-[#04acdb] hover:bg-[#0398c0] text-white font-bold py-4 px-6 rounded-xl transition-colors duration-300 flex items-center justify-center gap-2 text-lg">
+            <a href="https://ridejob.jp/entry" target="_blank" rel="noopener noreferrer" className="w-full bg-[#04acdb] hover:bg-[#0398c0] text-white font-bold py-4 px-6 rounded-xl transition-colors duration-300 flex items-center justify-center gap-2 text-lg">
               相談する
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
