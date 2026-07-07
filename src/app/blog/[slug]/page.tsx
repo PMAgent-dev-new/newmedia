@@ -11,6 +11,14 @@ import { Blog, Category } from '@/types/microcms';
 import { getBlogBySlug, getBlogById, getAllCategories, getLatestBlogs } from '@/lib/microcms';
 import { withBasePath } from '@/lib/basePath';
 import { getRelatedBlogs } from '@/lib/blogHelpers';
+import {
+  buildBlogPosting,
+  buildBreadcrumb,
+  extractFaq,
+  buildFaqPage,
+  blogUrl,
+  plainText,
+} from '@/lib/structuredData';
 
 interface BlogDetailPageProps {
   params: Promise<{
@@ -21,8 +29,12 @@ interface BlogDetailPageProps {
 // メタデータ生成
 export async function generateMetadata({ params }: BlogDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const blog = await getBlogBySlug(slug);
-  
+  // スラッグで見つからない場合は ID でも解決（本文表示と経路を揃える）
+  let blog = await getBlogBySlug(slug);
+  if (!blog) {
+    blog = await getBlogById(slug);
+  }
+
   if (!blog) {
     return {
       title: '記事が見つかりません',
@@ -30,12 +42,21 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
     };
   }
 
+  const body = blog.html || blog.content || '';
+  const description = plainText(body) || blog.title;
+  const canonical = blogUrl(blog);
+
   return {
     title: blog.title,
-    description: blog.content ? blog.content.substring(0, 160).replace(/<[^>]*>/g, '') : blog.title,
+    description,
+    alternates: { canonical },
     openGraph: {
       title: blog.title,
-      description: blog.content ? blog.content.substring(0, 160).replace(/<[^>]*>/g, '') : blog.title,
+      description,
+      url: canonical,
+      type: 'article',
+      publishedTime: blog.publishedAt,
+      modifiedTime: blog.revisedAt || blog.updatedAt || blog.publishedAt,
       images: blog.eyecatch ? [blog.eyecatch.url] : [],
     },
   };
@@ -115,8 +136,27 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     notFound();
   }
 
+  // 構造化データ（SEO/AIO）
+  const blogPostingLd = buildBlogPosting(blog);
+  const breadcrumbLd = buildBreadcrumb(blog);
+  const faqPageLd = buildFaqPage(extractFaq(blog.html || blog.content || ''));
+
   return (
     <div className="font-sans min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
+      {faqPageLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqPageLd) }}
+        />
+      )}
       <Header />
       <Breadcrumbs 
         pageName={blog.title} 
