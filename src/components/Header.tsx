@@ -39,7 +39,7 @@ export default function Header() {
             </Link>
             
             {/* Desktop Menu: Centered categories */}
-            <div className="hidden md:flex items-center flex-1 min-w-0 mx-6 justify-center">
+            <div className="hidden lg:flex items-center flex-1 min-w-0 mx-6 justify-center">
               <nav className="flex items-center gap-6">
                 {categories.map((category) => (
                   <Link
@@ -70,7 +70,7 @@ export default function Header() {
             </div>
 
             {/* Desktop CTAs (right side) */}
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden lg:flex items-center space-x-4">
               <a
                 href="https://ridejob.jp/entry"
                 target="_blank"
@@ -94,7 +94,7 @@ export default function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden flex flex-col justify-center items-center w-8 h-8 space-y-1"
+              className="lg:hidden flex flex-col justify-center items-center w-8 h-8 space-y-1"
             >
               <span className={`block w-6 h-0.5 bg-gray-600 transition-transform ${isMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></span>
               <span className={`block w-6 h-0.5 bg-gray-600 transition-opacity ${isMenuOpen ? 'opacity-0' : ''}`}></span>
@@ -106,7 +106,7 @@ export default function Header() {
 
             {/* Mobile Menu Overlay */}
       {isMenuOpen && (
-        <div className="fixed inset-0 bg-[#d5fbfe] z-50 md:hidden">
+        <div className="fixed inset-0 bg-[#d5fbfe] z-50 lg:hidden">
           {/* Close Button */}
           <div className="absolute top-4 right-4">
             <button
@@ -128,7 +128,7 @@ export default function Header() {
                   key={category.id}
                   href={`/blog?category=${category.id}`}
                   onClick={closeMenu}
-                  className="bg-white border border-black rounded-[10px] px-4 py-2 w-[200px] text-center"
+                  className="bg-white border border-black rounded-[10px] px-4 py-2 w-full max-w-[240px] text-center"
                 >
                   <span className="text-[#2204db] text-[24px] font-bold" style={{ fontFamily: 'Dela Gothic One, sans-serif' }}>
                     {category.name}
@@ -139,7 +139,7 @@ export default function Header() {
                 <Link
                   href="/contact"
                   onClick={closeMenu}
-                  className="bg-white border border-black rounded-[10px] px-4 py-2 w-[200px] text-center"
+                  className="bg-white border border-black rounded-[10px] px-4 py-2 w-full max-w-[240px] text-center"
                 >
                   <span className="text-[#2204db] text-[24px] font-bold" style={{ fontFamily: 'Dela Gothic One, sans-serif' }}>
                     お問い合わせ
@@ -149,7 +149,7 @@ export default function Header() {
                 <Link
                   href="/about"
                   onClick={closeMenu}
-                  className="bg-white border border-black rounded-[10px] px-4 py-2 w-[200px] text-center"
+                  className="bg-white border border-black rounded-[10px] px-4 py-2 w-full max-w-[240px] text-center"
                 >
                   <span className="text-[#2204db] text-[24px] font-bold" style={{ fontFamily: 'Dela Gothic One, sans-serif' }}>
                     ライドジョブについて

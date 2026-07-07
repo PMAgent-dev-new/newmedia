@@ -71,7 +71,7 @@ export default function Footer() {
           </div>
         </div>
         <div
-          className="box-border content-stretch flex flex-row gap-8 items-start justify-center p-0 relative shrink-0 w-full"
+          className="box-border content-stretch flex flex-col gap-8 items-start md:flex-row md:justify-center p-0 relative shrink-0 w-full"
           data-name="Container"
           id="node-2064_25"
         >
