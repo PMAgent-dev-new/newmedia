@@ -97,3 +97,38 @@ export function webSiteLd() {
 export function ldJson(obj: unknown): string {
   return JSON.stringify(obj).replace(/</g, '\\u003c');
 }
+
+/**
+ * 本文HTMLの「よくある質問」セクションから Q&A を抽出する。
+ * `<h2>よくある質問</h2>` 以降に並ぶ `<h3>Q. …</h3><p>A. …</p>` のペアを拾う。
+ * 該当が無ければ空配列（FAQPage は出力されない）。
+ */
+export function extractFaqFromHtml(html?: string): { q: string; a: string }[] {
+  if (!html) return [];
+  const idx = html.indexOf('よくある質問');
+  if (idx === -1) return [];
+  const section = html.slice(idx);
+  const faqs: { q: string; a: string }[] = [];
+  const re = /<h3[^>]*>([\s\S]*?)<\/h3>\s*<p[^>]*>([\s\S]*?)<\/p>/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(section)) !== null) {
+    const q = m[1].replace(/<[^>]*>/g, '').replace(/^Q[.．、:：]?\s*/, '').trim();
+    const a = m[2].replace(/<[^>]*>/g, '').replace(/^A[.．、:：]?\s*/, '').trim();
+    if (q && a) faqs.push({ q, a });
+  }
+  return faqs;
+}
+
+/** FAQPage 構造化データ（Q&A が無ければ null） */
+export function faqPageLd(faqs: { q: string; a: string }[]) {
+  if (!faqs.length) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  };
+}

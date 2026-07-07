@@ -14,6 +14,8 @@ import { getRelatedBlogs } from '@/lib/blogHelpers';
 import {
   blogPostingLd,
   breadcrumbLd,
+  faqPageLd,
+  extractFaqFromHtml,
   blogPath,
   htmlToDescription,
   ldJson,
@@ -139,6 +141,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     notFound();
   }
 
+  const faqLd = faqPageLd(extractFaqFromHtml(blog.html || blog.content));
   const structuredData = [
     blogPostingLd(blog),
     breadcrumbLd([
@@ -148,6 +151,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
         : []),
       { name: blog.title },
     ]),
+    ...(faqLd ? [faqLd] : []),
   ];
 
   return (
