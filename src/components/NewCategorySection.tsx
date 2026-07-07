@@ -94,7 +94,7 @@ export default function NewCategorySection({ categories }: NewCategorySectionPro
             alt="ご利用者様の声"
             width={680}
             height={222}
-            className="min-h-[120px] h-[150px] md:h-[200px] lg:h-[222px] w-full min-w-[380px] max-w-[400px] mx-auto lg:max-w-none lg:w-[680px] lg:mx-0 object-contain cursor-pointer"
+            className="min-h-[120px] h-[150px] md:h-[200px] lg:h-[222px] w-full min-w-0 max-w-[400px] mx-auto lg:max-w-none lg:w-[680px] lg:mx-0 object-contain cursor-pointer"
             loading="lazy"
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 680px"
           />
@@ -108,7 +108,7 @@ export default function NewCategorySection({ categories }: NewCategorySectionPro
             alt="お役立ち情報"
             width={680}
             height={222}
-            className="min-h-[120px] h-[150px] md:h-[200px] lg:h-[222px] w-full min-w-[380px] max-w-[400px] mx-auto lg:max-w-none lg:w-[680px] lg:mx-0 object-contain cursor-pointer"
+            className="min-h-[120px] h-[150px] md:h-[200px] lg:h-[222px] w-full min-w-0 max-w-[400px] mx-auto lg:max-w-none lg:w-[680px] lg:mx-0 object-contain cursor-pointer"
             loading="lazy"
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 680px"
           />
@@ -122,7 +122,7 @@ export default function NewCategorySection({ categories }: NewCategorySectionPro
             alt="企業取材"
             width={680}
             height={222}
-            className="min-h-[120px] h-[150px] md:h-[200px] lg:h-[222px] w-full min-w-[380px] max-w-[400px] mx-auto lg:max-w-none lg:w-[680px] lg:mx-0 object-contain cursor-pointer"
+            className="min-h-[120px] h-[150px] md:h-[200px] lg:h-[222px] w-full min-w-0 max-w-[400px] mx-auto lg:max-w-none lg:w-[680px] lg:mx-0 object-contain cursor-pointer"
             loading="lazy"
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 680px"
           />
@@ -136,7 +136,7 @@ export default function NewCategorySection({ categories }: NewCategorySectionPro
             alt="インタビュー"
             width={680}
             height={222}
-            className="min-h-[120px] h-[150px] md:h-[200px] lg:h-[222px] w-full min-w-[380px] max-w-[400px] mx-auto lg:max-w-none lg:w-[680px] lg:mx-0 object-contain cursor-pointer"
+            className="min-h-[120px] h-[150px] md:h-[200px] lg:h-[222px] w-full min-w-0 max-w-[400px] mx-auto lg:max-w-none lg:w-[680px] lg:mx-0 object-contain cursor-pointer"
             loading="lazy"
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 680px"
           />

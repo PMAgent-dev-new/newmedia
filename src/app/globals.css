@@ -108,7 +108,12 @@ body {
 }
 
 .article-content table {
-  @apply w-full border-collapse border border-gray-300 my-8 text-[15px];
+  @apply border-collapse border border-gray-300 my-8 text-[15px];
+  /* 狭い画面でも横スクロールで収める（テーブルがビューポート幅を超えるのを防ぐ） */
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
 }
 
 .article-content th {
@@ -136,12 +141,26 @@ body {
   @apply w-full h-auto rounded-lg shadow-sm mb-6;
 }
 
+/* 記事HTML内の table / pre はビューポート幅を超えないよう横スクロールに収める（--chat / --editorial 両対応） */
+.article-content-html table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+.article-content-html pre {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
 /* HTML入力用: chat（既存の対話型） */
 .article-content-html--chat h2 {
   position: relative;
   padding: 1.5rem;
   text-align: center;
-  font-size: 32px;
+  /* 577–768px帯でも縮むように clamp（576px以下の縮小指定は維持） */
+  font-size: clamp(1.5rem, 4.5vw, 32px);
   margin-bottom: 80px;
   font-weight: bold;
   color: #333;
@@ -494,8 +513,8 @@ body {
   }
 
   .article-content-html--chat .bubble {
-    max-width: 70%;
-    padding: 15px;
+    max-width: 85%;
+    padding: 12px;
     border: 1px solid #999;
   }
 

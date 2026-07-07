@@ -29,7 +29,7 @@ export default async function NewInterviewSection() {
         }}
       />
 
-      <div className="box-border content-stretch flex flex-col gap-2.5 items-center justify-center md:px-8 lg:px-[432px] py-0 relative rounded-tl-[80px] shrink-0 w-full relative z-10">
+      <div className="box-border content-stretch flex flex-col gap-2.5 items-center justify-center md:px-8 lg:px-16 xl:px-[432px] py-0 relative rounded-tl-[80px] shrink-0 w-full relative z-10">
         <InterviewStaffSection members={members} />
         <InterviewVideoSection />
         <HelpSection />
