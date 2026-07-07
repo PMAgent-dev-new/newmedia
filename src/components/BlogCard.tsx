@@ -39,13 +39,14 @@ export default function BlogCard({ blog }: BlogCardProps) {
   return (
     <Link href={linkHref} className="block">
       <div className="bg-white rounded-[12px] shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer border border-black">
-        {/* アイキャッチ画像 */}
-        <div className="relative w-full h-[180px] sm:h-[200px] md:h-[180px]">
+        {/* アイキャッチ画像（16:9・文字焼き込みサムネイルが切れないようアスペクト比を画像に一致） */}
+        <div className="relative w-full aspect-video bg-[#f5f8ff]">
           {blog.eyecatch?.url ? (
             <Image
               src={blog.eyecatch.url}
               alt={blog.title || '記事画像'}
               fill
+              sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
               className="object-cover"
             />
           ) : (
@@ -53,7 +54,7 @@ export default function BlogCard({ blog }: BlogCardProps) {
               <span className="text-gray-400 text-sm">画像なし</span>
             </div>
           )}
-          
+
         </div>
 
         {/* 記事情報 */}
