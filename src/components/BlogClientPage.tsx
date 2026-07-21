@@ -10,16 +10,20 @@ interface BlogClientPageProps {
   blogs: Blog[];
   categories: Category[];
   pickupArticles: Blog[];
+  /** サーバー側でURLの ?category から解決した初期カテゴリ（初回描画から確実に絞り込むため） */
+  initialCategory?: string | null;
 }
 
-export default function BlogClientPage({ blogs, categories, pickupArticles }: BlogClientPageProps) {
+export default function BlogClientPage({ blogs, categories, pickupArticles, initialCategory = null }: BlogClientPageProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  
-  // URLパラメータからカテゴリを取得
+
+  // URLパラメータからカテゴリを取得（初期値はサーバー解決分を採用し、初回描画から絞り込む）
   const categoryParam = searchParams.get('category');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    initialCategory ? [initialCategory] : []
+  );
 
   // URLパラメータが変更された時にselectedCategoriesを更新
   useEffect(() => {

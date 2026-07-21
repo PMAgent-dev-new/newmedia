@@ -85,6 +85,55 @@ export async function getLatestBlogs(limit: number = 6): Promise<BlogsResponse> 
 }
 
 /**
+ * 一覧表示用に全ブログを取得（公開日降順・全件をページネーションで取得）。
+ * カテゴリ絞り込みはクライアント側で行うため全件を返す。
+ * カード表示に必要なフィールドのみ取得し、本文(content/html)は含めずペイロードを抑える。
+ * @returns Blog[]（公開日降順・全件）
+ */
+export async function getAllBlogsForList(): Promise<Blog[]> {
+  // 環境変数の検証
+  if (!API_KEY || !SERVICE_DOMAIN) {
+    console.error('MicroCMS environment variables are not properly configured');
+    return [];
+  }
+
+  const fields = 'id,title,slug,eyecatch,category,publishedAt,createdAt';
+  const pageSize = 100;
+  const all: Blog[] = [];
+
+  try {
+    for (let offset = 0; offset <= 5000; offset += pageSize) {
+      const url = `${BASE_URL}/blogs?limit=${pageSize}&offset=${offset}&orders=-publishedAt&fields=${fields}`;
+      const res = await fetch(url, {
+        headers: {
+          "X-MICROCMS-API-KEY": API_KEY,
+        },
+        cache: "no-store",
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error(`getAllBlogsForList API Error ${res.status}:`, errorText);
+        break;
+      }
+
+      const data: BlogsResponse = await res.json();
+      const contents = data.contents || [];
+      all.push(...contents);
+
+      const total = typeof data.totalCount === 'number' ? data.totalCount : all.length;
+      if (all.length >= total || contents.length === 0) {
+        break;
+      }
+    }
+  } catch (error) {
+    console.error('getAllBlogsForList Network or parsing error:', error);
+  }
+
+  return all;
+}
+
+/**
  * 特定カテゴリのブログを取得
  * @param categoryId カテゴリのコンテンツID（例: "2"）
  * @param limit 取得件数（デフォルト: 6）
