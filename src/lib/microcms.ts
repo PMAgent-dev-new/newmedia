@@ -97,7 +97,7 @@ export async function getAllBlogsForList(): Promise<Blog[]> {
     return [];
   }
 
-  const fields = 'id,title,slug,eyecatch,category,publishedAt,createdAt';
+  const fields = 'id,title,slug,eyecatch,category,publishedAt,createdAt,revisedAt';
   const pageSize = 100;
   const all: Blog[] = [];
 
@@ -130,7 +130,25 @@ export async function getAllBlogsForList(): Promise<Blog[]> {
     console.error('getAllBlogsForList Network or parsing error:', error);
   }
 
-  return all;
+  // slug重複を除去：同一slugは最新(revisedAt→publishedAt)の1件のみ残す。
+  // 旧移行の下書き重複レコードが一覧に二重表示されるのを防ぐ。slug無し記事は全件保持。
+  const bySlug = new Map<string, Blog>();
+  const noSlug: Blog[] = [];
+  const stamp = (b: Blog) => b.revisedAt || b.publishedAt || '';
+  for (const b of all) {
+    if (!b.slug) {
+      noSlug.push(b);
+      continue;
+    }
+    const existing = bySlug.get(b.slug);
+    if (!existing || stamp(b) > stamp(existing)) {
+      bySlug.set(b.slug, b);
+    }
+  }
+  const deduped = [...noSlug, ...bySlug.values()];
+  deduped.sort((a, b) => (b.publishedAt || '').localeCompare(a.publishedAt || ''));
+
+  return deduped;
 }
 
 /**
@@ -393,7 +411,8 @@ export async function getBlogBySlug(slug: string): Promise<Blog | null> {
 
   try {
     const filters = encodeURIComponent(`slug[equals]${slug}`);
-    const url = `${BASE_URL}/blogs?filters=${filters}&limit=1`;
+    // 同一slugが複数存在する場合（旧移行の重複レコード等）は最新の改訂を優先し、公開版へ解決する
+    const url = `${BASE_URL}/blogs?filters=${filters}&limit=1&orders=-revisedAt`;
     console.log('Fetching blog by slug from URL:', url);
 
     const res = await fetch(url, {
