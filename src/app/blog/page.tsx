@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import BlogClientPage from '@/components/BlogClientPage';
 import BlogCTASection from '@/components/BlogCTASection';
 import { Blog, Category } from '@/types/microcms';
-import { getLatestBlogs, getAllCategories } from '@/lib/microcms';
+import { getLatestBlogs, getAllBlogsForList, getAllCategories } from '@/lib/microcms';
 
 export const metadata: Metadata = {
   title: '記事一覧',
@@ -17,7 +17,15 @@ export const metadata: Metadata = {
   alternates: { canonical: '/media/blog' },
 };
 
-export default async function BlogPage() {
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
+  // 選択カテゴリをサーバー側で解決（クライアントのハイドレーション待ちに依存しない）
+  const { category } = await searchParams;
+  const initialCategory = category ?? null;
+
   // サーバーサイドでデータ取得
   let blogs: Blog[] = [];
   let categories: Category[] = [];
@@ -25,10 +33,11 @@ export default async function BlogPage() {
   let error: string | null = null;
 
   try {
-    // ブログを取得
+    // ブログを全件取得（カテゴリ絞り込みはクライアント側で実施）。
+    // 最新50件のみだと、公開の新しいカテゴリ（お役立ち情報）に押し出され
+    // 他カテゴリの記事が一覧に出ない不具合になるため全件取得する。
     try {
-      const blogsResponse = await getLatestBlogs(50);
-      blogs = blogsResponse.contents || [];
+      blogs = await getAllBlogsForList();
       console.log('Blogs loaded successfully:', blogs.length);
     } catch (blogError) {
       console.error('ブログの取得に失敗しました:', blogError);
@@ -90,7 +99,7 @@ export default async function BlogPage() {
         <div className="container mx-auto px-4 py-8">
           <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
             <Suspense fallback={<div>Loading...</div>}>
-              <BlogClientPage blogs={blogs} categories={categories} pickupArticles={pickupArticles} />
+              <BlogClientPage blogs={blogs} categories={categories} pickupArticles={pickupArticles} initialCategory={initialCategory} />
             </Suspense>
           </div>
         </div>
