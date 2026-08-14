@@ -23,13 +23,20 @@ const escapeAttr = (s: string) =>
 
 export function upgradeYouTubeLinks(html: string): string {
   if (!html || !html.includes("youtube.com/watch")) return html
+  // 同じ動画IDが「リンク1本だけの段落」として2回書かれた記事では、両方が昇格して
+  // 同じプレーヤーが並ぶ。既に出した分をここで覚えておく（下の includes は変換前の
+  // 入力しか見ないので、この回で発行したものは検出できない）。
+  const emitted = new Set<string>()
   return html.replace(PARAGRAPH_WITH_SINGLE_LINK, (whole, id: string, label: string) => {
     if (!VIDEO_ID.test(id)) return whole
     // `html` フィールドの記事は iframe が剥がされずCMSに残っている（taxi-driver-salary）。
     // そこへ昇格を重ねると同じ動画のプレーヤーが2つ並ぶので、既にあるなら何もしない。
-    if (html.includes(`/embed/${id}`)) return whole
+    if (html.includes(`/embed/${id}`) || emitted.has(id)) return whole
+    emitted.add(id)
     const plain = label.replace(/<[^>]+>/g, "").trim()
-    const title = escapeAttr(plain || "YouTube動画")
+    // リンクテキストがURLそのものの記事がある。title はスクリーンリーダーが読み上げる
+    // 唯一のラベルなので、URLを読み上げさせず既定のラベルに落とす。
+    const title = escapeAttr(plain && !/^https?:\/\//i.test(plain) ? plain : "YouTube動画")
     // Cookie同意（CMP）が未導入のため nocookie ドメインを使う。
     return (
       `<div class="yt-embed">` +
