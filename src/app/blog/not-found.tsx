@@ -4,12 +4,16 @@ import Header from '@/components/Header';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import Footer from '@/components/Footer';
 
+/**
+ * /media/blog 配下の404。記事だけでなく、範囲外のページ番号や存在しないカテゴリも
+ * ここに来るよう [slug] から1階層上げた（Nextは最も近い not-found を使う）。
+ */
 export default function NotFound() {
   return (
     <div className="font-sans min-h-screen">
       <Header />
       <Breadcrumbs 
-        pageName="記事が見つかりません" 
+        pageName="ページが見つかりません" 
       />
       
       {/* メインコンテンツ - 背景画像付きセクション */}
@@ -23,9 +27,9 @@ export default function NotFound() {
             <div className="text-center py-16">
               <div className="mb-8">
                 <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
-                <h2 className="text-2xl font-semibold text-gray-700 mb-6">記事が見つかりません</h2>
+                <h2 className="text-2xl font-semibold text-gray-700 mb-6">ページが見つかりません</h2>
                 <p className="text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">
-                  お探しの記事は存在しないか、削除された可能性があります。<br />
+                  お探しのページは存在しないか、削除された可能性があります。<br />
                   URLをご確認いただくか、下記のリンクからお戻りください。
                 </p>
               </div>
@@ -35,7 +39,7 @@ export default function NotFound() {
                   href="/blog"
                   className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
                 >
-                  ブログ一覧に戻る
+                  記事一覧に戻る
                 </Link>
                 <Link 
                   href="/"

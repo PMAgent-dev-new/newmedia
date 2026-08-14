@@ -1,114 +1,56 @@
-import { Suspense } from 'react';
 import type { Metadata } from 'next';
+import { notFound, permanentRedirect } from 'next/navigation';
+import BlogListPageView from '@/components/BlogListPageView';
 import { withBasePath } from '@/lib/basePath';
-import Header from '@/components/Header';
-import Breadcrumbs from '@/components/Breadcrumbs';
-import Footer from '@/components/Footer';
-import BlogClientPage from '@/components/BlogClientPage';
-import BlogCTASection from '@/components/BlogCTASection';
-import { Blog, Category } from '@/types/microcms';
-import { getLatestBlogs, getAllBlogsForList, getAllCategories } from '@/lib/microcms';
+import {
+  BLOG_BASE_HREF,
+  categoryHref,
+  findCategory,
+  getBlogList,
+  listHref,
+  loadBlogListPage,
+  parsePageParam,
+  summarizeCategories,
+} from '@/lib/blogList';
+
+// セグメント設定はリテラルでないとNextが読めない。allBlogs.ts の ALL_BLOGS_REVALIDATE と揃える
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: '記事一覧',
   description:
     'タクシー・自動車整備士・ドライバー業界の仕事や転職に役立つ記事を配信するRIDE JOB Mediaの記事一覧です。',
-  // ?category パラメータ付きURLも記事一覧本体へ集約する
-  alternates: { canonical: '/media/blog' },
+  alternates: { canonical: withBasePath(BLOG_BASE_HREF) },
 };
 
+/**
+ * 記事一覧の1ページ目。
+ *
+ * 旧URLのクエリは実体のあるパスへ寄せる。?category= は検索結果にも残っており、
+ * ?page= は「常に1ページ目が返る」死んだパラメータだった。
+ */
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; page?: string }>;
 }) {
-  // 選択カテゴリをサーバー側で解決（クライアントのハイドレーション待ちに依存しない）
-  const { category } = await searchParams;
-  const initialCategory = category ?? null;
+  const { category: categoryParam, page: pageParam } = await searchParams;
 
-  // サーバーサイドでデータ取得
-  let blogs: Blog[] = [];
-  let categories: Category[] = [];
-  let pickupArticles: Blog[] = [];
-  let error: string | null = null;
-
-  try {
-    // ブログを全件取得（カテゴリ絞り込みはクライアント側で実施）。
-    // 最新50件のみだと、公開の新しいカテゴリ（お役立ち情報）に押し出され
-    // 他カテゴリの記事が一覧に出ない不具合になるため全件取得する。
-    try {
-      blogs = await getAllBlogsForList();
-      console.log('Blogs loaded successfully:', blogs.length);
-    } catch (blogError) {
-      console.error('ブログの取得に失敗しました:', blogError);
-    }
-
-    // カテゴリを取得
-    try {
-      categories = await getAllCategories();
-      console.log('Categories loaded successfully:', categories.length);
-    } catch (categoryError) {
-      console.error('カテゴリの取得に失敗しました:', categoryError);
-    }
-
-    // ピックアップ記事: 最新記事3件を取得
-    try {
-      const pickupResponse = await getLatestBlogs(3);
-      pickupArticles = pickupResponse.contents || [];
-      console.log('Pickup (latest) articles loaded successfully:', pickupArticles.length);
-    } catch (pickupError) {
-      console.error('ピックアップ記事（最新3件）の取得に失敗しました:', pickupError);
-    }
-  } catch (err) {
-    console.error('データの取得に失敗しました:', err);
-    error = 'データの取得に失敗しました。';
+  if (categoryParam) {
+    const categories = summarizeCategories(await getBlogList());
+    const category = findCategory(categories, categoryParam);
+    // 記事0件のカテゴリ（ピックアップ・特殊）を指す旧URLもあるため、
+    // 引けないときは404にせず一覧本体へ寄せてパラメータ自体を索引から消す
+    permanentRedirect(category ? categoryHref(category) : BLOG_BASE_HREF);
   }
 
-  if (error) {
-    return (
-      <div className="font-sans min-h-screen bg-gray-50">
-        <Header />
-        <Breadcrumbs />
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-red-600 mb-4">エラーが発生しました</h1>
-            <p className="text-gray-600">{error}</p>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
+  if (pageParam) {
+    const page = parsePageParam(pageParam);
+    permanentRedirect(page ? listHref(BLOG_BASE_HREF, page) : BLOG_BASE_HREF);
   }
 
-  return (
-    <div className="font-sans min-h-screen">
-      <Header />
-      <Breadcrumbs pageName="ブログ一覧" />
-      
-      {/* メインコンテンツ - 背景画像付きセクション */}
-      <main
-        className="min-h-screen"
-        style={{
-          backgroundImage: `url('${withBasePath('/figma/blue-bg.png')}')`,
-          backgroundSize: 'auto',
-          backgroundRepeat: 'repeat',
-          backgroundPosition: 'top left',
-        }}
-      >
-        {/* 白い背景のコンテナ */}
-        <div className="container mx-auto px-4 py-8">
-          <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
-            <Suspense fallback={<div>Loading...</div>}>
-              <BlogClientPage blogs={blogs} categories={categories} pickupArticles={pickupArticles} initialCategory={initialCategory} />
-            </Suspense>
-          </div>
-        </div>
-      </main>
-      
-      {/* CTAセクション */}
-      <BlogCTASection />
-      
-      <Footer />
-    </div>
-  );
+  const data = await loadBlogListPage({ page: 1 });
+  if (!data) notFound();
+
+  return <BlogListPageView data={data} />;
 }

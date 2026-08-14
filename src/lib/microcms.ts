@@ -1,4 +1,4 @@
-import { BlogsResponse, MembersResponse, JobsResponse, Category, Blog, LogosResponse } from "@/types/microcms";
+import { BlogsResponse, MembersResponse, JobsResponse, Blog, LogosResponse } from "@/types/microcms";
 
 // 環境変数の確認とフォールバック
 const getEnvVar = (key: string, fallback?: string): string => {
@@ -82,73 +82,6 @@ export async function getLatestBlogs(limit: number = 6): Promise<BlogsResponse> 
       limit: limit
     };
   }
-}
-
-/**
- * 一覧表示用に全ブログを取得（公開日降順・全件をページネーションで取得）。
- * カテゴリ絞り込みはクライアント側で行うため全件を返す。
- * カード表示に必要なフィールドのみ取得し、本文(content/html)は含めずペイロードを抑える。
- * @returns Blog[]（公開日降順・全件）
- */
-export async function getAllBlogsForList(): Promise<Blog[]> {
-  // 環境変数の検証
-  if (!API_KEY || !SERVICE_DOMAIN) {
-    console.error('MicroCMS environment variables are not properly configured');
-    return [];
-  }
-
-  const fields = 'id,title,slug,eyecatch,category,publishedAt,createdAt,revisedAt';
-  const pageSize = 100;
-  const all: Blog[] = [];
-
-  try {
-    for (let offset = 0; offset <= 5000; offset += pageSize) {
-      const url = `${BASE_URL}/blogs?limit=${pageSize}&offset=${offset}&orders=-publishedAt&fields=${fields}`;
-      const res = await fetch(url, {
-        headers: {
-          "X-MICROCMS-API-KEY": API_KEY,
-        },
-        cache: "no-store",
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error(`getAllBlogsForList API Error ${res.status}:`, errorText);
-        break;
-      }
-
-      const data: BlogsResponse = await res.json();
-      const contents = data.contents || [];
-      all.push(...contents);
-
-      const total = typeof data.totalCount === 'number' ? data.totalCount : all.length;
-      if (all.length >= total || contents.length === 0) {
-        break;
-      }
-    }
-  } catch (error) {
-    console.error('getAllBlogsForList Network or parsing error:', error);
-  }
-
-  // slug重複を除去：同一slugは最新(revisedAt→publishedAt)の1件のみ残す。
-  // 旧移行の下書き重複レコードが一覧に二重表示されるのを防ぐ。slug無し記事は全件保持。
-  const bySlug = new Map<string, Blog>();
-  const noSlug: Blog[] = [];
-  const stamp = (b: Blog) => b.revisedAt || b.publishedAt || '';
-  for (const b of all) {
-    if (!b.slug) {
-      noSlug.push(b);
-      continue;
-    }
-    const existing = bySlug.get(b.slug);
-    if (!existing || stamp(b) > stamp(existing)) {
-      bySlug.set(b.slug, b);
-    }
-  }
-  const deduped = [...noSlug, ...bySlug.values()];
-  deduped.sort((a, b) => (b.publishedAt || '').localeCompare(a.publishedAt || ''));
-
-  return deduped;
 }
 
 /**
@@ -374,30 +307,6 @@ export async function getLogos(limit: number = 20): Promise<LogosResponse> {
 }
 
 /**
- * ブログ記事からカテゴリを抽出
- * @returns Category[]
- */
-export async function getCategoriesFromBlogs(): Promise<Category[]> {
-  try {
-    const blogsResponse = await getLatestBlogs(50); // 最新記事からカテゴリを抽出
-    const blogs = blogsResponse.contents || [];
-    
-    const categoryMap = new Map<string, Category>();
-    
-    blogs.forEach(blog => {
-      if (blog.category && !categoryMap.has(blog.category.id)) {
-        categoryMap.set(blog.category.id, blog.category);
-      }
-    });
-    
-    return Array.from(categoryMap.values());
-  } catch (error) {
-    console.error('Failed to extract categories from blogs:', error);
-    return [];
-  }
-}
-
-/**
  * スラッグで単一ブログ記事を取得
  * @param slug 記事のスラッグ
  * @returns Blog | null
@@ -486,55 +395,3 @@ export async function getBlogById(id: string, draftKey?: string): Promise<Blog |
     return null;
   }
 }
-
-/**
- * 全カテゴリを取得（複数の方法を試行）
- * @returns Category[]
- */
-export async function getAllCategories(): Promise<Category[]> {
-  try {
-    // 1. 専用のcategoriesエンドポイントを試行
-    const url = `${BASE_URL}/categories?limit=100&orders=-publishedAt`;
-
-    const res = await fetch(url, {
-      headers: {
-        "X-MICROCMS-API-KEY": API_KEY,
-      },
-      cache: "no-store",
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      const categories = data.contents || [];
-      if (categories.length > 0) {
-        return categories;
-      }
-    }
-
-    console.warn(`Categories endpoint returned ${res.status}, trying to extract from blogs`);
-    
-    // 2. ブログ記事からカテゴリを抽出
-    const categoriesFromBlogs = await getCategoriesFromBlogs();
-    if (categoriesFromBlogs.length > 0) {
-      return categoriesFromBlogs;
-    }
-
-    // 3. フォールバックカテゴリを返す
-    console.warn('No categories found, using fallback categories');
-    return [
-      { id: '2', name: '企業取材', slug: 'company-interview', createdAt: '', updatedAt: '', publishedAt: '', revisedAt: '' },
-      { id: 'rqk2lr41z', name: 'ピックアップ', slug: 'pickup', createdAt: '', updatedAt: '', publishedAt: '', revisedAt: '' },
-      { id: '5', name: 'インタビュー', slug: 'interview', createdAt: '', updatedAt: '', publishedAt: '', revisedAt: '' },
-      { id: '4', name: 'お役立ち情報', slug: 'helpful-info', createdAt: '', updatedAt: '', publishedAt: '', revisedAt: '' }
-    ];
-  } catch (error) {
-    console.error('Failed to fetch categories, using fallback:', error);
-    // エラー時もフォールバックカテゴリを返す
-    return [
-      { id: '2', name: '企業取材', slug: 'company-interview', createdAt: '', updatedAt: '', publishedAt: '', revisedAt: '' },
-      { id: 'rqk2lr41z', name: 'ピックアップ', slug: 'pickup', createdAt: '', updatedAt: '', publishedAt: '', revisedAt: '' },
-      { id: '5', name: 'インタビュー', slug: 'interview', createdAt: '', updatedAt: '', publishedAt: '', revisedAt: '' },
-      { id: '4', name: 'お役立ち情報', slug: 'helpful-info', createdAt: '', updatedAt: '', publishedAt: '', revisedAt: '' }
-    ];
-  }
-} 

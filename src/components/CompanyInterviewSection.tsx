@@ -4,7 +4,7 @@ import { withBasePath } from '@/lib/basePath';
 import Link from 'next/link';
 import { Blog } from '@/types/microcms';
 import { fetchBlogsWithFallback } from '@/lib/blogHelpers';
-import { CATEGORY_IDS } from '@/constants/categories';
+import { CATEGORY_IDS, categoryPathById } from '@/constants/categories';
 
 const imgSection2CompanyInterview = "/figma/company-interview-bg.png";
 const imgHeading021 = "/figma/heading-02.png";
@@ -180,7 +180,7 @@ export default async function CompanyInterviewSection() {
             
             {/* Button */}
             <div className="flex flex-col items-center justify-center mt-4 md:mt-6 lg:mt-8">
-              <Link href={`/blog?category=${CATEGORY_IDS.COMPANY_INTERVIEW}`} className="block">
+              <Link href={categoryPathById(CATEGORY_IDS.COMPANY_INTERVIEW)} className="block">
                 <div className="bg-[#04acdb] box-border content-stretch flex flex-row gap-4 items-center justify-center pl-6 pr-4 py-4 relative rounded-[58px] shrink-0 cursor-pointer shadow-[4px_4px_0px_0px_rgba(19,19,19,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(19,19,19,0.3)] transition-shadow">
                   <div
                     aria-hidden="true"

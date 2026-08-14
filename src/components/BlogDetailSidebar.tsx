@@ -1,16 +1,20 @@
-import { Category, Blog } from '@/types/microcms';
+import { Blog } from '@/types/microcms';
+import type { CategorySummary } from '@/lib/blogList';
 import PickupArticles from './PickupArticles';
 import { withBasePath } from '@/lib/basePath';
 import Image from 'next/image';
-import Link from 'next/link';
+import CategoryNav from './CategoryNav';
 
 interface BlogDetailSidebarProps {
-  categories: Category[];
+  categories: CategorySummary[];
+  /** 表示中の記事のカテゴリID（サイドバーで現在地を示す）。 */
+  activeCategoryId?: string | null;
   pickupArticles: Blog[];
 }
 
 export default function BlogDetailSidebar({
   categories,
+  activeCategoryId = null,
   pickupArticles
 }: BlogDetailSidebarProps) {
   return (
@@ -34,22 +38,8 @@ export default function BlogDetailSidebar({
         <p className="text-xs text-gray-500 mt-2">※ キーワード検索は準備中です</p>
       </div>
 
-      {/* カテゴリ一覧（リンク化） */}
-      <div className="bg-white rounded-[12px] p-3 sm:p-4 shadow-sm">
-        <h3 className="text-[#333333] font-bold text-base sm:text-lg mb-3 sm:mb-4">カテゴリ</h3>
-        <div className="space-y-2">
-          {categories.map((category) => (
-            <div key={category.id} className="flex items-center">
-              <Link
-                href={{ pathname: '/blog', query: { category: category.id } }}
-                className="text-sm text-[#333333] hover:text-[#0066ff] cursor-pointer transition-colors"
-              >
-                {category.name}
-              </Link>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* カテゴリ一覧（カテゴリ別一覧の実URLへ） */}
+      <CategoryNav categories={categories} activeCategoryId={activeCategoryId} />
 
       {/* ピックアップ記事 */}
       <PickupArticles articles={pickupArticles} />

@@ -6,9 +6,10 @@ import BlogDetailSection from '@/components/BlogDetailSection';
 import BlogDetailSidebar from '@/components/BlogDetailSidebar';
 import BlogCTASection from '@/components/BlogCTASection';
 import RelatedArticlesSection from '@/components/RelatedArticlesSection';
-import { getBlogById, getAllCategories, getLatestBlogs } from '@/lib/microcms';
+import { getBlogById, getLatestBlogs } from '@/lib/microcms';
 import { withBasePath } from '@/lib/basePath';
 import { getRelatedBlogs } from '@/lib/blogHelpers';
+import { getBlogList, summarizeCategories } from '@/lib/blogList';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -54,7 +55,7 @@ export default async function BlogPreviewPage({ searchParams }: PreviewPageProps
   }
 
   const [categoriesRes, pickupRes, relatedRes] = await Promise.allSettled([
-    getAllCategories(),
+    getBlogList().then(summarizeCategories),
     getLatestBlogs(3),
     getRelatedBlogs(blog, 3),
   ]);
@@ -84,7 +85,11 @@ export default async function BlogPreviewPage({ searchParams }: PreviewPageProps
                 <RelatedArticlesSection articles={relatedArticles} />
               </div>
               <aside className="hidden lg:block lg:order-last">
-                <BlogDetailSidebar categories={categories} pickupArticles={pickupArticles} />
+                <BlogDetailSidebar
+                  categories={categories}
+                  activeCategoryId={blog.category?.id ?? null}
+                  pickupArticles={pickupArticles}
+                />
               </aside>
             </div>
           </div>
