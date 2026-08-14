@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [
     { url: buildUrl("/"), lastModified: new Date() },
     { url: buildUrl("/blog"), lastModified: new Date() },
+    { url: buildUrl("/videos"), lastModified: new Date() },
     { url: buildUrl("/about"), lastModified: new Date() },
     { url: buildUrl("/privacy"), lastModified: new Date() },
     { url: buildUrl("/contact"), lastModified: new Date() },

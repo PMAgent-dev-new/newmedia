@@ -53,6 +53,13 @@ export default function Header() {
                 ))}
                 {/* Additional Links */}
                 <Link
+                  href="/videos"
+                  className="text-[#555555] font-bold hover:opacity-80 transition-opacity whitespace-nowrap"
+                  aria-label="動画で見る一覧へ"
+                >
+                  動画で見る
+                </Link>
+                <Link
                   href="/contact"
                   className="text-[#555555] font-bold hover:opacity-80 transition-opacity whitespace-nowrap"
                   aria-label="お問い合わせページへ"
@@ -135,6 +142,16 @@ export default function Header() {
                   </span>
                 </Link>
               ))}
+                {/* 動画で見る */}
+                <Link
+                  href="/videos"
+                  onClick={closeMenu}
+                  className="bg-white border border-black rounded-[10px] px-4 py-2 w-full max-w-[240px] text-center"
+                >
+                  <span className="text-[#2204db] text-[24px] font-bold" style={{ fontFamily: 'Dela Gothic One, sans-serif' }}>
+                    動画で見る
+                  </span>
+                </Link>
                 {/* お問い合わせ */}
                 <Link
                   href="/contact"
