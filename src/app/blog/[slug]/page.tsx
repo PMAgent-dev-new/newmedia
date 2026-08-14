@@ -83,18 +83,15 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   let relatedArticles: Blog[] = [];
   let error: string | null = null;
 
+  // 記事の取得は try の外で行う。notFound() は例外を投げて Next に 404 を出させる仕組みなので、
+  // try の中で呼ぶと下の catch が制御例外を飲み込み、HTTP 200 で「エラーが発生しました」を返す
+  // ソフト404になる（実測: 存在しない記事URLも /media/blog/page も本番で200だった）。
+  blog = (await getBlogBySlug(slug)) ?? (await getBlogById(slug));
+  if (!blog) {
+    notFound();
+  }
+
   try {
-    // メインの記事を取得（スラッグまたはIDで）
-    blog = await getBlogBySlug(slug);
-    
-    // スラッグで見つからない場合、IDで検索を試行
-    if (!blog) {
-      blog = await getBlogById(slug);
-    }
-    
-    if (!blog) {
-      notFound();
-    }
 
     // サイドバー用のデータを並行取得
     // カテゴリは記事側の実データから集計する。microCMSのカテゴリAPIには記事0件の
