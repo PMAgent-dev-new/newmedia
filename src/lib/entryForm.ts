@@ -30,13 +30,13 @@ export const DEFAULT_ENTRY_URL = ENTRY_URLS.taxi;
 /**
  * 実際に振り分ける職種。ここに無い職種は判定できても既定（タクシー）へ置く。
  *
- * truck を外しているのは、受け皿の運用が未確認のため。求人フィード実測（2026-08-14）で
- * 自社のトラック求人は1,370件中わずか2件（整備士740・タクシー365に対して）。
- * `/entry/truck` の Lark Base に担当が付いていない場合、いま曲がりなりにも人が動いている
- * タクシーのファネルに落ちているリードを、止まった箱へ移すことになる。
- * 運用が確認できたら 'truck' を足すだけで73記事が切り替わる。
+ * 全職種を有効にしている。フォーム側を読んだところ truck / bus はタクシーと同じ
+ * 求職者DB🚕・同じLark通知先で、変わるのは「マスタ-応募職種」「保有資格」と
+ * 通知タイトルだけ（整備士とクーパンだけが別Base）。つまり振り分けても
+ * リードの行き先も見る人も変わらず、職種と免許のラベルが正しく付くだけになる。
+ * 応募職種マスタに「トラックドライバー」「バスドライバー」が実在することも実査で確認済み。
  */
-const ENABLED_JOBS: ReadonlySet<EntryJob> = new Set<EntryJob>(['mechanic', 'bus', 'taxi']);
+const ENABLED_JOBS: ReadonlySet<EntryJob> = new Set<EntryJob>(['mechanic', 'truck', 'bus', 'taxi']);
 
 /** CTAの設置場所。Lark側で「記事本文のCTA」と「ヘッダー」を撃ち分けられるようにする。 */
 export type EntryPlacement = 'article_cta' | 'header_cta';
