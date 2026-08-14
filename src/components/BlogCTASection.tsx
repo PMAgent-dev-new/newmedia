@@ -1,7 +1,16 @@
 import Image from 'next/image';
 import { withBasePath } from '@/lib/basePath';
+import { DEFAULT_ENTRY_URL } from '@/lib/entryForm';
 
-export default function BlogCTASection() {
+interface BlogCTASectionProps {
+  /**
+   * 応募フォームの着地先。記事詳細のように職種が分かる面から渡す。
+   * 一覧・about・動画一覧のように記事コンテキストが無い面は既定（タクシー）のまま。
+   */
+  entryUrl?: string;
+}
+
+export default function BlogCTASection({ entryUrl = DEFAULT_ENTRY_URL }: BlogCTASectionProps = {}) {
   return (
     <section className="py-12 sm:py-16 bg-[#FDEAB1] relative">
       
@@ -28,7 +37,7 @@ export default function BlogCTASection() {
               未経験でも安心、面接対策や<br />
               働き方の相談まで丁寧に対応します。
             </p>
-            <a href="https://ridejob.jp/entry" target="_blank" rel="noopener noreferrer" className="w-full bg-[#04acdb] hover:bg-[#0398c0] text-white font-bold py-4 px-6 rounded-xl transition-colors duration-300 flex items-center justify-center gap-2 text-lg">
+            <a href={entryUrl} target="_blank" rel="noopener noreferrer" className="w-full bg-[#04acdb] hover:bg-[#0398c0] text-white font-bold py-4 px-6 rounded-xl transition-colors duration-300 flex items-center justify-center gap-2 text-lg">
               相談する
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>

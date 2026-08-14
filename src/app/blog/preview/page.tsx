@@ -10,6 +10,7 @@ import { getBlogById, getLatestBlogs } from '@/lib/microcms';
 import { withBasePath } from '@/lib/basePath';
 import { getRelatedBlogs } from '@/lib/blogHelpers';
 import { getBlogList, summarizeCategories } from '@/lib/blogList';
+import { entryUrlForBlog } from '@/lib/entryForm';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -63,10 +64,15 @@ export default async function BlogPreviewPage({ searchParams }: PreviewPageProps
   const categories = categoriesRes.status === 'fulfilled' ? categoriesRes.value : [];
   const pickupArticles = pickupRes.status === 'fulfilled' ? (pickupRes.value.contents || []) : [];
   const relatedArticles = relatedRes.status === 'fulfilled' ? relatedRes.value : [];
+  // 公開前に「この記事のCTAがどの応募フォームへ行くか」を編集側で確かめられるように、
+  // プレビューでも本番と同じ判定を通す。
+  // ヘッダーと本文CTAで utm_medium を撃ち分け、Lark側でどちらが効いたか見られるようにする
+  const entryUrl = entryUrlForBlog(blog);
+  const headerEntryUrl = entryUrlForBlog(blog, 'header_cta');
 
   return (
     <div className="font-sans min-h-screen">
-      <Header />
+      <Header entryUrl={headerEntryUrl} />
       <Breadcrumbs pageName={`[プレビュー] ${blog.title}`} />
       <main
         className="min-h-screen"
@@ -95,7 +101,7 @@ export default async function BlogPreviewPage({ searchParams }: PreviewPageProps
           </div>
         </div>
       </main>
-      <BlogCTASection />
+      <BlogCTASection entryUrl={entryUrl} />
       <Footer />
     </div>
   );

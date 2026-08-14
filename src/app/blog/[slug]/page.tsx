@@ -11,6 +11,7 @@ import { Blog } from '@/types/microcms';
 import { getBlogBySlug, getBlogById, getLatestBlogs } from '@/lib/microcms';
 import { withBasePath } from '@/lib/basePath';
 import { getRelatedBlogs } from '@/lib/blogHelpers';
+import { entryUrlForBlog } from '@/lib/entryForm';
 import {
   categoryHref,
   getBlogList,
@@ -146,6 +147,12 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     notFound();
   }
 
+  // 応募フォームは職種ごとにLPが分かれ、フォーム側が formOrigin で投入先のLark Baseを決める。
+  // 既定の /entry はタクシー専用なので、記事の職種が読めるならその職種のフォームへ送る。
+  // ヘッダーと本文CTAで utm_medium を撃ち分け、Lark側でどちらが効いたか見られるようにする
+  const entryUrl = entryUrlForBlog(blog);
+  const headerEntryUrl = entryUrlForBlog(blog, 'header_cta');
+
   const faqLd = faqPageLd(extractFaqFromHtml(blog.html || blog.content));
   const structuredData = [
     blogPostingLd(blog),
@@ -169,7 +176,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           dangerouslySetInnerHTML={{ __html: ldJson(data) }}
         />
       ))}
-      <Header />
+      <Header entryUrl={headerEntryUrl} />
       <Breadcrumbs
         pageName={blog.title}
       />
@@ -208,7 +215,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       </main>
       
       {/* CTAセクション */}
-      <BlogCTASection />
+      <BlogCTASection entryUrl={entryUrl} />
       
       <Footer />
     </div>
