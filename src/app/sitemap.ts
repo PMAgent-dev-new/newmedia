@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getAllBlogs } from "@/lib/microcms";
+import { fetchAllBlogsCached, dedupeBySlug, SITEMAP_FIELDS } from "@/lib/allBlogs";
 import { BASE_PATH } from "@/lib/basePath";
 
 const buildBaseUrl = () => {
@@ -20,22 +20,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [
     { url: buildUrl("/"), lastModified: new Date() },
     { url: buildUrl("/blog"), lastModified: new Date() },
+    { url: buildUrl("/videos"), lastModified: new Date() },
     { url: buildUrl("/about"), lastModified: new Date() },
     { url: buildUrl("/privacy"), lastModified: new Date() },
     { url: buildUrl("/contact"), lastModified: new Date() },
   ];
 
-  const limit = 100;
-  let offset = 0;
-  let total = 0;
-  const blogs: Array<{ slug?: string; id: string; updatedAt: string; publishedAt: string }> = [];
-
-  do {
-    const response = await getAllBlogs(limit, offset);
-    total = response.totalCount;
-    blogs.push(...(response.contents || []));
-    offset += limit;
-  } while (offset < total);
+  // getAllBlogs は取得失敗を握り潰して0件を返すため、CMSの一時障害で
+  // 記事0本のサイトマップを配ってしまう。失敗したら throw する版を使う。
+  // slug重複のレコードは同一URLを指すため畳む（本番sitemapに3件の重複が出ていた）
+  const blogs = dedupeBySlug(await fetchAllBlogsCached({ fields: SITEMAP_FIELDS }));
 
   for (const blog of blogs) {
     const slugOrId = blog.slug || blog.id;

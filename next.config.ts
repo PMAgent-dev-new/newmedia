@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.microcms-assets.io',
       },
+      // 「動画で見る」一覧のサムネイル（YouTubeの静的サムネイル）
+      {
+        protocol: 'https',
+        hostname: 'i.ytimg.com',
+      },
     ],
     // 画像最適化の設定
     formats: ['image/webp', 'image/avif'],
