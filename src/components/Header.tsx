@@ -113,7 +113,9 @@ export default function Header() {
 
             {/* Mobile Menu Overlay */}
       {isMenuOpen && (
-        <div className="fixed inset-0 bg-[#d5fbfe] z-50 lg:hidden">
+        // overflow-y-auto が無いと、項目が増えたときや低いビューポート（横向きスマホ・小型Android）で
+        // 上端の項目が画面外に出たまま到達できなくなる
+        <div className="fixed inset-0 overflow-y-auto overscroll-contain bg-[#d5fbfe] z-50 lg:hidden">
           {/* Close Button */}
           <div className="absolute top-4 right-4">
             <button
@@ -127,7 +129,7 @@ export default function Header() {
           </div>
 
           {/* Menu Content */}
-          <div className="flex flex-col items-center justify-center h-full gap-8 px-4">
+          <div className="flex min-h-full flex-col items-center justify-center gap-8 px-4 py-20">
               {/* Category & Additional Menu Items */}
               <div className="flex flex-col gap-4 items-center">
               {categories.map((category) => (

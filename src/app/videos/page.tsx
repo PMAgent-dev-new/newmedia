@@ -6,11 +6,12 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import Footer from "@/components/Footer";
 import BlogCTASection from "@/components/BlogCTASection";
 import { getVideoArticles } from "@/lib/videoArticles";
+import { absoluteUrl, breadcrumbLd, ldJson } from "@/lib/structuredData";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "動画で見る｜タクシー・ドライバーの仕事",
+  title: "動画で見る",
   description:
     "RIDE JOBのYouTubeチャンネルで解説している内容を、記事とあわせて見られるようまとめました。会社の選び方・面接・収入の考え方など、求人票からは読み取れない話を現場の担当者が話しています。",
   alternates: { canonical: "/media/videos" },
@@ -26,10 +27,32 @@ export const metadata: Metadata = {
 export default async function VideosPage() {
   const items = await getVideoArticles();
 
+  // VideoObject は出さない。このページ上で動画は再生できず、Google の動画構造化データは
+  // 「動画がそのページに存在すること」を要求するため。ItemList と BreadcrumbList だけ出す。
+  const itemListLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "動画で見る",
+    numberOfItems: items.length,
+    itemListElement: items.map((v, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: v.title,
+      url: absoluteUrl(`/blog/${v.slug}`),
+    })),
+  };
+
   return (
     <div className="font-sans min-h-screen bg-gray-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: ldJson(breadcrumbLd([{ name: "メディアトップページ", url: absoluteUrl("/") }, { name: "動画で見る" }])),
+        }}
+      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(itemListLd) }} />
       <Header />
-      <Breadcrumbs />
+      <Breadcrumbs pageName="動画で見る" />
       <main className="container mx-auto px-4 py-8">
         <header className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">動画で見る</h1>
@@ -38,7 +61,7 @@ export default async function VideosPage() {
             会社の選び方、面接で見られていること、収入の考え方など、
             求人票の数字からは読み取れない話を、実際に転職相談を受けている担当者が話しています。
           </p>
-          <p className="mt-2 text-sm text-gray-500">現在 {items.length} 本</p>
+          <p className="mt-2 text-sm text-gray-500">現在 {items.length} 記事</p>
         </header>
 
         {items.length === 0 ? (
@@ -51,13 +74,15 @@ export default async function VideosPage() {
                   href={`/blog/${v.slug}`}
                   className="group flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white transition-colors hover:border-gray-400"
                 >
-                  {/* サムネイルはYouTube側の静的画像を使う（記事のアイキャッチより動画だと分かりやすい） */}
+                  {/* サムネイルはYouTube側の静的画像を使う（記事のアイキャッチより動画だと分かりやすい）。
+                      hqdefault は 480×360 の4:3で、16:9枠に object-cover で入れると
+                      焼き込み文字が上下で切れる。maxresdefault は 1280×720 の真の16:9（全動画で存在を確認済み）。 */}
                   <div className="relative aspect-video bg-gray-100">
                     <Image
-                      src={`https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`}
+                      src={`https://i.ytimg.com/vi/${v.videoId}/maxresdefault.jpg`}
                       alt=""
                       fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
                       className="object-cover"
                     />
                     <span className="absolute bottom-2 right-2 rounded bg-black/70 px-2 py-0.5 text-xs font-semibold text-white">
