@@ -28,6 +28,20 @@ export const ENTRY_URLS: Record<EntryJob, string> = {
 export const DEFAULT_ENTRY_URL = ENTRY_URLS.taxi;
 
 /**
+ * 実際に振り分ける職種。ここに無い職種は判定できても既定（タクシー）へ置く。
+ *
+ * truck を外しているのは、受け皿の運用が未確認のため。求人フィード実測（2026-08-14）で
+ * 自社のトラック求人は1,370件中わずか2件（整備士740・タクシー365に対して）。
+ * `/entry/truck` の Lark Base に担当が付いていない場合、いま曲がりなりにも人が動いている
+ * タクシーのファネルに落ちているリードを、止まった箱へ移すことになる。
+ * 運用が確認できたら 'truck' を足すだけで73記事が切り替わる。
+ */
+const ENABLED_JOBS: ReadonlySet<EntryJob> = new Set<EntryJob>(['mechanic', 'bus', 'taxi']);
+
+/** CTAの設置場所。Lark側で「記事本文のCTA」と「ヘッダー」を撃ち分けられるようにする。 */
+export type EntryPlacement = 'article_cta' | 'header_cta';
+
+/**
  * ルール上は職種が拾えてしまうが、記事の行き先が読者の現職と別なので既定に置く記事。
  * slug ごとに理由を残す（消すときに根拠を辿れるように）。
  */
@@ -130,8 +144,26 @@ export function resolveEntryJob(blog: Pick<Blog, 'title'> & { slug?: string }): 
   return null;
 }
 
-/** 記事に対応する応募フォームURL。解決できなければ既定の /entry。 */
-export function entryUrlForBlog(blog: Pick<Blog, 'title'> & { slug?: string }): string {
+/**
+ * 記事に対応する応募フォームURL。解決できなければ既定の /entry。
+ *
+ * UTMを必ず付ける。応募フォームは `window.location.search` から utm_* を読んで
+ * Lark へ渡す実装を既に持っている一方、CTAは `rel="noopener noreferrer"` で
+ * Referer が落ちるため、**UTM以外にメディア経由だと伝える手段が無い**。
+ * 付けないと、記事から来たリードが広告経由・直接流入と Lark 上で区別できず、
+ * この施策が効いたかを後から検証できない（自然検索経由の応募0件を潰すのが目的なのに）。
+ */
+export function entryUrlForBlog(
+  blog: Pick<Blog, 'id' | 'title'> & { slug?: string },
+  placement: EntryPlacement = 'article_cta',
+): string {
   const job = resolveEntryJob(blog);
-  return job ? ENTRY_URLS[job] : DEFAULT_ENTRY_URL;
+  const base = job && ENABLED_JOBS.has(job) ? ENTRY_URLS[job] : DEFAULT_ENTRY_URL;
+  const params = new URLSearchParams({
+    utm_source: 'ridejob_media',
+    utm_medium: placement,
+    // slug が空のレコードが9件実在するので id にフォールバックする
+    utm_content: blog.slug || blog.id || 'unknown',
+  });
+  return `${base}?${params.toString()}`;
 }

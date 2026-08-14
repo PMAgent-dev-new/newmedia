@@ -149,7 +149,9 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
 
   // 応募フォームは職種ごとにLPが分かれ、フォーム側が formOrigin で投入先のLark Baseを決める。
   // 既定の /entry はタクシー専用なので、記事の職種が読めるならその職種のフォームへ送る。
+  // ヘッダーと本文CTAで utm_medium を撃ち分け、Lark側でどちらが効いたか見られるようにする
   const entryUrl = entryUrlForBlog(blog);
+  const headerEntryUrl = entryUrlForBlog(blog, 'header_cta');
 
   const faqLd = faqPageLd(extractFaqFromHtml(blog.html || blog.content));
   const structuredData = [
@@ -174,7 +176,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           dangerouslySetInnerHTML={{ __html: ldJson(data) }}
         />
       ))}
-      <Header entryUrl={entryUrl} />
+      <Header entryUrl={headerEntryUrl} />
       <Breadcrumbs
         pageName={blog.title}
       />

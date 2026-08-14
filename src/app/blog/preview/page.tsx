@@ -66,11 +66,13 @@ export default async function BlogPreviewPage({ searchParams }: PreviewPageProps
   const relatedArticles = relatedRes.status === 'fulfilled' ? relatedRes.value : [];
   // 公開前に「この記事のCTAがどの応募フォームへ行くか」を編集側で確かめられるように、
   // プレビューでも本番と同じ判定を通す。
+  // ヘッダーと本文CTAで utm_medium を撃ち分け、Lark側でどちらが効いたか見られるようにする
   const entryUrl = entryUrlForBlog(blog);
+  const headerEntryUrl = entryUrlForBlog(blog, 'header_cta');
 
   return (
     <div className="font-sans min-h-screen">
-      <Header entryUrl={entryUrl} />
+      <Header entryUrl={headerEntryUrl} />
       <Breadcrumbs pageName={`[プレビュー] ${blog.title}`} />
       <main
         className="min-h-screen"
