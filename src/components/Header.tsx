@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Category } from '@/types/microcms';
 import { withBasePath } from '@/lib/basePath';
+import { categoryPathById } from '@/constants/categories';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,8 +13,8 @@ export default function Header() {
   // Figmaデザインに合わせた固定カテゴリ（環境変数エラーを回避）
   const categories: Category[] = [
     { id: '2', name: '企業取材', slug: 'company-interview', createdAt: '', updatedAt: '', publishedAt: '', revisedAt: '' },
-    { id: '3', name: 'ご利用者様の声', slug: 'user-voices', createdAt: '', updatedAt: '', publishedAt: '', revisedAt: '' },
-    { id: '4', name: 'お役立ち情報', slug: 'helpful-info', createdAt: '', updatedAt: '', publishedAt: '', revisedAt: '' },
+    { id: '3', name: 'ご利用者様の声', slug: 'user-voice', createdAt: '', updatedAt: '', publishedAt: '', revisedAt: '' },
+    { id: '4', name: 'お役立ち情報', slug: 'tips', createdAt: '', updatedAt: '', publishedAt: '', revisedAt: '' },
     { id: '5', name: 'インタビュー', slug: 'interview', createdAt: '', updatedAt: '', publishedAt: '', revisedAt: '' }
   ];
 
@@ -44,7 +45,7 @@ export default function Header() {
                 {categories.map((category) => (
                   <Link
                     key={category.id}
-                    href={`/blog?category=${category.id}`}
+                    href={categoryPathById(category.id)}
                     className="text-[#555555] font-bold hover:opacity-80 transition-opacity whitespace-nowrap"
                     aria-label={`${category.name}カテゴリへ`}
                   >
@@ -135,7 +136,7 @@ export default function Header() {
               {categories.map((category) => (
                 <Link
                   key={category.id}
-                  href={`/blog?category=${category.id}`}
+                  href={categoryPathById(category.id)}
                   onClick={closeMenu}
                   className="bg-white border border-black rounded-[10px] px-4 py-2 w-full max-w-[240px] text-center"
                 >

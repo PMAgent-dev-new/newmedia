@@ -7,10 +7,16 @@ import BlogDetailSection from '@/components/BlogDetailSection';
 import BlogDetailSidebar from '@/components/BlogDetailSidebar';
 import BlogCTASection from '@/components/BlogCTASection';
 import RelatedArticlesSection from '@/components/RelatedArticlesSection';
-import { Blog, Category } from '@/types/microcms';
-import { getBlogBySlug, getBlogById, getAllCategories, getLatestBlogs } from '@/lib/microcms';
+import { Blog } from '@/types/microcms';
+import { getBlogBySlug, getBlogById, getLatestBlogs } from '@/lib/microcms';
 import { withBasePath } from '@/lib/basePath';
 import { getRelatedBlogs } from '@/lib/blogHelpers';
+import {
+  categoryHref,
+  getBlogList,
+  summarizeCategories,
+  type CategorySummary,
+} from '@/lib/blogList';
 import {
   blogPostingLd,
   breadcrumbLd,
@@ -72,7 +78,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   
   // 並行してデータを取得
   let blog: Blog | null = null;
-  let categories: Category[] = [];
+  let categories: CategorySummary[] = [];
   let pickupArticles: Blog[] = [];
   let relatedArticles: Blog[] = [];
   let error: string | null = null;
@@ -91,8 +97,10 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     }
 
     // サイドバー用のデータを並行取得
+    // カテゴリは記事側の実データから集計する。microCMSのカテゴリAPIには記事0件の
+    // カテゴリも残っており、そのままリンクすると空の一覧へ送ってしまうため。
     const [categoriesResponse, pickupLatestResponse, relatedArticlesResponse] = await Promise.allSettled([
-      getAllCategories(),
+      getBlogList().then(summarizeCategories),
       getLatestBlogs(3),
       getRelatedBlogs(blog, 3),
     ]);
@@ -146,8 +154,9 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     blogPostingLd(blog),
     breadcrumbLd([
       { name: 'メディアトップ', url: '/' },
+      { name: '記事一覧', url: '/blog' },
       ...(blog.category?.name
-        ? [{ name: blog.category.name, url: `/blog?category=${blog.category.id}` }]
+        ? [{ name: blog.category.name, url: categoryHref(blog.category) }]
         : []),
       { name: blog.title },
     ]),
@@ -192,6 +201,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
               <aside className="hidden lg:block lg:order-last">
                 <BlogDetailSidebar
                   categories={categories}
+                  activeCategoryId={blog.category?.id ?? null}
                   pickupArticles={pickupArticles}
                 />
               </aside>

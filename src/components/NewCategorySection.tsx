@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { withBasePath } from '@/lib/basePath';
 import { Category } from '@/types/microcms';
+import { categoryPathById } from '@/constants/categories';
 
 interface NewCategorySectionProps {
   categories: Category[];
@@ -85,7 +86,7 @@ export default function NewCategorySection({ categories }: NewCategorySectionPro
         id="node-2151_1328"
       >
         <Link
-          href={`/blog?category=${getCategoryId('ご利用者様の声') || ''}`}
+          href={categoryPathById(getCategoryId('ご利用者様の声') || '')}
           className="block hover:opacity-80 transition-opacity"
         >
           {/* カテゴリカードをImageで最適化 */}
@@ -100,7 +101,7 @@ export default function NewCategorySection({ categories }: NewCategorySectionPro
           />
         </Link>
         <Link
-          href={`/blog?category=${getCategoryId('お役立ち情報') || ''}`}
+          href={categoryPathById(getCategoryId('お役立ち情報') || '')}
           className="block hover:opacity-80 transition-opacity"
         >
           <Image
@@ -114,7 +115,7 @@ export default function NewCategorySection({ categories }: NewCategorySectionPro
           />
         </Link>
         <Link
-          href={`/blog?category=${getCategoryId('企業取材') || ''}`}
+          href={categoryPathById(getCategoryId('企業取材') || '')}
           className="block hover:opacity-80 transition-opacity"
         >
           <Image
@@ -128,7 +129,7 @@ export default function NewCategorySection({ categories }: NewCategorySectionPro
           />
         </Link>
         <Link
-          href={`/blog?category=${getCategoryId('インタビュー') || ''}`}
+          href={categoryPathById(getCategoryId('インタビュー') || '')}
           className="block hover:opacity-80 transition-opacity"
         >
           <Image

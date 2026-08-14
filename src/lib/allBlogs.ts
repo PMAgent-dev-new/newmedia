@@ -25,9 +25,6 @@ const API_KEY = process.env.MICROCMS_API_KEY || process.env.NEXT_PUBLIC_MICROCMS
 /** 全件走査の面はこの間隔で十分（記事の公開は1日1〜2本）。 */
 export const ALL_BLOGS_REVALIDATE = 3600;
 
-/** sitemap は本文が要らない。取得量を1/100以下に落とす。 */
-export const SITEMAP_FIELDS = "id,slug,updatedAt,publishedAt";
-
 const PAGE = 100;
 /** 暴走防止。到達したら黙って切り捨てず気づけるようにする。 */
 const MAX_PAGES = 30;
