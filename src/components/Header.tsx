@@ -6,8 +6,17 @@ import Link from 'next/link';
 import { Category } from '@/types/microcms';
 import { withBasePath } from '@/lib/basePath';
 import { categoryPathById } from '@/constants/categories';
+import { DEFAULT_ENTRY_URL } from '@/lib/entryForm';
 
-export default function Header() {
+interface HeaderProps {
+  /**
+   * 「まずお話を聞く」の着地先。記事の職種を知っているのは記事詳細だけなので、
+   * 渡すのもそこからだけ。トップ・一覧・お問い合わせ等は既定（タクシー）のまま。
+   */
+  entryUrl?: string;
+}
+
+export default function Header({ entryUrl = DEFAULT_ENTRY_URL }: HeaderProps = {}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   // Figmaデザインに合わせた固定カテゴリ（環境変数エラーを回避）
@@ -80,7 +89,7 @@ export default function Header() {
             {/* Desktop CTAs (right side) */}
             <div className="hidden lg:flex items-center space-x-4">
               <a
-                href="https://ridejob.jp/entry"
+                href={entryUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-[#04acdb] text-white px-6 py-2 rounded-[10px] font-bold text-base shadow-sm hover:bg-[#0398c0] transition-colors"
