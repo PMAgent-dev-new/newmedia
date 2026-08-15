@@ -55,14 +55,15 @@ export default function Header({ entryUrl = DEFAULT_ENTRY_URL }: HeaderProps = {
               PCナビの表示開始を lg(1024) から xl(1280) へ上げている。
               和文は1文字が必ず1em幅なのでフォントに依らず必要幅を計算でき、
               ナビ44文字 × 14px + gap16×6 = 711px、CTA2本272px、ロゴ120px、
-              左右padding 80px、ナビ左右マージン32px → 合計1215px。
-              つまり7項目+CTA2本は1215px未満のどの幅にも物理的に入らない。
+              左右padding 80px、ナビ左右マージン32px、行の gap-4 が両端で32px
+              → 合計1247px。つまり7項目+CTA2本は1247px未満のどの幅にも物理的に入らない。
               1024〜1279はロゴ・CTA・ナビが重なるしかないので、この帯はハンバーガーに寄せる
               （項目は全てオーバーレイ側にあり、CTA2本はバーに残るので導線は失われない）。
 
               閾値だけ上げても、元のサイズ（ナビ847px・CTA336px＝合計1431px必要）では
               1280〜1430で溢れたままになる。そのため文字サイズ(16→14px)と
-              gap(24→16px)も併せて詰め、1280で65pxの余裕を確保している。
+              gap(24→16px)も併せて詰めた。実測の余裕は1280で33px（ナビ711 / スロット744）。
+              ⚠️ ナビ項目を1つ足すと再発する幅なので、増やすときは必ず1280pxで測り直すこと。
             */}
             <div className="hidden xl:flex items-center flex-1 min-w-0 mx-4 justify-center">
               <nav className="flex items-center gap-4">
