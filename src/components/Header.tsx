@@ -35,8 +35,9 @@ export default function Header({ entryUrl = DEFAULT_ENTRY_URL }: HeaderProps = {
     <>
       <header className="bg-white w-full border-b border-gray-200 relative z-40">
         <div className="px-4 md:px-10">
-          <div className="flex items-center justify-between h-20">
-            <Link href="/" className="flex flex-col items-center hover:opacity-80 transition-opacity">
+          {/* gap-4 は、1024〜1279でCTAとハンバーガーが隣り合うときの最低限の間隔 */}
+          <div className="flex items-center justify-between gap-4 h-20">
+            <Link href="/" className="flex shrink-0 flex-col items-center hover:opacity-80 transition-opacity">
               <Image
                 src={withBasePath('/logo-ridejob.png')}
                 alt="RIDE JOB Logo"
@@ -48,14 +49,29 @@ export default function Header({ entryUrl = DEFAULT_ENTRY_URL }: HeaderProps = {
               />
             </Link>
             
-            {/* Desktop Menu: Centered categories */}
-            <div className="hidden lg:flex items-center flex-1 min-w-0 mx-6 justify-center">
-              <nav className="flex items-center gap-6">
+            {/*
+              Desktop Menu: Centered categories
+
+              PCナビの表示開始を lg(1024) から xl(1280) へ上げている。
+              和文は1文字が必ず1em幅なのでフォントに依らず必要幅を計算でき、
+              ナビ44文字 × 14px + gap16×6 = 711px、CTA2本272px、ロゴ120px、
+              左右padding 80px、ナビ左右マージン32px、行の gap-4 が両端で32px
+              → 合計1247px。つまり7項目+CTA2本は1247px未満のどの幅にも物理的に入らない。
+              1024〜1279はロゴ・CTA・ナビが重なるしかないので、この帯はハンバーガーに寄せる
+              （項目は全てオーバーレイ側にあり、CTA2本はバーに残るので導線は失われない）。
+
+              閾値だけ上げても、元のサイズ（ナビ847px・CTA336px＝合計1431px必要）では
+              1280〜1430で溢れたままになる。そのため文字サイズ(16→14px)と
+              gap(24→16px)も併せて詰めた。実測の余裕は1280で33px（ナビ711 / スロット744）。
+              ⚠️ ナビ項目を1つ足すと再発する幅なので、増やすときは必ず1280pxで測り直すこと。
+            */}
+            <div className="hidden xl:flex items-center flex-1 min-w-0 mx-4 justify-center">
+              <nav className="flex items-center gap-4">
                 {categories.map((category) => (
                   <Link
                     key={category.id}
                     href={categoryPathById(category.id)}
-                    className="text-[#555555] font-bold hover:opacity-80 transition-opacity whitespace-nowrap"
+                    className="text-[#555555] text-sm font-bold hover:opacity-80 transition-opacity whitespace-nowrap"
                     aria-label={`${category.name}カテゴリへ`}
                   >
                     {category.name}
@@ -64,21 +80,21 @@ export default function Header({ entryUrl = DEFAULT_ENTRY_URL }: HeaderProps = {
                 {/* Additional Links */}
                 <Link
                   href="/videos"
-                  className="text-[#555555] font-bold hover:opacity-80 transition-opacity whitespace-nowrap"
+                  className="text-[#555555] text-sm font-bold hover:opacity-80 transition-opacity whitespace-nowrap"
                   aria-label="動画で見る一覧へ"
                 >
                   動画で見る
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-[#555555] font-bold hover:opacity-80 transition-opacity whitespace-nowrap"
+                  className="text-[#555555] text-sm font-bold hover:opacity-80 transition-opacity whitespace-nowrap"
                   aria-label="お問い合わせページへ"
                 >
                   お問い合わせ
                 </Link>
                 <Link
                   href="/about"
-                  className="text-[#555555] font-bold hover:opacity-80 transition-opacity whitespace-nowrap"
+                  className="text-[#555555] text-sm font-bold hover:opacity-80 transition-opacity whitespace-nowrap"
                   aria-label="ライドジョブについて"
                 >
                   ライドジョブについて
@@ -86,13 +102,19 @@ export default function Header({ entryUrl = DEFAULT_ENTRY_URL }: HeaderProps = {
               </nav>
             </div>
 
-            {/* Desktop CTAs (right side) */}
-            <div className="hidden lg:flex items-center space-x-4">
+            {/*
+              Desktop CTAs (right side)
+
+              表示開始は lg(1024) のまま。1024〜1279はナビをハンバーガーへ引っ込めるが、
+              オーバーレイ側にCTAは無いので、この2本まで隠すと応募導線が消えてしまう。
+              shrink-0 は、xl以上でナビが伸びてもCTAが潰れない保証。
+            */}
+            <div className="hidden lg:flex shrink-0 ml-auto items-center gap-3">
               <a
                 href={entryUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-[#04acdb] text-white px-6 py-2 rounded-[10px] font-bold text-base shadow-sm hover:bg-[#0398c0] transition-colors"
+                className="bg-[#04acdb] text-white px-4 py-2 rounded-[10px] font-bold text-sm shadow-sm hover:bg-[#0398c0] transition-colors whitespace-nowrap"
                 aria-label="まずお話を聞く"
               >
                 まずお話を聞く
@@ -101,17 +123,19 @@ export default function Header({ entryUrl = DEFAULT_ENTRY_URL }: HeaderProps = {
                 href="https://ridejob.jp/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-[#2204db] text-white px-6 py-2 rounded-[10px] font-bold text-base shadow-sm hover:bg-[#1b03b8] transition-colors"
+                className="bg-[#2204db] text-white px-4 py-2 rounded-[10px] font-bold text-sm shadow-sm hover:bg-[#1b03b8] transition-colors whitespace-nowrap"
                 aria-label="求人情報を見る（外部サイト）"
               >
                 求人情報を見る
               </a>
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button（1280未満はナビをここに畳む） */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden flex flex-col justify-center items-center w-8 h-8 space-y-1"
+              aria-expanded={isMenuOpen}
+              aria-label={isMenuOpen ? 'メニューを閉じる' : 'メニューを開く'}
+              className="xl:hidden flex shrink-0 flex-col justify-center items-center w-8 h-8 space-y-1"
             >
               <span className={`block w-6 h-0.5 bg-gray-600 transition-transform ${isMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></span>
               <span className={`block w-6 h-0.5 bg-gray-600 transition-opacity ${isMenuOpen ? 'opacity-0' : ''}`}></span>
@@ -125,7 +149,9 @@ export default function Header({ entryUrl = DEFAULT_ENTRY_URL }: HeaderProps = {
       {isMenuOpen && (
         // overflow-y-auto が無いと、項目が増えたときや低いビューポート（横向きスマホ・小型Android）で
         // 上端の項目が画面外に出たまま到達できなくなる
-        <div className="fixed inset-0 overflow-y-auto overscroll-contain bg-[#d5fbfe] z-50 lg:hidden">
+        // 開閉ボタンが xl:hidden なので、こちらも xl で揃える。
+        // ずれると1024〜1279でボタンだけ残りメニューが出ない
+        <div className="fixed inset-0 overflow-y-auto overscroll-contain bg-[#d5fbfe] z-50 xl:hidden">
           {/* Close Button */}
           <div className="absolute top-4 right-4">
             <button
