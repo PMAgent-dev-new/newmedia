@@ -1,8 +1,22 @@
+import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Footer from "@/components/Footer";
 import { withBasePath } from "@/lib/basePath";
 
+export const metadata: Metadata = {
+  title: "プライバシーポリシー",
+  description: "ライドジョブのプライバシーポリシーです。",
+  alternates: { canonical: "/media/privacy" },
+};
+
+/**
+ * プライバシーポリシー。
+ *
+ * 本文は ridejob.jp/privacy（求人本体リポジトリ）の第２版と同一。法務が承認した文言なので、
+ * 表現・条項の順序を変えず逐語で複製する。片側だけ改定すると同一ドメイン上に食い違う
+ * ポリシーが並ぶため、改定時は必ず両方を同時に更新すること。
+ */
 export default function PrivacyPage() {
   return (
     <div className="font-sans min-h-screen">
@@ -24,16 +38,18 @@ export default function PrivacyPage() {
 
               <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">1. 事業者情報</h2>
               <p>法人名：株式会社PM Agent</p>
-              <p>住所：〒150-0001　東京都渋谷区神宮前1丁目9番地3 原宿第3コーポ4階402号室</p>
+              <p>住所：〒150-0041　東京都渋谷区神南１−６−５ Shibuya WayP ８−４</p>
               <p>代表：梅津　哲豪</p>
 
               <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">2. 取得する個人情報</h2>
               <p>当社では、お問い合わせフォーム・コメントの送信時に、氏名・電話番号・メールアドレスなど個人を特定できる情報を取得させていただきます。</p>
 
               <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">3. 個人情報の利用目的</h2>
-              <ul className="list-disc list-inside space-y-1">
+              <p>当社では、ユーザーから取得した個人情報を次に掲げる利用目的の範囲内で利用する場合があります。</p>
+              <ul className="list-disc list-inside space-y-1 mt-2">
                 <li>ユーザーからのコメントやお問い合わせに回答するため</li>
                 <li>ユーザーがご利用いただくサービスの更新情報など、必要に応じたご連絡をするため</li>
+                <li>提携企業との業務提携に基づき、応募状況、面談実施状況、選考結果、内定・入社等の成約情報を共有し、サービス品質の向上、業務改善、契約条件の見直しその他業務提携の運営のために利用するため</li>
               </ul>
               <p className="mt-3">
                 個人情報の利用目的は、変更前後の関連性について合理性が認められる場合に限って変更するものとします。個人情報の利用目的について変更を行った際は、変更後の目的について当社所定の方法によってユーザーに通知又は公表するものとします。
@@ -62,6 +78,9 @@ export default function PrivacyPage() {
                   </ul>
                 </li>
               </ul>
+              <p className="mt-4">
+                当社は、ユーザーから同意を得た場合または法令に基づく場合のほか、転職支援サービスの提供に必要な範囲において、提携企業との業務提携契約に基づき、応募状況、面談実施状況、選考結果、内定・入社等の成約情報を、サービス提供・業務改善・契約条件の見直し等を目的として提供することがあります。
+              </p>
 
               <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">6. 匿名加工情報に関する取扱い</h2>
               <p>当社は、匿名加工情報（特定の個人を識別できないよう加工した個人情報であって、復元ができないようにしたもの）を作成する場合、以下の対応を行います。</p>
@@ -82,6 +101,7 @@ export default function PrivacyPage() {
 
               <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">9. プライバシーポリシーの制定日及び改定日</h2>
               <p>第１版：２０２５年３月１１日　制定</p>
+              <p>第２版：２０２６年７月２２日　改定</p>
             </article>
           </div>
         </div>
@@ -91,9 +111,3 @@ export default function PrivacyPage() {
     </div>
   );
 }
-
-
-
-
-
-
