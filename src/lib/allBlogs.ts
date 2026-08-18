@@ -8,7 +8,7 @@ import type { Blog, BlogsResponse } from "@/types/microcms";
  * それでよいが、全件走査する面（/media/videos・sitemap）で使うと2つ困る。
  *
  * 1. `export const revalidate` が no-store に打ち消され、1リクエストごとに
- *    214記事分を取り直す（本文込みだと実測 4.3MB / 9コール）。microCMS は API 5/5 が満杯で
+ *    214記事分を取り直す（本文込みだと実測 4.3MB）。microCMS は API 5/5 が満杯で
  *    レート制限もあるため、ヘッダー全ページから導線のある面がこれをやるのは危険
  * 2. 取得に失敗しても 200 で「0件」を配ってしまう。sitemap なら空、一覧なら
  *    「動画つきの記事はまだありません」が、クロールされうる状態で出る
@@ -50,7 +50,15 @@ export const BODY_SCAN_PAGE = 25;
  */
 export const BODY_SCAN_FIELDS = "id,title,slug,eyecatch,publishedAt,content,html";
 
-const DEFAULT_PAGE = 100;
+/**
+ * 本文を含まない呼び出し（一覧カード・sitemap）が使うページ幅。microCMS の limit 上限。
+ *
+ * 既定はあえて安全側の BODY_SCAN_PAGE にしてある。取り違えたときの被害が非対称だから:
+ * 本文つきなのに100で取ると「警告1行を残してキャッシュが全滅」（#17で実際に起きた）、
+ * 本文なしなのに25で取っても「リクエストが数本増える」だけで済む。
+ */
+export const NO_BODY_PAGE = 100;
+
 /** 暴走防止。到達したら黙って切り捨てず気づけるようにする。 */
 const MAX_ARTICLES = 3000;
 
@@ -80,9 +88,9 @@ async function page(
 /**
  * 全記事。1件でも取れなければ throw する（0件と取得失敗を混同しない）。
  *
- * `pageSize` は「1リクエスト＝1キャッシュエントリ」の大きさを決める。本文を含める
- * 呼び出しは既定の100だと Next のデータキャッシュ上限（2MB／エントリ）を超えて
- * **何もキャッシュされない**ので、必ず BODY_SCAN_PAGE を渡すこと（下のコメント参照）。
+ * `pageSize` は「1リクエスト＝1キャッシュエントリ」の大きさを決める。既定は本文つきでも
+ * Next のデータキャッシュ上限（2MB／エントリ）に収まる BODY_SCAN_PAGE。本文を取らないと
+ * 分かっている呼び出しだけ NO_BODY_PAGE へ上げてよい（各定数のコメント参照）。
  */
 export async function fetchAllBlogsCached(opts: {
   fields?: string;
@@ -93,7 +101,13 @@ export async function fetchAllBlogsCached(opts: {
     throw new Error("microCMS の環境変数が未設定です（MICROCMS_SERVICE_DOMAIN / MICROCMS_API_KEY）");
   }
   const revalidate = opts.revalidate ?? ALL_BLOGS_REVALIDATE;
-  const pageSize = opts.pageSize ?? DEFAULT_PAGE;
+  const pageSize = opts.pageSize ?? BODY_SCAN_PAGE;
+  // microCMS は limit=0 を「0件」として200で返す（実測）。throw されないので素通りさせると
+  // needed も maxPages も Infinity になり、offset=0 のまま無限にリクエストし続ける。
+  // 101以上と負数は400で落ちる（実測）が、失敗の仕方を揃えるため入口でまとめて弾く。
+  if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > NO_BODY_PAGE) {
+    throw new Error(`[allBlogs] pageSize は 1〜${NO_BODY_PAGE} の整数にしてください（受け取った値: ${pageSize}）`);
+  }
   const all: Blog[] = [];
   const first = await page(0, opts.fields, revalidate, pageSize);
   all.push(...(first.contents || []));
