@@ -1,4 +1,4 @@
-import { fetchAllBlogsCached, dedupeBySlug } from "@/lib/allBlogs";
+import { fetchAllBlogsCached, dedupeBySlug, NO_BODY_PAGE } from "@/lib/allBlogs";
 import type { Blog } from "@/types/microcms";
 
 /**
@@ -62,7 +62,11 @@ const RESERVED_SLUGS = new Set(["page", "category", "preview"]);
  * 「sitemapにあるのに一覧から辿れない記事」が出る。
  */
 export async function getBlogList(): Promise<Blog[]> {
-  const blogs = dedupeBySlug(await fetchAllBlogsCached({ fields: LIST_FIELDS }));
+  // LIST_FIELDS は本文を含まないので、取得幅は microCMS の上限まで上げてよい
+  // （既定は本文つきでも安全な BODY_SCAN_PAGE=25 にしてある）。
+  const blogs = dedupeBySlug(
+    await fetchAllBlogsCached({ fields: LIST_FIELDS, pageSize: NO_BODY_PAGE }),
+  );
   for (const blog of blogs) {
     if (blog.slug && RESERVED_SLUGS.has(blog.slug)) {
       console.warn(`[blogList] slug "${blog.slug}" はルートの予約語です。記事URLが開けません（id=${blog.id}）`);
