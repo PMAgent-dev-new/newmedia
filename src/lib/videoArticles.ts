@@ -1,4 +1,4 @@
-import { dedupeBySlug, fetchAllBlogsCached } from "@/lib/allBlogs";
+import { BODY_SCAN_FIELDS, BODY_SCAN_PAGE, dedupeBySlug, fetchAllBlogsCached } from "@/lib/allBlogs";
 import { playableVideoIds } from "@/lib/youtubeEmbed";
 import type { Blog } from "@/types/microcms";
 
@@ -30,7 +30,14 @@ const VIDEO_HEADING = /<h2[^>]*>\s*(動画で見る[^<]*)<\/h2>/;
 const body = (b: Blog) => (b.html || b.content || "") as string;
 
 export async function getVideoArticles(): Promise<VideoArticle[]> {
-  const all = dedupeBySlug(await fetchAllBlogsCached());
+  // 本文つきの全件取得。pageSize は既定のままで正しいが、この面が小さいページ幅に
+  // 依存していること自体を call site に残す。NO_BODY_PAGE へ上げると1エントリが Next の
+  // データキャッシュ上限(2MB)を超え、キャッシュが丸ごと効かなくなる（理由は allBlogs.ts）。
+  // microCMS 側で「動画つき」だけ絞れないかも試したが、filters[contains] も q も本文中の
+  // URLを拾えず、正解13件に対し1〜3件しか返さない。全件走査は避けられない。
+  const all = dedupeBySlug(
+    await fetchAllBlogsCached({ fields: BODY_SCAN_FIELDS, pageSize: BODY_SCAN_PAGE }),
+  );
 
   const out: VideoArticle[] = [];
   for (const b of all) {
