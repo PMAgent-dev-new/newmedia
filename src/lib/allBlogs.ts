@@ -8,7 +8,7 @@ import type { Blog, BlogsResponse } from "@/types/microcms";
  * それでよいが、全件走査する面（/media/videos・sitemap）で使うと2つ困る。
  *
  * 1. `export const revalidate` が no-store に打ち消され、1リクエストごとに
- *    214記事分を取り直す（本文込みだと実測 4.3MB）。microCMS は API 5/5 が満杯で
+ *    全記事分を取り直す（本文込みで実測 4.67MB／224記事・2026-08-25）。microCMS は API 5/5 が満杯で
  *    レート制限もあるため、ヘッダー全ページから導線のある面がこれをやるのは危険
  * 2. 取得に失敗しても 200 で「0件」を配ってしまう。sitemap なら空、一覧なら
  *    「動画つきの記事はまだありません」が、クロールされうる状態で出る
@@ -32,15 +32,20 @@ export const ALL_BLOGS_REVALIDATE = 3600;
  * 「そのfetchは一切キャッシュされない」状態になる（= revalidate ごとに全件取り直し）。
  * しかも本文は base64 で格納されるため、実際に使える生JSONは 2MB×3/4 ≒ 1.5MB しかない。
  *
- * 実測（214記事）:
- *   limit=100 → 最大 2.16MB/ページ（base64 で 2.88MB）→ 上限超過。これが警告の正体
- *   limit=50  → 最大 1.08MB（1.45MB）→ 収まるが余裕28%。記事が長くなると再発する
- *   limit=25  → 最大 0.58MB（0.77MB）→ 余裕61%。最大級の記事(52KB)が25本並んでも収まる
+ * 実測（224記事・2026-08-25）:
+ *   limit=100 → 2.01MB/ページ（base64 で 2.68MB）→ 上限超過。これが警告の正体
+ *   limit=50  → 1.16MB（1.55MB）→ 今は収まるが、最も長い50本が集まると 2MB を超える
+ *   limit=25  → 0.68MB（0.91MB）→ 上限の 43%。最長級の記事(52KB)が25本並んでも 83% で収まる
  *
  * ⚠️ `fields` を絞っても解決しない。本文以外は全記事あわせて35KB（全体の1.8%）しかなく、
  * 容量はほぼ本文そのものだから。効くのはページ幅だけ。
- * 転送量は変わらず9リクエストに増えるが、microCMS は大きなページの組み立てが遅く、
- * 全件取得は逆に速くなる（実測 10.2秒 → 3.9秒）。
+ * 転送量は変わらないが、リクエストが3→9本に増えるぶん全件取得は**遅くなる**
+ * （実測 3.9〜4.5秒 → 5.4〜8.9秒。キャッシュバスター付き各3回）。
+ * revalidate=3600 で1時間に1回しか走らないので無視できるコストで、
+ * キャッシュに載る利益のほうがはるかに大きい。
+ * ⚠️ 初版のコメントは「逆に速くなる（10.2秒→3.9秒）」と書いていたが、
+ * 測り直すと方向が逆だった。誤った実測値を恒久コメントに残すと、次に触る人が
+ * それを根拠に判断してしまう（#17 で警告1行を信じて見逃したのと同じ形）。
  */
 export const BODY_SCAN_PAGE = 25;
 
@@ -58,6 +63,9 @@ export const BODY_SCAN_FIELDS = "id,title,slug,eyecatch,publishedAt,content,html
  * 本文なしなのに25で取っても「リクエストが数本増える」だけで済む。
  */
 export const NO_BODY_PAGE = 100;
+
+/** microCMS の `limit` の上限。ページ幅の検証はこちらを使う（NO_BODY_PAGE を流用しない）。 */
+export const MICROCMS_MAX_LIMIT = 100;
 
 /** 暴走防止。到達したら黙って切り捨てず気づけるようにする。 */
 const MAX_ARTICLES = 3000;
@@ -82,7 +90,35 @@ async function page(
   if (!res.ok) {
     throw new Error(`microCMS blogs fetch failed: ${res.status} (offset=${offset})`);
   }
-  return res.json();
+  const text = await res.text();
+  warnIfNearCacheLimit(text.length, offset, pageSize);
+  return JSON.parse(text) as BlogsResponse;
+}
+
+/** Next のデータキャッシュの上限。1エントリ 2MiB を超えると**一切保存されない**。 */
+const CACHE_LIMIT_BYTES = 2 * 1024 * 1024;
+/** 上限のこの割合を超えたら警告する。超えてからでは遅いので手前で鳴らす。 */
+const CACHE_WARN_RATIO = 0.8;
+
+/**
+ * キャッシュ上限に近づいたら気づけるようにする。
+ *
+ * ⚠️ これが無いと再発しても分からない。#17 では上限超過の唯一の信号が
+ * `next build` の警告1行で、誰も読まないまま「キャッシュが一度も効いていない」状態が
+ * そのまま本番に出ていた。記事は増え続けるので、いつか必ずまた上限に当たる。
+ * body は base64 で保存されるため、生バイト数の 4/3 が実際に載る量になる。
+ */
+function warnIfNearCacheLimit(rawBytes: number, offset: number, pageSize: number): void {
+  const stored = (rawBytes * 4) / 3;
+  if (stored < CACHE_LIMIT_BYTES * CACHE_WARN_RATIO) return;
+  const over = stored >= CACHE_LIMIT_BYTES;
+  console.warn(
+    `[allBlogs] ${over ? "データキャッシュの上限を超えています" : "データキャッシュの上限に近づいています"}` +
+      `（offset=${offset} limit=${pageSize} / base64換算 ${Math.round(stored / 1024)}KB` +
+      ` = 上限の${Math.round((stored / CACHE_LIMIT_BYTES) * 100)}%）。` +
+      `${over ? "このページはキャッシュされず毎回取り直しになります。" : ""}` +
+      `BODY_SCAN_PAGE を下げてください。`,
+  );
 }
 
 /**
@@ -105,7 +141,7 @@ export async function fetchAllBlogsCached(opts: {
   // microCMS は limit=0 を「0件」として200で返す（実測）。throw されないので素通りさせると
   // needed も maxPages も Infinity になり、offset=0 のまま無限にリクエストし続ける。
   // 101以上と負数は400で落ちる（実測）が、失敗の仕方を揃えるため入口でまとめて弾く。
-  if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > NO_BODY_PAGE) {
+  if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > MICROCMS_MAX_LIMIT) {
     throw new Error(`[allBlogs] pageSize は 1〜${NO_BODY_PAGE} の整数にしてください（受け取った値: ${pageSize}）`);
   }
   const all: Blog[] = [];
