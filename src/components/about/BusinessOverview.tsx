@@ -67,7 +67,7 @@ export default function BusinessOverview() {
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-20 md:py-28">
-        <h2 className="text-[#0a6bb3] text-[24px] md:text-[32px] font-extrabold tracking-[0.06em] mb-10">
+        <h2 className="text-[#0a6bb3] text-2xl md:text-4xl font-extrabold tracking-[0.06em] mb-10">
           事業概要
         </h2>
 
@@ -94,7 +94,7 @@ export default function BusinessOverview() {
                     </div>
                   ) : (
                     <>
-                      <div className={`font-extrabold text-[28px] md:text-[32px] leading-tight ${item.brandColor}`}>
+                      <div className={`font-extrabold text-3xl md:text-4xl ${item.brandColor}`}>
                         {item.brandLabel}
                       </div>
                     </>
@@ -104,10 +104,10 @@ export default function BusinessOverview() {
                 {/* Center: Content */}
                 <div className={item.id === 'ridejob' ? "md:col-span-7" : "md:col-span-9"}>
                   <div className="flex flex-wrap items-baseline gap-4 mb-4">
-                    <h3 className="text-[#0b2a44] text-[20px] md:text-[28px] font-extrabold tracking-[0.02em]">
+                    <h3 className="text-[#0b2a44] text-xl md:text-3xl font-extrabold tracking-[0.02em]">
                       {item.title}
                     </h3>
-                    <span className="text-[#64748b] text-[14px] md:text-[16px] font-bold">
+                    <span className="text-[#64748b] text-sm md:text-base font-bold">
                       {item.since}
                     </span>
                   </div>
@@ -116,11 +116,11 @@ export default function BusinessOverview() {
                     {item.bullets.map((b, i) => (
                       <div key={i}>
                         {b.heading && (
-                          <div className="text-[#0b2a44] text-[16px] md:text-[18px] font-extrabold mb-1">
+                          <div className="text-[#0b2a44] text-base md:text-lg font-extrabold mb-1">
                             {b.heading}
                           </div>
                         )}
-                        <p className="text-[#0d2233] text-[14px] md:text-[16px] leading-[2]">
+                        <p className="text-[#0d2233] text-sm md:text-base">
                           {b.body}
                         </p>
                       </div>

@@ -63,14 +63,14 @@ function InterviewCard({ blog }: { blog: Blog }) {
           <div className="box-border content-stretch flex flex-col gap-4 lg:gap-6 items-start justify-start p-0 relative shrink-0 w-full">
             <div className="box-border content-stretch flex flex-row items-center justify-between p-0 relative shrink-0 w-full">
               <div className="bg-[#2204db] box-border content-stretch flex flex-row items-center justify-center overflow-clip px-3 py-[3px] lg:px-5 lg:py-[5px] relative rounded-[32px] shrink-0">
-                <div className="flex flex-col font-['Noto_Sans_JP:Medium',_sans-serif] font-medium justify-center leading-[0] relative shrink-0 text-[12px] lg:text-[14px] text-center text-neutral-50 text-nowrap">
+                <div className="flex flex-col font-medium justify-center relative shrink-0 text-xs lg:text-sm text-center text-neutral-50 text-nowrap">
                   <p className="block leading-[16px] lg:leading-[20px] whitespace-pre">
                     {blog.category?.name || '企業取材'}
                   </p>
                 </div>
               </div>
               <div className="box-border content-stretch flex flex-col items-start justify-start p-0 relative shrink-0">
-                <div className="flex flex-col font-['Noto_Sans_JP:DemiLight',_sans-serif] font-[350] justify-center leading-[0] relative shrink-0 text-[#6a7282] text-[11.438px] lg:text-[13px] text-left text-nowrap">
+                <div className="flex flex-col font-[350] justify-center relative shrink-0 text-[#6a7282] text-xs text-left text-nowrap">
                   <p className="block leading-[16px] lg:leading-[20px] whitespace-pre">
                     {formatDate(blog.publishedAt)}
                   </p>
@@ -78,12 +78,12 @@ function InterviewCard({ blog }: { blog: Blog }) {
               </div>
             </div>
             <div className="box-border content-stretch flex flex-col gap-2 lg:gap-3 items-start justify-start leading-[0] p-0 relative shrink-0 w-full">
-              <div className="flex flex-col font-['Noto_Sans_JP:Bold',_sans-serif] font-bold justify-center relative shrink-0 text-[#101828] text-[18px] md:text-[16px] lg:text-[20px] text-left w-full">
+              <div className="flex flex-col font-bold justify-center relative shrink-0 text-[#101828] text-lg md:text-base lg:text-xl text-left w-full">
                 <p className="block leading-[20px] lg:leading-[24px] group-hover:text-[#2204db] transition-colors duration-200">
                   {truncateTitle(blog.title)}
                 </p>
               </div>
-              <div className="flex flex-col font-['Noto_Sans_JP:Regular',_sans-serif] font-normal justify-center relative shrink-0 text-[#4a5565] text-[14px] md:text-[13px] lg:text-[16px] text-justify w-full">
+              <div className="flex flex-col font-normal justify-center relative shrink-0 text-[#4a5565] text-sm md:text-xs lg:text-base text-justify w-full">
                 {/* Mobile: 20文字に省略 */}
                 <p className="block md:hidden leading-[1.5]">
                   {getExcerpt(20)}
@@ -186,7 +186,7 @@ export default async function CompanyInterviewSection() {
                     aria-hidden="true"
                     className="absolute border-[#333333] border-[1.5px] border-solid inset-0 pointer-events-none rounded-[58px]"
                   />
-                  <div className="flex flex-col font-['Noto_Sans_JP:Medium',_sans-serif] font-medium justify-center leading-[0] relative shrink-0 text-[#ffffff] text-[16px] md:text-[18px] text-center text-nowrap tracking-[0.36px]">
+                  <div className="flex flex-col font-medium justify-center relative shrink-0 text-[#ffffff] text-base md:text-lg text-center text-nowrap tracking-[0.36px]">
                     <p className="adjustLetterSpacing block leading-[normal] whitespace-pre">
                       企業取材をもっと見る
                     </p>

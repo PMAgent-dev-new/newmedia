@@ -75,7 +75,7 @@ export default function BlogDetailSection({ blog }: BlogDetailSectionProps) {
         )}
 
         {/* 記事タイトル */}
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-heading">
           {blog.title}
         </h1>
 

@@ -50,7 +50,7 @@ export default function PickupArticles({ articles }: PickupArticlesProps) {
               
               {/* 記事情報 */}
               <div className="flex-1 min-w-0">
-                <h4 className="text-[#333333] text-sm font-medium line-clamp-2 leading-tight mb-1">
+                <h4 className="text-[#333333] text-sm font-medium line-clamp-2 leading-heading mb-1">
                   {truncateTitle(article.title)}
                 </h4>
                 <span className="text-[#666666] text-xs">

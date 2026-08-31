@@ -5,7 +5,7 @@ export default function Achievements() {
   return (
     <section className="bg-[#f3f9ff]">
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-20 md:py-28">
-        <h2 className="text-[#0a6bb3] text-[24px] md:text-[32px] text-center font-extrabold tracking-[0.06em] mb-10">
+        <h2 className="text-[#0a6bb3] text-2xl md:text-4xl text-center font-extrabold tracking-[0.06em] mb-10">
           タクシードライバーに特化した採用サービス
         </h2>
 
@@ -23,11 +23,11 @@ export default function Achievements() {
           </div>
 
           <div className="flex items-end gap-4">
-            <div className="text-[#0b2a44] text-[20px] md:text-[28px] font-extrabold">取引実績</div>
+            <div className="text-[#0b2a44] text-xl md:text-3xl font-extrabold">取引実績</div>
             <div className="text-[#101828] font-extrabold leading-none tracking-tight">
-              <span className="text-[72px] md:text-[120px]">300</span>
+              <span className="text-7xl md:text-9xl">300</span>
             </div>
-            <div className="text-[#0b2a44] text-[20px] md:text-[28px] font-extrabold">社以上</div>
+            <div className="text-[#0b2a44] text-xl md:text-3xl font-extrabold">社以上</div>
           </div>
         </div>
 
@@ -43,7 +43,7 @@ export default function Achievements() {
             />
           </div>
           {/* Caption inside container */}
-          <p className="mt-8 text-[#0b4f80] text-center text-[18px] md:text-[24px] lg:text-[28px] font-extrabold tracking-[0.02em]">
+          <p className="mt-8 text-[#0b4f80] text-center text-lg md:text-2xl lg:text-3xl font-extrabold tracking-[0.02em]">
             全国主要都市を中心としタクシー・ハイヤー・バス会社の採用支援
           </p>
         </div>

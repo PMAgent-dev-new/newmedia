@@ -57,7 +57,7 @@ function MemberDetail({ member }: { member: Member }) {
       <div className="box-border content-stretch flex flex-col gap-3 items-center justify-start p-0 relative shrink-0 w-full max-w-full">
         {/* 名前部分 */}
         <div className="box-border content-stretch flex flex-col items-center justify-start leading-[0] p-0 relative shrink-0 text-center w-full">
-          <div className="flex flex-col font-['Noto_Sans_JP:Bold',_sans-serif] font-bold justify-center relative shrink-0 text-[#2204db] text-[20px] md:text-[18px]">
+          <div className="flex flex-col font-bold justify-center relative shrink-0 text-[#2204db] text-xl md:text-lg">
             <p className="block leading-[normal] break-words">
               {member.name || '名前未設定'}
             </p>
@@ -66,7 +66,7 @@ function MemberDetail({ member }: { member: Member }) {
         
         {/* テキスト部分 */}
         <div className="box-border content-stretch flex flex-col gap-4 items-start justify-start p-0 relative shrink-0 w-full max-w-full">
-          <div className="flex flex-col font-['Noto_Sans_JP:Medium',_sans-serif] font-bold justify-start leading-[1.6] relative shrink-0 text-[16px] md:text-[14px] text-left text-neutral-950 w-full max-w-full px-2">
+          <div className="flex flex-col font-bold justify-start relative shrink-0 text-base md:text-sm text-left text-neutral-950 w-full max-w-full px-2">
             <p className="block break-words">
               {member.text || 'メンバーの説明文が設定されていません。'}
             </p>

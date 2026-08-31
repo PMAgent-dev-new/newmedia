@@ -5,6 +5,101 @@
   --foreground: #171717;
 }
 
+/* ============================================================================
+ * タイポグラフィ規則（RIDE JOB Media）
+ * ----------------------------------------------------------------------------
+ * 日本語の可読性を基準に決めた1組のスケール。**新しいサイズを増やさない**こと。
+ * `text-[17px]` のような任意値を書くと、同じ役割の文字がページごとに違う大きさに
+ * なる（実測で27種類のサイズ・26種類の行間が混在していた）。
+ *
+ * 原則1: 行間はサイズに反比例させる。
+ *   日本語は全角で字面が詰まるため、小さい文字ほど行間を広く取らないと読めない。
+ *   逆に大きい見出しで行間を広げると、行が離れて1つの見出しに見えなくなる。
+ *   （修正前は 32px の見出しが 1.5、14px の本文が 1.43 と逆転していた）
+ *
+ * 原則2: 字間は本文で 0.02em、見出しで 0.01em、特大で 0。
+ *   日本語はベタ組みだと詰まって見えるので本文にわずかな字間を入れる。
+ *   大きい文字ほど相対的な隙間が目立つので減らす。
+ *
+ * 原則3: 12px を最小とする。
+ *   10〜11px の日本語は漢字が潰れて読めない。タグやバッジも 12px を下限にする。
+ *
+ * 役割の目安:
+ *   xs   タグ・日付・注記        2xl  中見出し(h3)
+ *   sm   カードのメタ・補助      3xl  大見出し(h2)
+ *   base 本文                    4xl  ページタイトル(h1)
+ *   lg   リード文・カード見出し  5xl  セクションタイトル(PC)
+ *   xl   小見出し(h4)            6xl〜 ヒーロー・装飾数字
+ * ========================================================================== */
+@theme {
+  --text-xs: 0.75rem;              /* 12px */
+  --text-xs--line-height: 1.6;
+  --text-xs--letter-spacing: 0.02em;
+
+  --text-sm: 0.875rem;             /* 14px */
+  --text-sm--line-height: 1.75;
+  --text-sm--letter-spacing: 0.02em;
+
+  --text-base: 1rem;               /* 16px */
+  --text-base--line-height: 1.9;
+  --text-base--letter-spacing: 0.02em;
+
+  --text-lg: 1.125rem;             /* 18px */
+  --text-lg--line-height: 1.8;
+  --text-lg--letter-spacing: 0.02em;
+
+  --text-xl: 1.25rem;              /* 20px */
+  --text-xl--line-height: 1.7;
+  --text-xl--letter-spacing: 0.01em;
+
+  --text-2xl: 1.5rem;              /* 24px */
+  --text-2xl--line-height: 1.6;
+  --text-2xl--letter-spacing: 0.01em;
+
+  --text-3xl: 1.75rem;             /* 28px */
+  --text-3xl--line-height: 1.5;
+  --text-3xl--letter-spacing: 0.01em;
+
+  --text-4xl: 2rem;                /* 32px */
+  --text-4xl--line-height: 1.45;
+  --text-4xl--letter-spacing: 0;
+
+  --text-5xl: 2.5rem;              /* 40px */
+  --text-5xl--line-height: 1.35;
+  --text-5xl--letter-spacing: 0;
+
+  --text-6xl: 3rem;                /* 48px */
+  --text-6xl--line-height: 1.25;
+  --text-6xl--letter-spacing: 0;
+
+  --text-7xl: 4.5rem;              /* 72px */
+  --text-7xl--line-height: 1.1;
+  --text-7xl--letter-spacing: 0;
+
+  --text-8xl: 5.75rem;             /* 92px  LPの装飾数字 */
+  --text-8xl--line-height: 1.05;
+  --text-8xl--letter-spacing: 0;
+
+  --text-9xl: 7.5rem;              /* 120px 実績数字（数字のみ・日本語には使わない） */
+  --text-9xl--line-height: 1;
+  --text-9xl--letter-spacing: 0;
+}
+
+/* 見出しラベル（英字の小さな飾り文字）だけは字間を大きく取る。
+   日本語には使わない。 */
+@utility tracking-eyebrow {
+  letter-spacing: 0.18em;
+}
+
+/* 行間を詰めてよい唯一の場面: カード見出し・記事タイトルなど、
+   2〜3行に収める短い見出し。スケールの行間（本文寄り）だと行が離れて
+   1つの見出しに見えなくなるため。
+   ⚠️ Tailwind の `leading-tight`(1.25) は使わない。日本語は仮名・漢字の
+   字面が大きく、1.25では行が接触して読めなくなる。 */
+@utility leading-heading {
+  line-height: 1.4;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -22,7 +117,18 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* ⚠️ 以前は `Arial, Helvetica, sans-serif` だった。Arial は日本語グリフを持たないため、
+     本文の大半を占める日本語が**OS任せのフォントにフォールバック**していた
+     （Windowsは游ゴシック/メイリオ、Macはヒラギノ）。字面率も字幅も違うので、
+     同じページが環境ごとに別の見た目になり、行間の調整も意味を成さなかった。
+     欧文はGeist（読み込み済みだが未使用だった）、日本語は各OSの標準ゴシックを明示する。 */
+  font-family: var(--font-geist-sans), "Hiragino Kaku Gothic ProN", "Hiragino Sans",
+    "BIZ UDPGothic", "Noto Sans JP", "Yu Gothic Medium", "Yu Gothic", Meiryo,
+    system-ui, sans-serif;
+  /* 日本語の字面を締める。ぶら下げ・約物の詰めはブラウザ任せにせず明示。 */
+  font-feature-settings: "palt" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* ロゴマルキー */
@@ -40,18 +146,23 @@ body {
   100% { transform: translateX(-50%); }
 }
 
-/* ブログ記事本文のスタイル */
+/* ブログ記事本文のスタイル。
+   サイズ・行間・字間はすべて上のトークンに従う（ここで個別に上書きしない）。
+   見出しの階層は h2:28 / h3:20 / h4:18 / 本文:16。 */
 .article-content {
-  line-height: 1.9;
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  letter-spacing: var(--text-base--letter-spacing);
 }
 
+/* 本文。行間・字間はトークン（--text-base）が持つので、ここでは指定しない。 */
 .article-content p {
-  @apply text-base text-gray-800 leading-[1.9] mb-5;
+  @apply text-base text-gray-800 mb-5;
 }
 
 /* H2: セクションが一目で分かる大見出し（下線ボーダー＋広い上余白） */
 .article-content h2 {
-  @apply text-2xl md:text-[27px] font-bold text-gray-900 mt-14 mb-6 pb-3 border-b-[3px] border-blue-600;
+  @apply text-2xl md:text-3xl font-bold text-gray-900 mt-14 mb-6 pb-3 border-b-[3px] border-blue-600;
 }
 
 .article-content h2:first-child {
@@ -60,11 +171,11 @@ body {
 
 /* H3: 中見出し（黄ハイライト。H2より一段小さく従属的に） */
 .article-content h3 {
-  @apply text-[19px] font-bold text-[#101828] bg-[#ffe9ab] px-4 py-2 rounded-md mt-9 mb-4;
+  @apply text-xl font-bold text-[#101828] bg-[#ffe9ab] px-4 py-2 rounded-md mt-9 mb-4;
 }
 
 .article-content h4 {
-  @apply text-base md:text-[17px] font-semibold text-gray-900 mt-6 mb-2;
+  @apply text-lg font-semibold text-gray-900 mt-6 mb-2;
 }
 
 .article-content strong {
@@ -84,7 +195,7 @@ body {
 }
 
 .article-content li {
-  @apply pl-1 leading-[1.8];
+  @apply pl-1;
 }
 
 .article-content a {
@@ -108,7 +219,7 @@ body {
 }
 
 .article-content table {
-  @apply border-collapse border border-gray-300 my-8 text-[15px];
+  @apply border-collapse border border-gray-300 my-8 text-sm;
   /* 狭い画面でも横スクロールで収める（テーブルがビューポート幅を超えるのを防ぐ） */
   display: block;
   overflow-x: auto;

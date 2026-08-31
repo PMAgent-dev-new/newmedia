@@ -18,10 +18,10 @@ function HelpCard({ title, description, buttonText, buttonColor, href, ariaLabel
     <div className="bg-white rounded-2xl border-[1.2px] border-[#333333] shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] w-full">
       <div className="flex flex-col-reverse">
         <div className="px-4 py-8 text-center">
-          <h3 className="font-bold text-[24px] md:text-[32px] text-gray-800 mb-4 leading-[1.1]">
+          <h3 className="font-bold text-2xl md:text-4xl text-gray-800 mb-4">
             {title}
           </h3>
-          <p className="font-medium text-[#333333] text-[14px] md:text-[16px] leading-[1.6] whitespace-pre-line">
+          <p className="font-medium text-[#333333] text-sm md:text-base whitespace-pre-line">
             {description}
           </p>
         </div>
@@ -37,7 +37,7 @@ function HelpCard({ title, description, buttonText, buttonColor, href, ariaLabel
             className="flex items-center justify-center gap-4 py-6 md:py-[30px] px-6 md:px-12 rounded-t-2xl border-[1.5px] border-[#333333] hover:opacity-90 transition-opacity duration-200"
             style={{ backgroundColor: buttonColor }}
           >
-            <p className="font-extrabold text-white text-[24px] md:text-[32px] leading-none">
+            <p className="font-extrabold text-white text-2xl md:text-4xl leading-none">
               {buttonText}
             </p>
             <div className="rotate-[270deg]">

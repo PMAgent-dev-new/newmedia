@@ -13,7 +13,7 @@ const PHONE_TEL = 'tel:0366920477';
 const PHONE_HOURS = '平日 9:30〜18:30';
 
 const BTN_BASE =
-  'group inline-flex flex-col items-center justify-center rounded-full font-extrabold px-8 py-3.5 text-[15px] md:text-[16px] leading-tight transition-all duration-200 hover:-translate-y-0.5';
+  'group inline-flex flex-col items-center justify-center rounded-full font-extrabold px-8 py-3.5 text-sm md:text-base transition-all duration-200 hover:-translate-y-0.5';
 
 function ArrowIcon({ className = '' }: { className?: string }) {
   return (
@@ -44,7 +44,7 @@ export function BookButton({ label = '無料で相談する', sub = '1分で完�
   return (
     <a href={BOOK_URL} target="_blank" rel="noopener noreferrer" className={`${BTN_BASE} bg-[#04acdb] text-white shadow-[0_8px_20px_rgba(4,172,219,0.3)] hover:bg-[#0398c0]`}>
       <span className="inline-flex items-center gap-2">{label}<ArrowIcon className="transition-transform group-hover:translate-x-1" /></span>
-      <span className="mt-0.5 text-[11px] md:text-[12px] font-bold opacity-90">{sub}</span>
+      <span className="mt-0.5 text-xs font-bold opacity-90">{sub}</span>
     </a>
   );
 }
@@ -54,7 +54,7 @@ function LineButton({ sub = 'ともだち追加で気軽に' }: { sub?: string }
   return (
     <a href={LINE_URL} target="_blank" rel="noopener noreferrer" className={`${BTN_BASE} bg-[#06c755] text-white shadow-[0_8px_20px_rgba(6,199,85,0.25)] hover:bg-[#05b54d]`}>
       <span className="inline-flex items-center gap-2"><ChatIcon />LINEで相談する</span>
-      <span className="mt-0.5 text-[11px] md:text-[12px] font-bold opacity-90">{sub}</span>
+      <span className="mt-0.5 text-xs font-bold opacity-90">{sub}</span>
     </a>
   );
 }
@@ -64,7 +64,7 @@ function PhoneButton() {
   return (
     <a href={PHONE_TEL} className={`${BTN_BASE} bg-white text-[#0b2a44] border-[1.5px] border-[#0b2a44] hover:bg-[#0b2a44] hover:text-white`}>
       <span className="inline-flex items-center gap-2"><PhoneIcon /><span className="font-extrabold tracking-wide">{PHONE_DISPLAY}</span></span>
-      <span className="mt-0.5 text-[11px] md:text-[12px] font-bold opacity-80">今すぐ電話で相談（{PHONE_HOURS}）</span>
+      <span className="mt-0.5 text-xs font-bold opacity-80">今すぐ電話で相談（{PHONE_HOURS}）</span>
     </a>
   );
 }
@@ -92,13 +92,13 @@ export function LpHero() {
     >
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-20 md:py-28">
         <div className="max-w-[900px]">
-            <div className="inline-flex items-center gap-3 text-[#0a6bb3] font-extrabold tracking-[0.12em] text-[13px] md:text-[15px] mb-6">
+            <div className="inline-flex items-center gap-3 text-[#0a6bb3] font-extrabold tracking-[0.12em] text-xs md:text-sm mb-6">
               <span className="h-px w-7 bg-[#0a6bb3]" />
               未経験から始めるタクシー転職
             </div>
             <h1 className="text-[#1569a7] font-extrabold leading-[1.35] tracking-[0.04em] mb-7">
-              <span className="block text-[34px] md:text-[52px] lg:text-[58px]">タクシー会社選びは、</span>
-              <span className="block text-[34px] md:text-[52px] lg:text-[58px]">
+              <span className="block text-4xl md:text-6xl">タクシー会社選びは、</span>
+              <span className="block text-4xl md:text-6xl">
                 <span className="relative inline-block">
                   プロにご相談ください
                   <span className="absolute left-0 -bottom-1 h-[6px] w-full bg-[#ffe066]/70 -z-10" />
@@ -106,20 +106,20 @@ export function LpHero() {
                 。
               </span>
             </h1>
-            <p className="text-[#0d2233] text-[16px] md:text-[19px] leading-[2.1] font-semibold mb-9">
+            <p className="text-[#0d2233] text-base md:text-lg font-semibold mb-9">
               取引実績300社以上の中から、あなたにふさわしい1社を。
               <br className="hidden md:block" />
               収入・勤務形態・エリアのご希望にあわせ、専任の担当が無料でご提案します。
             </p>
             <CtaCluster />
             <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2">
-              <span className="inline-flex items-center gap-1.5 text-[14px] font-bold text-[#0b2a44]">
-                <span className="text-[#fbbc04] text-[15px]">★</span>Googleクチコミ高評価多数
+              <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[#0b2a44]">
+                <span className="text-[#fbbc04] text-sm">★</span>Googleクチコミ高評価多数
               </span>
-              <span className="inline-flex items-center gap-1.5 text-[14px] font-bold text-[#0b2a44]">
+              <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[#0b2a44]">
                 <span className="text-[#0a6bb3]">✓</span>未経験スタート80%
               </span>
-              <span className="inline-flex items-center gap-1.5 text-[14px] font-bold text-[#0b2a44]">
+              <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[#0b2a44]">
                 <span className="text-[#0a6bb3]">✓</span>相談料0円・履歴書不要
               </span>
             </div>
@@ -140,7 +140,7 @@ export function LpWorries() {
   return (
     <section className="bg-[#f3f9ff]">
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-20 md:py-28">
-        <h2 className="text-[#0a6bb3] text-[24px] md:text-[32px] text-center font-extrabold tracking-[0.06em] mb-12">
+        <h2 className="text-[#0a6bb3] text-2xl md:text-4xl text-center font-extrabold tracking-[0.06em] mb-12">
           タクシー転職で、こんなお悩みはありませんか
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-[920px] mx-auto">
@@ -149,14 +149,14 @@ export function LpWorries() {
               key={w}
               className="flex items-start gap-5 rounded-2xl bg-white border border-[#e6eef9] px-7 py-6 shadow-[0_2px_8px_rgba(16,24,40,0.04)]"
             >
-              <span className="text-[#1569a7] font-extrabold text-[26px] leading-none shrink-0">Q</span>
-              <p className="text-[#0d2233] text-[16px] md:text-[17px] font-semibold leading-[1.9]">{w}</p>
+              <span className="text-[#1569a7] font-extrabold text-2xl leading-none shrink-0">Q</span>
+              <p className="text-[#0d2233] text-base font-semibold">{w}</p>
             </div>
           ))}
         </div>
         <p className="text-center mt-12 text-[#0b2a44] font-extrabold tracking-[0.04em] leading-[1.7]">
-          <span className="block text-[18px] md:inline md:text-[26px]">その会社選び、</span>
-          <span className="relative inline-block text-[26px] md:text-[26px] text-[#0a6bb3]">
+          <span className="block text-lg md:inline md:text-2xl">その会社選び、</span>
+          <span className="relative inline-block text-2xl text-[#0a6bb3]">
             専門家にお任せいただけます。
             <span className="absolute left-0 -bottom-1 h-[6px] w-full bg-[#ffe066]/70"></span>
           </span>
@@ -202,7 +202,7 @@ export function LpReasons() {
       title: (
         <>
           未経験でも安心。<br />
-          利用者の<span className="text-[#0a6bb3] text-[28px]">80%</span>が未経験スタート
+          利用者の<span className="text-[#0a6bb3] text-3xl">80%</span>が未経験スタート
         </>
       ),
       body: '二種免許の取得から入社後の不安まで、専任の担当が一人ひとりに伴走します。はじめての業界でも、ゼロから着実にサポートいたします。',
@@ -212,7 +212,7 @@ export function LpReasons() {
       icon: <IconTarget />,
       title: (
         <>
-          取引<span className="text-[#0a6bb3] text-[28px]">300</span>社以上から<br />
+          取引<span className="text-[#0a6bb3] text-3xl">300</span>社以上から<br />
           専門家が厳選してご提案
         </>
       ),
@@ -233,7 +233,7 @@ export function LpReasons() {
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-20 md:py-28">
-        <h2 className="text-[#0a6bb3] text-[24px] md:text-[32px] text-center font-extrabold tracking-[0.06em] mb-14">
+        <h2 className="text-[#0a6bb3] text-2xl md:text-4xl text-center font-extrabold tracking-[0.06em] mb-14">
           ライドジョブが選ばれる<br className="md:hidden" />3つの理由
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 rounded-2xl overflow-hidden border border-[#e6eef9]">
@@ -242,10 +242,10 @@ export function LpReasons() {
               key={r.no}
               className={`bg-white p-10 md:p-11 ${i !== 2 ? 'md:border-r border-b md:border-b-0 border-[#e6eef9]' : ''}`}
             >
-              <div className="text-[#0a6bb3] font-extrabold text-[13px] tracking-[0.12em] mb-6">{r.no}</div>
+              <div className="text-[#0a6bb3] font-extrabold text-xs tracking-[0.12em] mb-6">{r.no}</div>
               <div className="w-12 h-12 text-[#0a6bb3] mb-6">{r.icon}</div>
-              <h3 className="text-[#0b2a44] font-extrabold text-[19px] leading-[1.6] mb-4">{r.title}</h3>
-              <p className="text-[#5a6175] text-[15px] leading-[1.95] font-medium">{r.body}</p>
+              <h3 className="text-[#0b2a44] font-extrabold text-lg mb-4">{r.title}</h3>
+              <p className="text-[#5a6175] text-sm font-medium">{r.body}</p>
             </div>
           ))}
         </div>
@@ -272,17 +272,17 @@ export function LpPromise() {
     >
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-20 md:py-28">
         <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-3 text-[#ffd233] font-extrabold tracking-[0.2em] text-[13px] mb-5">
+          <div className="inline-flex items-center gap-3 text-[#ffd233] font-extrabold tracking-[0.2em] text-xs mb-5">
             <span className="h-px w-7 bg-[#ffd233]/60" />OUR PROMISE<span className="h-px w-7 bg-[#ffd233]/60" />
           </div>
-          <h2 className="text-white text-[26px] md:text-[38px] font-extrabold tracking-[0.06em] leading-[1.5]">
+          <h2 className="text-white text-2xl md:text-5xl font-extrabold tracking-[0.06em]">
             ライドジョブの
             <span className="relative inline-block">
               <span className="text-[#ffd233]">4つ</span>のお約束
               <span className="absolute left-0 -bottom-1 h-[6px] w-full bg-[#ffd233]/40"></span>
             </span>
           </h2>
-          <p className="text-[#a9c4de] mt-6 font-semibold text-[15px] md:text-[16px]">
+          <p className="text-[#a9c4de] mt-6 font-semibold text-sm md:text-base">
             転職エージェントは強引なのでは——そうしたご不安に、誠実にお応えします。
           </p>
         </div>
@@ -293,12 +293,12 @@ export function LpPromise() {
               className="rounded-2xl bg-white/[0.06] border border-white/15 p-7 md:p-8 transition-colors hover:bg-white/[0.1]"
             >
               <div className="flex items-center gap-4 mb-4">
-                <span className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-[#ffd233] text-[#0b2a44] font-extrabold text-[18px] shrink-0 shadow-[0_4px_12px_rgba(255,210,51,0.3)]">
+                <span className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-[#ffd233] text-[#0b2a44] font-extrabold text-lg shrink-0 shadow-[0_4px_12px_rgba(255,210,51,0.3)]">
                   0{i + 1}
                 </span>
-                <span className="text-[#ffd233] font-extrabold tracking-[0.18em] text-[12px]">PROMISE</span>
+                <span className="text-[#ffd233] font-extrabold tracking-[0.18em] text-xs">PROMISE</span>
               </div>
-              <p className="text-[#e6eef7] text-[16px] md:text-[17px] font-medium leading-[1.9]">{p}</p>
+              <p className="text-[#e6eef7] text-base font-medium">{p}</p>
             </li>
           ))}
         </ul>
@@ -320,9 +320,9 @@ export function LpFlow() {
     <section className="bg-[#f3f9ff]">
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-20 md:py-28">
         <div className="text-center mb-12">
-          <div className="text-[#0a6bb3] font-extrabold tracking-[0.18em] text-[13px] mb-4">FLOW</div>
-          <h2 className="text-[#0a6bb3] text-[24px] md:text-[32px] font-extrabold tracking-[0.06em]">ご利用の流れ</h2>
-          <p className="text-[#0b2a44] mt-5 font-semibold text-[15px] md:text-[16px]">
+          <div className="text-[#0a6bb3] font-extrabold tracking-[0.18em] text-xs mb-4">FLOW</div>
+          <h2 className="text-[#0a6bb3] text-2xl md:text-4xl font-extrabold tracking-[0.06em]">ご利用の流れ</h2>
+          <p className="text-[#0b2a44] mt-5 font-semibold text-sm md:text-base">
             ご相談から入社後のフォローまで、すべて無料でご利用いただけます。
           </p>
         </div>
@@ -332,10 +332,10 @@ export function LpFlow() {
               key={s.n}
               className="relative flex md:flex-col items-center gap-5 md:gap-0 rounded-2xl bg-white border border-[#e6eef9] px-6 md:px-4 py-6 md:py-8 text-left md:text-center"
             >
-              <div className="shrink-0 w-12 h-12 rounded-full border-[1.5px] border-[#0a6bb3] text-[#0a6bb3] flex items-center justify-center font-extrabold text-[20px] md:mb-4">
+              <div className="shrink-0 w-12 h-12 rounded-full border-[1.5px] border-[#0a6bb3] text-[#0a6bb3] flex items-center justify-center font-extrabold text-xl md:mb-4">
                 {s.n}
               </div>
-              <h4 className="text-[#0b2a44] font-extrabold text-[15px] md:text-[16px] leading-[1.55]">
+              <h4 className="text-[#0b2a44] font-extrabold text-sm md:text-base">
                 {s.t.map((line) => (
                   <span key={line} className="block">{line}</span>
                 ))}
@@ -373,11 +373,11 @@ export function LpYoutube() {
     <section className="bg-white">
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-20 md:py-28">
         <div className="text-center mb-12">
-          <div className="text-[#0a6bb3] font-extrabold tracking-[0.18em] text-[13px] mb-4">MOVIE</div>
-          <h2 className="text-[#0a6bb3] text-[24px] md:text-[32px] font-extrabold tracking-[0.06em]">
+          <div className="text-[#0a6bb3] font-extrabold tracking-[0.18em] text-xs mb-4">MOVIE</div>
+          <h2 className="text-[#0a6bb3] text-2xl md:text-4xl font-extrabold tracking-[0.06em]">
             動画でわかる<br />タクシー転職のリアル
           </h2>
-          <p className="text-[#0b2a44] mt-5 font-semibold text-[15px] md:text-[16px]">
+          <p className="text-[#0b2a44] mt-5 font-semibold text-sm md:text-base">
             実際の転職者インタビューや面談の様子を、YouTubeチャンネルで公開しています。
           </p>
         </div>
@@ -402,10 +402,10 @@ export function LpYoutube() {
                 <PlayIcon />
               </div>
               <div className="p-6">
-                <h3 className="text-[#0b2a44] font-extrabold text-[15px] leading-[1.6] line-clamp-2 min-h-[3em]">
+                <h3 className="text-[#0b2a44] font-extrabold text-sm line-clamp-2 min-h-[3em]">
                   {v.title}
                 </h3>
-                <div className="mt-4 inline-flex items-center gap-2 text-[#0a6bb3] font-extrabold text-[13px]">
+                <div className="mt-4 inline-flex items-center gap-2 text-[#0a6bb3] font-extrabold text-xs">
                   動画を見る
                   <ArrowIcon className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </div>
@@ -419,7 +419,7 @@ export function LpYoutube() {
             href={YT_CHANNEL_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 rounded-full bg-[#FF0000] text-white font-extrabold px-9 py-4 text-[15px] md:text-[16px] shadow-[0_8px_20px_rgba(255,0,0,0.25)] transition-all hover:-translate-y-0.5 hover:bg-[#e60000]"
+            className="inline-flex items-center gap-3 rounded-full bg-[#FF0000] text-white font-extrabold px-9 py-4 text-sm md:text-base shadow-[0_8px_20px_rgba(255,0,0,0.25)] transition-all hover:-translate-y-0.5 hover:bg-[#e60000]"
           >
             <svg width="26" height="19" viewBox="0 0 30 21" fill="none" aria-hidden>
               <path d="M29.52 3.28c-.346-1.297-1.366-2.317-2.663-2.663C24.485 0 15.06 0 15.06 0S5.635 0 3.263.617c-1.297.346-2.317 1.366-2.663 2.663C0 5.652 0 10.5 0 10.5s0 4.848.6 7.22c.346 1.297 1.366 2.317 2.663 2.663C5.635 21 15.06 21 15.06 21s9.425 0 11.797-.617c1.297-.346 2.317-1.366 2.663-2.663.6-2.372.6-7.22.6-7.22s0-4.848-.6-7.22zM12.048 15V6l7.872 4.5-7.872 4.5z" fill="white" />
@@ -442,17 +442,17 @@ export function LpCompare() {
     ['費用', '完全無料', '無料', 'good', 'good'],
   ];
   const mark = (k: string) =>
-    k === 'good' ? <span className="text-[#0a6bb3] font-extrabold text-[18px] mr-1.5">◎</span>
+    k === 'good' ? <span className="text-[#0a6bb3] font-extrabold text-lg mr-1.5">◎</span>
     : k === 'mid' ? <span className="text-[#8a91a6] font-extrabold mr-1.5">△</span>
     : <span className="text-[#8a91a6] font-extrabold mr-1.5">×</span>;
   return (
     <section className="bg-[#f3f9ff]">
       <div className="mx-auto max-w-[860px] px-4 md:px-10 py-20 md:py-28">
-        <h2 className="text-[#0a6bb3] text-[24px] md:text-[32px] text-center font-extrabold tracking-[0.06em] mb-12">
+        <h2 className="text-[#0a6bb3] text-2xl md:text-4xl text-center font-extrabold tracking-[0.06em] mb-12">
           ご自身で探す場合との比較
         </h2>
         <div className="overflow-hidden rounded-2xl border border-[#e6eef9] bg-white">
-          <table className="w-full border-collapse text-[14px] md:text-[15px]">
+          <table className="w-full border-collapse text-sm">
             <thead>
               <tr>
                 <th className="bg-[#8a91a6] text-white font-extrabold p-4" />
@@ -488,7 +488,7 @@ export function LpFaq() {
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-[860px] px-4 md:px-10 py-20 md:py-28">
-        <h2 className="text-[#0a6bb3] text-[24px] md:text-[32px] text-center font-extrabold tracking-[0.06em] mb-12">
+        <h2 className="text-[#0a6bb3] text-2xl md:text-4xl text-center font-extrabold tracking-[0.06em] mb-12">
           よくあるご質問
         </h2>
         <div className="rounded-2xl border border-[#e6eef9] overflow-hidden divide-y divide-[#e6eef9]">
@@ -496,12 +496,12 @@ export function LpFaq() {
             <details key={q} className="group bg-white">
               <summary className="flex items-start gap-4 cursor-pointer list-none px-6 py-5 [&::-webkit-details-marker]:hidden">
                 <span className="text-[#0a6bb3] font-extrabold shrink-0">Q</span>
-                <span className="text-[#0b2a44] font-extrabold text-[16px] flex-1">{q}</span>
+                <span className="text-[#0b2a44] font-extrabold text-base flex-1">{q}</span>
                 <span className="shrink-0 mt-1 w-3 h-3 border-r-2 border-b-2 border-[#8a91a6] rotate-45 transition-transform group-open:rotate-[225deg]" />
               </summary>
               <div className="flex items-start gap-4 px-6 pb-6 -mt-1">
                 <span className="text-[#8a91a6] font-extrabold shrink-0">A</span>
-                <p className="text-[#5a6175] text-[15px] leading-[1.95] font-medium">{a}</p>
+                <p className="text-[#5a6175] text-sm font-medium">{a}</p>
               </div>
             </details>
           ))}
@@ -516,10 +516,10 @@ export function LpMidCta() {
   return (
     <section className="bg-[#0b2a44]">
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-14 md:py-16 text-center">
-        <h3 className="text-white text-[20px] md:text-[26px] font-extrabold tracking-[0.04em] leading-[1.5]">
+        <h3 className="text-white text-xl md:text-2xl font-extrabold tracking-[0.04em]">
           まずは「話を聞くだけ」でも大丈夫です。
         </h3>
-        <p className="text-[#bcd2e6] font-semibold text-[14px] md:text-[15px] mt-3">
+        <p className="text-[#bcd2e6] font-semibold text-sm mt-3">
           無料・履歴書不要・1分で完了。無理な勧誘はいたしません。
         </p>
         <div className="mt-8">
@@ -538,14 +538,14 @@ export function LpFinalCta() {
       style={{ background: 'linear-gradient(160deg,#0b2a44 0%,#0a4e86 100%)' }}
     >
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-20 md:py-28">
-        <h2 className="text-white text-[24px] md:text-[34px] font-extrabold tracking-[0.04em] leading-[1.6] mb-5">
+        <h2 className="text-white text-2xl md:text-4xl font-extrabold tracking-[0.04em] mb-5">
           あなたにふさわしいタクシー会社を、<br />
           <span className="relative inline-block">
             専門家が無料でお探しします。
             <span className="absolute left-0 -bottom-1 h-[5px] w-full bg-[#ffd233]/70" />
           </span>
         </h2>
-        <p className="text-[#bcd2e6] font-semibold mb-10 text-[15px] md:text-[16px]">
+        <p className="text-[#bcd2e6] font-semibold mb-10 text-sm md:text-base">
           まずはお気軽に、LINEまたはお電話でご相談ください。履歴書は不要・1分で完了します。
         </p>
         <CtaCluster center />
@@ -560,7 +560,7 @@ export function LpStickyCta() {
     <div className="fixed inset-x-0 bottom-0 z-50 md:hidden flex gap-2.5 p-3 bg-white/95 backdrop-blur border-t border-[#e6eef9] shadow-[0_-2px_14px_rgba(13,21,48,0.12)]">
       <a
         href={PHONE_TEL}
-        className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-[#0b2a44] text-white font-extrabold py-3.5 text-[15px]"
+        className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-[#0b2a44] text-white font-extrabold py-3.5 text-sm"
       >
         <PhoneIcon />電話する
       </a>
@@ -568,7 +568,7 @@ export function LpStickyCta() {
         href={BOOK_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-[#04acdb] text-white font-extrabold py-3.5 text-[15px]"
+        className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-[#04acdb] text-white font-extrabold py-3.5 text-sm"
       >
         <ArrowIcon />無料相談
       </a>

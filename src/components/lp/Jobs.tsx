@@ -37,28 +37,28 @@ function JobCard({ job }: { job: Job }) {
     <div className="flex flex-col rounded-2xl bg-white border border-[#e6eef9] p-6 shadow-[0_2px_8px_rgba(16,24,40,0.04)]">
       <div className="flex flex-wrap gap-2 mb-3">
         {job.employmentType && (
-          <span className="rounded-full bg-[#eaf3ff] text-[#0a6bb3] text-[12px] font-bold px-3 py-1">
+          <span className="rounded-full bg-[#eaf3ff] text-[#0a6bb3] text-xs font-bold px-3 py-1">
             {job.employmentType}
           </span>
         )}
         {tags.map((t, i) => (
-          <span key={i} className="rounded-full border border-[#e6eef9] text-[#5a6175] text-[12px] font-bold px-3 py-1">
+          <span key={i} className="rounded-full border border-[#e6eef9] text-[#5a6175] text-xs font-bold px-3 py-1">
             {t.name}
           </span>
         ))}
       </div>
 
-      <h3 className="text-[#0b2a44] font-extrabold text-[17px] leading-[1.55] mb-1">{jobTitle}</h3>
-      <div className="text-[#8a91a6] text-[13px] font-medium mb-4">{company}</div>
+      <h3 className="text-[#0b2a44] font-extrabold text-base mb-1">{jobTitle}</h3>
+      <div className="text-[#8a91a6] text-xs font-medium mb-4">{company}</div>
 
       <div className="mt-auto space-y-2.5 pt-4 border-t border-[#e6eef9]">
         <div className="flex items-baseline gap-3">
-          <span className="text-[#8a91a6] text-[12px] font-bold shrink-0 w-9">給与</span>
-          <span className="text-[#f0651f] font-extrabold text-[16px] leading-tight">{salary}</span>
+          <span className="text-[#8a91a6] text-xs font-bold shrink-0 w-9">給与</span>
+          <span className="text-[#f0651f] font-extrabold text-base leading-heading">{salary}</span>
         </div>
         <div className="flex items-baseline gap-3">
-          <span className="text-[#8a91a6] text-[12px] font-bold shrink-0 w-9">勤務地</span>
-          <span className="text-[#0b2a44] font-bold text-[14px]">{location}</span>
+          <span className="text-[#8a91a6] text-xs font-bold shrink-0 w-9">勤務地</span>
+          <span className="text-[#0b2a44] font-bold text-sm">{location}</span>
         </div>
       </div>
     </div>
@@ -80,11 +80,11 @@ export default async function LpJobs() {
     <section className="bg-[#f3f9ff]">
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-20 md:py-28">
         <div className="text-center mb-12">
-          <div className="text-[#0a6bb3] font-extrabold tracking-[0.18em] text-[13px] mb-4">JOBS</div>
-          <h2 className="text-[#0a6bb3] text-[24px] md:text-[32px] font-extrabold tracking-[0.06em]">
+          <div className="text-[#0a6bb3] font-extrabold tracking-[0.18em] text-xs mb-4">JOBS</div>
+          <h2 className="text-[#0a6bb3] text-2xl md:text-4xl font-extrabold tracking-[0.06em]">
             取扱求人の一例
           </h2>
-          <p className="text-[#0b2a44] mt-5 font-semibold text-[15px] md:text-[16px]">
+          <p className="text-[#0b2a44] mt-5 font-semibold text-sm md:text-base">
             ほんの一例です。あなたに合う求人は、専門家が条件にあわせて厳選してご提案します。
           </p>
         </div>
@@ -97,7 +97,7 @@ export default async function LpJobs() {
 
         <div className="flex flex-col items-center gap-3">
           <BookButton label="あなたに合う求人を相談する" sub="非公開求人のご紹介も・無料" />
-          <p className="text-[#8a91a6] text-[13px] font-medium">
+          <p className="text-[#8a91a6] text-xs font-medium">
             「まだ応募は決めていない」段階でのご相談も歓迎します。
           </p>
         </div>

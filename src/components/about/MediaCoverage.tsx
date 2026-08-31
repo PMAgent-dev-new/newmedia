@@ -41,14 +41,14 @@ export default function MediaCoverage() {
   return (
     <section className="bg-[#f3f9ff]">
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-20 md:py-28">
-        <h2 className="text-[#0a6bb3] text-[24px] md:text-[32px] font-extrabold tracking-[0.06em] mb-10">
+        <h2 className="text-[#0a6bb3] text-2xl md:text-4xl font-extrabold tracking-[0.06em] mb-10">
           メディア取材実績
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {items.map((item) => (
             <article key={item.id} className="flex flex-col items-center">
-              <div className="text-[#0b2a44] text-[18px] md:text-[22px] font-extrabold mb-4">
+              <div className="text-[#0b2a44] text-lg md:text-xl font-extrabold mb-4">
                 {item.brand}
               </div>
               <div className="w-full rounded-2xl overflow-hidden bg-white">
@@ -60,13 +60,13 @@ export default function MediaCoverage() {
                   className="w-full h-auto object-cover"
                 />
               </div>
-              <h3 className="mt-6 text-center text-[#0b2a44] text-[18px] md:text-[22px] font-extrabold leading-relaxed">
+              <h3 className="mt-6 text-center text-[#0b2a44] text-lg md:text-xl font-extrabold leading-relaxed">
                 {item.title}
               </h3>
               <div className="mt-6">
                 <a
                   href={item.href || '#'}
-                  className="inline-flex items-center justify-center rounded-full bg-[#115df2] text-white font-extrabold px-8 py-3 text-[14px] md:text-[16px]"
+                  className="inline-flex items-center justify-center rounded-full bg-[#115df2] text-white font-extrabold px-8 py-3 text-sm md:text-base"
                 >
                   {item.ctaLabel}
                 </a>

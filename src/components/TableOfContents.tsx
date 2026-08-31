@@ -83,7 +83,7 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
     <div className="bg-white relative rounded-[10px] border-[1.5px] border-[#333333] w-full mb-8">
       <div className="p-6">
         {/* タイトル */}
-        <h3 className="text-[18px] font-bold text-gray-800 mb-4">
+        <h3 className="text-lg font-bold text-gray-800 mb-4">
           目次
         </h3>
         
@@ -107,16 +107,16 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
                     {/* h2の場合は数字、h3の場合は点 */}
                     <div className={`${
                       item.level === 2 
-                        ? 'text-[16px] font-semibold text-[#333333] mr-2 min-w-[20px]' 
-                        : 'text-[14px] text-[#666666] mr-2'
+                        ? 'text-base font-semibold text-[#333333] mr-2 min-w-[20px]' 
+                        : 'text-sm text-[#666666] mr-2'
                     }`}>
                       {item.level === 2 ? `${h2Count}.` : '•'}
                     </div>
                     <div 
                       className={`${
                         item.level === 2 
-                          ? 'text-[16px] font-medium text-[#2204db] leading-[1.6]' 
-                          : 'text-[14px] text-[#2204db] leading-[1.6]'
+                          ? 'text-base font-medium text-[#2204db]' 
+                          : 'text-sm text-[#2204db]'
                       } hover:text-[#130278] hover:underline ${
                         activeId === item.id ? 'font-semibold text-[#130278]' : ''
                       }`}

@@ -40,7 +40,7 @@ const INITIAL = 3;
 
 function Stars() {
   return (
-    <div className="flex gap-0.5 text-[#fbbc04] text-[15px] leading-none" aria-label="星5">
+    <div className="flex gap-0.5 text-[#fbbc04] text-sm leading-none" aria-label="星5">
       {Array.from({ length: 5 }).map((_, i) => (
         <span key={i}>★</span>
       ))}
@@ -67,11 +67,11 @@ export function LpReviews() {
     <section className="bg-white">
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-20 md:py-28">
         <div className="text-center mb-12">
-          <div className="text-[#0a6bb3] font-extrabold tracking-[0.18em] text-[13px] mb-4">REVIEWS</div>
-          <h2 className="text-[#0a6bb3] text-[24px] md:text-[32px] font-extrabold tracking-[0.06em]">
+          <div className="text-[#0a6bb3] font-extrabold tracking-[0.18em] text-xs mb-4">REVIEWS</div>
+          <h2 className="text-[#0a6bb3] text-2xl md:text-4xl font-extrabold tracking-[0.06em]">
             ご利用者のクチコミ
           </h2>
-          <p className="inline-flex items-center gap-2 text-[#5a6175] mt-5 font-semibold text-[15px] md:text-[16px]">
+          <p className="inline-flex items-center gap-2 text-[#5a6175] mt-5 font-semibold text-sm md:text-base">
             <GoogleG />
             Googleに寄せられた、ご利用者様のリアルな声です。
           </p>
@@ -92,15 +92,15 @@ export function LpReviews() {
                   className="w-10 h-10 rounded-full bg-[#f3f9ff] object-cover shrink-0 border border-[#e6eef9]"
                 />
                 <div className="min-w-0">
-                  <div className="text-[#0b2a44] font-bold text-[14px] truncate">{r.name}</div>
-                  <div className="text-[#8a91a6] text-[11px] font-medium">
+                  <div className="text-[#0b2a44] font-bold text-sm truncate">{r.name}</div>
+                  <div className="text-[#8a91a6] text-xs font-medium">
                     {r.localGuide ? 'ローカルガイド・' : ''}{r.time}
                   </div>
                 </div>
                 <span className="ml-auto shrink-0"><GoogleG /></span>
               </div>
               <Stars />
-              <p className="mt-3 text-[#5a6175] text-[14px] leading-[1.9] font-medium">{r.text}</p>
+              <p className="mt-3 text-[#5a6175] text-sm font-medium">{r.text}</p>
             </article>
           ))}
         </div>
@@ -110,7 +110,7 @@ export function LpReviews() {
             <button
               type="button"
               onClick={() => setShowAll(true)}
-              className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#0a6bb3] text-[#0a6bb3] font-extrabold px-9 py-3.5 text-[15px] transition-colors hover:bg-[#0a6bb3] hover:text-white"
+              className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#0a6bb3] text-[#0a6bb3] font-extrabold px-9 py-3.5 text-sm transition-colors hover:bg-[#0a6bb3] hover:text-white"
             >
               クチコミをもっと見る（全{REVIEWS.length}件）
             </button>
@@ -119,7 +119,7 @@ export function LpReviews() {
             href={GOOGLE_REVIEWS_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-[#0a6bb3] font-bold text-[14px] hover:underline"
+            className="inline-flex items-center gap-2 text-[#0a6bb3] font-bold text-sm hover:underline"
           >
             <GoogleG />
             Googleですべてのクチコミを見る

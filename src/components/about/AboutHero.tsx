@@ -13,14 +13,14 @@ export default function AboutHero() {
           {/* Left: Big copy */}
           <div className="md:col-span-7">
             <h1 className="text-[#1569a7] font-extrabold leading-[1.3] tracking-[0.5rem]">
-              <span className="block text-[48px] md:text-[72px] lg:text-[92px]">新しい価値を</span>
-              <span className="block text-[48px] md:text-[72px] lg:text-[92px]">創造し社会を</span>
-              <span className="block text-[48px] md:text-[72px] lg:text-[92px]">幸せに</span>
+              <span className="block text-6xl md:text-7xl lg:text-8xl">新しい価値を</span>
+              <span className="block text-6xl md:text-7xl lg:text-8xl">創造し社会を</span>
+              <span className="block text-6xl md:text-7xl lg:text-8xl">幸せに</span>
             </h1>
           </div>
 
           {/* Right: description paragraphs */}
-          <div className="md:col-span-5 text-[#0d2233] text-[18px] md:text-[22px] lg:text-[24px] leading-[2.2] md:leading-[2.4] font-semibold">
+          <div className="md:col-span-5 text-[#0d2233] text-lg md:text-xl lg:text-2xl font-semibold">
             <p className="mb-8">
               わたしたちは、
               世の中の課題・負を当事者となって

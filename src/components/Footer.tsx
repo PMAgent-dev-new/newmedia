@@ -60,7 +60,7 @@ export default function Footer() {
           id="node-2064_23"
         >
           <div
-            className="flex flex-col font-['Noto_Sans_JP:Regular',_sans-serif] font-normal justify-center leading-[22.75px] relative shrink-0 text-[14px] text-gray-600 text-justify w-full"
+            className="flex flex-col font-normal justify-center relative shrink-0 text-sm text-gray-600 text-justify w-full"
             id="node-2064_24"
           >
             <p className="block">
@@ -86,7 +86,7 @@ export default function Footer() {
               id="node-2064_27"
             >
               <div
-                className="flex flex-col font-['Noto_Sans_JP:Bold',_sans-serif] font-semibold justify-center leading-[24px] relative shrink-0 text-[16px] text-gray-800 text-left w-full"
+                className="flex flex-col font-semibold justify-center relative shrink-0 text-base text-gray-800 text-left w-full"
                 id="node-2064_28"
               >
                 <p className="block">ライドジョブについて</p>
@@ -103,7 +103,7 @@ export default function Footer() {
                 id="node-2064_36"
               >
                 <div
-                  className="flex flex-col font-['Noto_Sans_JP:Regular',_sans-serif] font-normal justify-center leading-[20px] relative shrink-0 text-[#130278] text-[14px] text-left w-full"
+                  className="flex flex-col font-normal justify-center relative shrink-0 text-[#130278] text-sm text-left w-full"
                   id="node-2064_37"
                 >
                   <p className="block">
@@ -119,7 +119,7 @@ export default function Footer() {
                 id="node-2064_36-contact"
               >
                 <div
-                  className="flex flex-col font-['Noto_Sans_JP:Regular',_sans-serif] font-normal justify-center leading-[20px] relative shrink-0 text-[#130278] text-[14px] text-left w-full"
+                  className="flex flex-col font-normal justify-center relative shrink-0 text-[#130278] text-sm text-left w-full"
                   id="node-2064_37-contact"
                 >
                   <p className="block">
@@ -135,7 +135,7 @@ export default function Footer() {
                 id="node-2064_38"
               >
                 <div
-                  className="flex flex-col font-['Noto_Sans_JP:Regular',_sans-serif] font-normal justify-center leading-[20px] relative shrink-0 text-[#130278] text-[14px] text-left w-full"
+                  className="flex flex-col font-normal justify-center relative shrink-0 text-[#130278] text-sm text-left w-full"
                   id="node-2064_39"
                 >
                   <p className="block">
