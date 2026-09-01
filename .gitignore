@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ローカルの開発用設定（各自の環境依存。共有しない）
+.claude/
