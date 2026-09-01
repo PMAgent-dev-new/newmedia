@@ -296,7 +296,7 @@ export function LpPromise() {
                 <span className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-[#ffd233] text-[#0b2a44] font-extrabold text-lg shrink-0 shadow-[0_4px_12px_rgba(255,210,51,0.3)]">
                   0{i + 1}
                 </span>
-                <span className="text-[#ffd233] font-extrabold tracking-[0.18em] text-xs">PROMISE</span>
+                <span className="text-[#ffd233] font-extrabold tracking-eyebrow text-xs">PROMISE</span>
               </div>
               <p className="text-[#e6eef7] text-base font-medium">{p}</p>
             </li>
@@ -320,7 +320,7 @@ export function LpFlow() {
     <section className="bg-[#f3f9ff]">
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-20 md:py-28">
         <div className="text-center mb-12">
-          <div className="text-[#0a6bb3] font-extrabold tracking-[0.18em] text-xs mb-4">FLOW</div>
+          <div className="text-[#0a6bb3] font-extrabold tracking-eyebrow text-xs mb-4">FLOW</div>
           <h2 className="text-[#0a6bb3] text-2xl md:text-4xl font-extrabold tracking-[0.06em]">ご利用の流れ</h2>
           <p className="text-[#0b2a44] mt-5 font-semibold text-sm md:text-base">
             ご相談から入社後のフォローまで、すべて無料でご利用いただけます。
@@ -373,7 +373,7 @@ export function LpYoutube() {
     <section className="bg-white">
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-20 md:py-28">
         <div className="text-center mb-12">
-          <div className="text-[#0a6bb3] font-extrabold tracking-[0.18em] text-xs mb-4">MOVIE</div>
+          <div className="text-[#0a6bb3] font-extrabold tracking-eyebrow text-xs mb-4">MOVIE</div>
           <h2 className="text-[#0a6bb3] text-2xl md:text-4xl font-extrabold tracking-[0.06em]">
             動画でわかる<br />タクシー転職のリアル
           </h2>
@@ -443,8 +443,8 @@ export function LpCompare() {
   ];
   const mark = (k: string) =>
     k === 'good' ? <span className="text-[#0a6bb3] font-extrabold text-lg mr-1.5">◎</span>
-    : k === 'mid' ? <span className="text-[#8a91a6] font-extrabold mr-1.5">△</span>
-    : <span className="text-[#8a91a6] font-extrabold mr-1.5">×</span>;
+    : k === 'mid' ? <span className="text-[#6a7282] font-extrabold mr-1.5">△</span>
+    : <span className="text-[#6a7282] font-extrabold mr-1.5">×</span>;
   return (
     <section className="bg-[#f3f9ff]">
       <div className="mx-auto max-w-[860px] px-4 md:px-10 py-20 md:py-28">
@@ -500,7 +500,7 @@ export function LpFaq() {
                 <span className="shrink-0 mt-1 w-3 h-3 border-r-2 border-b-2 border-[#8a91a6] rotate-45 transition-transform group-open:rotate-[225deg]" />
               </summary>
               <div className="flex items-start gap-4 px-6 pb-6 -mt-1">
-                <span className="text-[#8a91a6] font-extrabold shrink-0">A</span>
+                <span className="text-[#6a7282] font-extrabold shrink-0">A</span>
                 <p className="text-[#5a6175] text-sm font-medium">{a}</p>
               </div>
             </details>

@@ -67,7 +67,7 @@ export function LpReviews() {
     <section className="bg-white">
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-20 md:py-28">
         <div className="text-center mb-12">
-          <div className="text-[#0a6bb3] font-extrabold tracking-[0.18em] text-xs mb-4">REVIEWS</div>
+          <div className="text-[#0a6bb3] font-extrabold tracking-eyebrow text-xs mb-4">REVIEWS</div>
           <h2 className="text-[#0a6bb3] text-2xl md:text-4xl font-extrabold tracking-[0.06em]">
             ご利用者のクチコミ
           </h2>
@@ -93,7 +93,7 @@ export function LpReviews() {
                 />
                 <div className="min-w-0">
                   <div className="text-[#0b2a44] font-bold text-sm truncate">{r.name}</div>
-                  <div className="text-[#8a91a6] text-xs font-medium">
+                  <div className="text-[#6a7282] text-xs font-medium">
                     {r.localGuide ? 'ローカルガイド・' : ''}{r.time}
                   </div>
                 </div>
