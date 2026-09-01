@@ -80,7 +80,7 @@ export default async function LpJobs() {
     <section className="bg-[#f3f9ff]">
       <div className="mx-auto max-w-[1200px] px-4 md:px-10 py-20 md:py-28">
         <div className="text-center mb-12">
-          <div className="text-[#0a6bb3] font-extrabold tracking-[0.18em] text-xs mb-4">JOBS</div>
+          <div className="text-[#0a6bb3] font-extrabold tracking-eyebrow text-xs mb-4">JOBS</div>
           <h2 className="text-[#0a6bb3] text-2xl md:text-4xl font-extrabold tracking-[0.06em]">
             取扱求人の一例
           </h2>

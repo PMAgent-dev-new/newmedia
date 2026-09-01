@@ -169,6 +169,15 @@ body {
   font-size: var(--text-base);
   line-height: var(--text-base--line-height);
   letter-spacing: var(--text-base--letter-spacing);
+  /* 行長の上限。日本語の読みやすい行長は35〜42字で、これを超えると
+     行末から次の行頭へ目を戻すときに行を見失いやすくなる。
+     実測（1280px）では本文カラムが832px＝**51字/行**あった。
+     42rem(672px) で約41字/行に収まる。
+     ⚠️ 中央寄せ(margin-inline:auto)にしないこと。ページ見出し(h1)は
+     このコンテナの外にあり幅832pxのままなので、中央寄せると本文だけ
+     左に80pxインデントされたように見える（実測: h1 left=48 / 本文 left=128）。
+     左揃えのまま右に余白を残す。 */
+  max-width: 42rem;
 }
 
 /* 本文。行間・字間はトークン（--text-base）が持つので、ここでは指定しない。 */
@@ -243,6 +252,20 @@ body {
   max-width: 100%;
 }
 
+/* ⚠️ セルに最低幅を与えないと、モバイルで表が読めなくなる。
+   日本語は任意の位置で折り返せるため、`overflow-x: auto` を付けていても
+   表は横に溢れず、**列の方が潰れて**収まってしまう。
+   実測（375px・4列の比較表）: ヘッダの「運転操作の主体」が70px幅に押し込まれ
+   1〜2文字ずつ縦積みになり、行の高さが189pxになっていた。横スクロールも発動しない。
+   最低幅を与えることで表が親より広くなり、初めて横スクロールが効く。
+   比較表は読者が応募を判断する材料なので、ここが読めないのは実害が大きい。 */
+.article-content th,
+.article-content td,
+.article-content-html th,
+.article-content-html td {
+  min-width: 9em;
+}
+
 .article-content th {
   @apply border border-gray-300 bg-gray-100 px-4 py-2 text-left font-semibold text-gray-900;
 }
@@ -259,9 +282,12 @@ body {
   @apply w-full h-auto rounded-lg shadow-sm mb-6;
 }
 
-/* HTML入力用スタイル */
+/* HTML入力用スタイル。
+   ⚠️ こちらは microCMS の html フィールド由来（全224本中39本）で、
+   content 型185本とは別系統。行長の上限だけは揃えて読書体験を分裂させない。 */
 .article-content-html {
   line-height: 1.8;
+  max-width: 42rem;
 }
 
 .article-content-html img {
