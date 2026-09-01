@@ -60,7 +60,7 @@ export default function BlogCard({ blog }: BlogCardProps) {
         {/* 記事情報 */}
         <div className="p-3 sm:p-4">
           {/* タイトル */}
-          <h3 className="font-bold text-[#333333] text-sm sm:text-base md:text-lg line-clamp-2 mb-2 sm:mb-3 leading-tight">
+          <h3 className="font-bold text-[#333333] text-sm sm:text-base md:text-lg line-clamp-2 mb-2 sm:mb-3 leading-heading">
             {blog.title}
           </h3>
 

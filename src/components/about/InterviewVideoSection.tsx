@@ -44,7 +44,7 @@ export function InterviewVideoSection() {
             sizes="(max-width: 768px) 180px, 229px"
           />
           
-          <p className="font-medium text-[14px] md:text-[16px] text-center text-gray-800 leading-[1.6] whitespace-pre-line">
+          <p className="font-medium text-sm md:text-base text-center text-gray-800 whitespace-pre-line">
             あなたのお仕事探し
             <br />
             貴方に1番に寄り添う転職エージェント✨

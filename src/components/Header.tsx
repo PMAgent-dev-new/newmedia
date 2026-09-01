@@ -175,7 +175,7 @@ export default function Header({ entryUrl = DEFAULT_ENTRY_URL }: HeaderProps = {
                   onClick={closeMenu}
                   className="bg-white border border-black rounded-[10px] px-4 py-2 w-full max-w-[240px] text-center"
                 >
-                  <span className="text-[#2204db] text-[24px] font-bold" style={{ fontFamily: 'Dela Gothic One, sans-serif' }}>
+                  <span className="text-[#2204db] text-2xl font-bold" style={{ fontFamily: 'Dela Gothic One, sans-serif' }}>
                     {category.name}
                   </span>
                 </Link>
@@ -186,7 +186,7 @@ export default function Header({ entryUrl = DEFAULT_ENTRY_URL }: HeaderProps = {
                   onClick={closeMenu}
                   className="bg-white border border-black rounded-[10px] px-4 py-2 w-full max-w-[240px] text-center"
                 >
-                  <span className="text-[#2204db] text-[24px] font-bold" style={{ fontFamily: 'Dela Gothic One, sans-serif' }}>
+                  <span className="text-[#2204db] text-2xl font-bold" style={{ fontFamily: 'Dela Gothic One, sans-serif' }}>
                     動画で見る
                   </span>
                 </Link>
@@ -196,7 +196,7 @@ export default function Header({ entryUrl = DEFAULT_ENTRY_URL }: HeaderProps = {
                   onClick={closeMenu}
                   className="bg-white border border-black rounded-[10px] px-4 py-2 w-full max-w-[240px] text-center"
                 >
-                  <span className="text-[#2204db] text-[24px] font-bold" style={{ fontFamily: 'Dela Gothic One, sans-serif' }}>
+                  <span className="text-[#2204db] text-2xl font-bold" style={{ fontFamily: 'Dela Gothic One, sans-serif' }}>
                     お問い合わせ
                   </span>
                 </Link>
@@ -206,7 +206,7 @@ export default function Header({ entryUrl = DEFAULT_ENTRY_URL }: HeaderProps = {
                   onClick={closeMenu}
                   className="bg-white border border-black rounded-[10px] px-4 py-2 w-full max-w-[240px] text-center"
                 >
-                  <span className="text-[#2204db] text-[24px] font-bold" style={{ fontFamily: 'Dela Gothic One, sans-serif' }}>
+                  <span className="text-[#2204db] text-2xl font-bold" style={{ fontFamily: 'Dela Gothic One, sans-serif' }}>
                     ライドジョブについて
                   </span>
                 </Link>

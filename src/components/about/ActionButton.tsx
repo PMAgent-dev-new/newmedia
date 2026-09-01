@@ -30,7 +30,7 @@ export function ActionButton({
         className={`relative flex items-center justify-center gap-3.5 py-6 md:py-10 px-4 md:px-8 rounded-[20px] w-full hover:opacity-90 transition-opacity duration-200 border-[1.5px] border-[#333333] ${className}`}
         style={{ backgroundColor }}
       >
-        <p className="font-extrabold text-[#ffffff] text-[16px] md:text-[32px] leading-none">
+        <p className="font-extrabold text-[#ffffff] text-base md:text-4xl leading-none">
           {text}
         </p>
         <div className="rotate-[270deg]">

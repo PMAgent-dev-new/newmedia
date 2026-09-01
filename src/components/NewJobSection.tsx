@@ -72,10 +72,10 @@ function JobCard({ job }: { job: Job }) {
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />
         <div className="flex flex-col gap-2 flex-1">
-          <div className="font-['Noto_Sans_JP:Bold',_sans-serif] font-bold text-[#101828] text-[16px] leading-[1.5] break-words">
+          <div className="font-bold text-[#101828] text-base break-words">
             {jobTitle}
           </div>
-          <div className="font-['Noto_Sans_JP:Medium',_sans-serif] font-medium text-neutral-500 text-[12px] leading-normal pb-1 break-words">
+          <div className="font-medium text-neutral-500 text-xs leading-normal pb-1 break-words">
             {companyName}
           </div>
           <div className="flex items-center gap-2 pb-1 border-b border-[#cccccc]">
@@ -90,7 +90,7 @@ function JobCard({ job }: { job: Job }) {
                 sizes="16px"
               />
             </div>
-            <div className="font-['Noto_Sans_JP:Medium',_sans-serif] font-medium text-neutral-500 text-[14px] leading-normal break-words flex-1 min-w-0">
+            <div className="font-medium text-neutral-500 text-sm leading-normal break-words flex-1 min-w-0">
               {location}
             </div>
           </div>
@@ -106,7 +106,7 @@ function JobCard({ job }: { job: Job }) {
                 sizes="16px"
               />
             </div>
-            <div className="font-['Noto_Sans_JP:Medium',_sans-serif] font-medium text-neutral-500 text-[14px] leading-normal break-words flex-1 min-w-0">
+            <div className="font-medium text-neutral-500 text-sm leading-normal break-words flex-1 min-w-0">
               {salary}
             </div>
           </div>
@@ -122,14 +122,14 @@ function JobCard({ job }: { job: Job }) {
                 sizes="16px"
               />
             </div>
-            <div className="font-['Noto_Sans_JP:Medium',_sans-serif] font-medium text-neutral-500 text-[14px] leading-normal break-words flex-1 min-w-0">
+            <div className="font-medium text-neutral-500 text-sm leading-normal break-words flex-1 min-w-0">
               {employmentType}
             </div>
           </div>
           <div className="flex flex-wrap gap-2 mt-2">
             {tags.map((tag, tagIndex) => (
               <div key={tagIndex} className="border border-[#333333] border-solid rounded-md px-2 py-1 shrink-0">
-                <div className="font-['Noto_Sans_JP:Medium',_sans-serif] font-medium text-[#333333] text-[12px] leading-4">
+                <div className="font-medium text-[#333333] text-xs leading-4">
                   {tag.name}
                 </div>
               </div>
@@ -208,7 +208,7 @@ export default async function NewJobSection() {
             </div>
           ) : (
             <div className="box-border content-stretch flex flex-col gap-4 items-center justify-center p-8 relative shrink-0 w-full">
-              <p className="text-[#666666] text-[16px] font-medium">
+              <p className="text-[#666666] text-base font-medium">
                 求人情報を取得できませんでした
               </p>
             </div>
@@ -233,7 +233,7 @@ export default async function NewJobSection() {
             >
               <div className="absolute border-[#333333] border-[1.5px] border-solid inset-0 pointer-events-none rounded-[58px]" />
               <div
-                className="flex flex-col font-['Noto_Sans_JP:Medium',_sans-serif] font-medium justify-center leading-[0] relative shrink-0 text-[#ffffff] text-[16px] md:text-[18px] text-center text-nowrap tracking-[0.36px]"
+                className="flex flex-col font-medium justify-center relative shrink-0 text-[#ffffff] text-base md:text-lg text-center text-nowrap tracking-[0.36px]"
                 id="node-2161_308"
               >
                 <p className="adjustLetterSpacing block leading-[normal] whitespace-pre">
