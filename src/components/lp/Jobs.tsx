@@ -49,15 +49,15 @@ function JobCard({ job }: { job: Job }) {
       </div>
 
       <h3 className="text-[#0b2a44] font-extrabold text-base mb-1">{jobTitle}</h3>
-      <div className="text-[#8a91a6] text-xs font-medium mb-4">{company}</div>
+      <div className="text-[#6a7282] text-xs font-medium mb-4">{company}</div>
 
       <div className="mt-auto space-y-2.5 pt-4 border-t border-[#e6eef9]">
         <div className="flex items-baseline gap-3">
-          <span className="text-[#8a91a6] text-xs font-bold shrink-0 w-9">給与</span>
+          <span className="text-[#6a7282] text-xs font-bold shrink-0 w-9">給与</span>
           <span className="text-[#f0651f] font-extrabold text-base leading-heading">{salary}</span>
         </div>
         <div className="flex items-baseline gap-3">
-          <span className="text-[#8a91a6] text-xs font-bold shrink-0 w-9">勤務地</span>
+          <span className="text-[#6a7282] text-xs font-bold shrink-0 w-9">勤務地</span>
           <span className="text-[#0b2a44] font-bold text-sm">{location}</span>
         </div>
       </div>
@@ -97,7 +97,7 @@ export default async function LpJobs() {
 
         <div className="flex flex-col items-center gap-3">
           <BookButton label="あなたに合う求人を相談する" sub="非公開求人のご紹介も・無料" />
-          <p className="text-[#8a91a6] text-xs font-medium">
+          <p className="text-[#6a7282] text-xs font-medium">
             「まだ応募は決めていない」段階でのご相談も歓迎します。
           </p>
         </div>

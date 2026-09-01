@@ -88,6 +88,8 @@
 /* 見出しラベル（英字の小さな飾り文字）だけは字間を大きく取る。
    日本語には使わない。 */
 @utility tracking-eyebrow {
+  /* leading-heading と同じ理由で `--tw-tracking` を併記する。 */
+  --tw-tracking: 0.18em;
   letter-spacing: 0.18em;
 }
 
@@ -97,13 +99,29 @@
    ⚠️ Tailwind の `leading-tight`(1.25) は使わない。日本語は仮名・漢字の
    字面が大きく、1.25では行が接触して読めなくなる。 */
 @utility leading-heading {
+  /* ⚠️ `--tw-leading` を必ず併記する。Tailwind v4 の `text-*` は
+     `line-height: var(--tw-leading, var(--text-lg--line-height))` を出力するため、
+     素の `line-height` だけだと `@media` 内で後に来る `md:text-*` に**負ける**。
+     初版はこれが無く、記事h1が1280pxで1.5、一覧カードが640px以上で1.8になっていた
+     （＝この規則が主要画面で効いていなかった）。組み込みの leading-* が常に勝つのは
+     この変数を設定しているから。 */
+  --tw-leading: 1.4;
   line-height: 1.4;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  /* ⚠️ 日本語スタックは body ではなく**ここ**に持たせる。
+     ページのルート div が `className="font-sans"` を持っており（/・/about・/blog/[slug] 等）、
+     それが body の font-family を打ち消す。初版は body 側にだけ書いていたため、
+     記事本文の computed font-family が `Geist, Geist Fallback` だけになり、
+     日本語は結局OS任せのまま＝**このPRの中核が主要コンテンツに届いていなかった**。
+     Windowsでは Meiryo 等に落ちるが Meiryo は palt 非対応のため、
+     「約物の穴が空いたまま字間だけ広がる」という最も読みにくい組み合わせになる。 */
+  --font-sans: var(--font-geist-sans), "Hiragino Kaku Gothic ProN", "Hiragino Sans",
+    "BIZ UDPGothic", "Noto Sans JP", "Yu Gothic Medium", "Yu Gothic", Meiryo,
+    system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
@@ -122,9 +140,7 @@ body {
      （Windowsは游ゴシック/メイリオ、Macはヒラギノ）。字面率も字幅も違うので、
      同じページが環境ごとに別の見た目になり、行間の調整も意味を成さなかった。
      欧文はGeist（読み込み済みだが未使用だった）、日本語は各OSの標準ゴシックを明示する。 */
-  font-family: var(--font-geist-sans), "Hiragino Kaku Gothic ProN", "Hiragino Sans",
-    "BIZ UDPGothic", "Noto Sans JP", "Yu Gothic Medium", "Yu Gothic", Meiryo,
-    system-ui, sans-serif;
+  font-family: var(--font-sans);
   /* 日本語の字面を締める。ぶら下げ・約物の詰めはブラウザ任せにせず明示。 */
   font-feature-settings: "palt" 1;
   text-rendering: optimizeLegibility;
