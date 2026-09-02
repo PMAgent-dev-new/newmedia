@@ -8,7 +8,11 @@ export const SITE_ORIGIN = (
 
 export const SITE_NAME = 'RIDE JOB Media';
 export const OPERATOR_NAME = '株式会社PM Agent';
-const LOGO_URL = `${SITE_ORIGIN}${BASE_PATH}/media/OGP.png`;
+// ⚠️ BASE_PATH は既に "/media"。ここでさらに "/media/" を足すと
+//    https://ridejob.jp/media/media/OGP.png となり **404**（本番実測）。
+//    publisher.logo と、アイキャッチ無し記事の image フォールバックが
+//    全228記事で壊れたURLを指していた。
+const LOGO_URL = `${SITE_ORIGIN}${BASE_PATH}/OGP.png`;
 
 /** basePath(/media) を含む絶対URLを組み立てる（canonical / JSON-LD 用） */
 export function absoluteUrl(path: string): string {
@@ -57,7 +61,12 @@ export function htmlToDescription(html?: string, fallback = '', max = 140): stri
   while (segments.length > 1) {
     const head = segments[0];
     const next = segments[1];
-    const isLabel = HEADING_LABELS.test(head);
+    // ⚠️ 長さのガードが要る。無いと「結論から言うと、〜」で**始まる**リード文が
+    //    見出しラベルと誤判定され、記事の最良の要約（250字）が丸ごと捨てられる。
+    //    実測: senior-driver-jobs の description が「一方で、健康診断や深視力…」と
+    //    逆接から始まってしまっていた。
+    //    正当な見出しラベルの実測最長は20字なので、isEcho と同じ24字で切る。
+    const isLabel = head.length <= 24 && HEADING_LABELS.test(head);
     // 「荷役とは」+「荷役とは、…」のように、見出しの語で本文が始まるケース
     const isEcho = head.length <= 24 && next.startsWith(head.replace(/[はとのをがにで]*$/, '').slice(0, 6));
     if (!isLabel && !isEcho) break;
