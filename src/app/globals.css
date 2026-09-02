@@ -223,8 +223,16 @@ body {
   @apply pl-1;
 }
 
-.article-content a {
-  @apply text-blue-600 no-underline hover:underline hover:text-blue-800 transition-colors duration-200;
+/* 本文中のリンクは**色だけで示さない**。
+   WCAG 1.4.1（色の使用）は、色以外の手がかりも必要とする。色覚特性のある読者や
+   コントラストの低い画面では、青文字が本文と区別できない。
+   常時下線を引き、ホバーでは太さと色を変えて状態変化も色以外で示す。
+   ⚠️ 下線は文字に近すぎると濁点・半濁点や「ー」に被って読みにくくなるので、
+   `underline-offset` で離す。 */
+.article-content a,
+.article-content-html a {
+  @apply text-blue-700 underline decoration-blue-700/40 underline-offset-4
+         hover:text-blue-900 hover:decoration-blue-900 transition-colors duration-200;
 }
 
 .article-content blockquote {
@@ -286,9 +294,23 @@ body {
    ⚠️ こちらは microCMS の html フィールド由来（全224本中39本）で、
    content 型185本とは別系統。行長の上限だけは揃えて読書体験を分裂させない。 */
 .article-content-html {
-  line-height: 1.8;
+  /* ⚠️ 全224本のうち html 型は39本。以前はここだけ行間1.8・字間なしで、
+     content 型185本（行間1.9・字間0.02em）と読書体験が分裂していた。
+     同じメディアの記事なのに、どちらの形式で入稿されたかで読み味が変わる。
+     スケールのトークンに揃える。 */
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  letter-spacing: var(--text-base--letter-spacing);
   max-width: 42rem;
 }
+
+/* ⚠️ かつてここに `.article-content-html:not(--chat)` の p/h2/h3/h4 を書いていたが削除した。
+   html型39本の blog-style は実測で **chat 36本 + 空3本（空はchat扱い・BlogDetailSection.tsx）**、
+   **editorial は0本**。つまり1記事にも効かない死にコードだった上に、
+   詳細度 (0,2,1) が既存の `.article-content-html--editorial h3` (0,1,1) に必ず勝つため、
+   editorial 記事を1本公開した瞬間に青い左ボーダーと黄色ハイライト箱が混ざる。
+   素の html 記事に content 型の見出しを効かせたくなったら、その variant を作るときに書く。 */
+
 
 .article-content-html img {
   @apply w-full h-auto rounded-lg shadow-sm mb-6;
@@ -484,7 +506,10 @@ body {
 .article-content-html--editorial a {
   color: var(--editorial-primary);
   text-decoration: none;
-  border-bottom: 1px solid transparent;
+  /* ⚠️ 既定を transparent にしない。色だけでリンクを示すことになり WCAG 1.4.1 に反する
+     （本文との contrast は 3:1 に届かない）。editorial は下ボーダーを装飾言語に
+     持っているので、下線を被せずそれを既定から見せる。ホバーでは濃くする。 */
+  border-bottom: 1px solid color-mix(in srgb, var(--editorial-primary) 40%, transparent);
   transition: border-color 0.2s ease, color 0.2s ease;
 }
 
