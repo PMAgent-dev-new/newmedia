@@ -304,24 +304,13 @@ body {
   max-width: 42rem;
 }
 
-/* html 型の本文も content 型と同じ見出し階層・段落間隔にする。
-   ⚠️ `--chat` 形式（対話型記事）は独自の h2 装飾を持つので、そちらの指定を
-   打ち消さないよう、ここでは chat 以外にだけ効かせる。 */
-.article-content-html:not(.article-content-html--chat) p {
-  @apply mb-5 text-gray-800;
-}
+/* ⚠️ かつてここに `.article-content-html:not(--chat)` の p/h2/h3/h4 を書いていたが削除した。
+   html型39本の blog-style は実測で **chat 36本 + 空3本（空はchat扱い・BlogDetailSection.tsx）**、
+   **editorial は0本**。つまり1記事にも効かない死にコードだった上に、
+   詳細度 (0,2,1) が既存の `.article-content-html--editorial h3` (0,1,1) に必ず勝つため、
+   editorial 記事を1本公開した瞬間に青い左ボーダーと黄色ハイライト箱が混ざる。
+   素の html 記事に content 型の見出しを効かせたくなったら、その variant を作るときに書く。 */
 
-.article-content-html:not(.article-content-html--chat) h2 {
-  @apply text-2xl md:text-3xl font-bold text-gray-900 mt-14 mb-6 pb-3 border-b-[3px] border-blue-600;
-}
-
-.article-content-html:not(.article-content-html--chat) h3 {
-  @apply text-xl font-bold text-[#101828] bg-[#ffe9ab] px-4 py-2 rounded-md mt-9 mb-4;
-}
-
-.article-content-html:not(.article-content-html--chat) h4 {
-  @apply text-lg font-semibold text-gray-900 mt-6 mb-2;
-}
 
 .article-content-html img {
   @apply w-full h-auto rounded-lg shadow-sm mb-6;
@@ -517,7 +506,10 @@ body {
 .article-content-html--editorial a {
   color: var(--editorial-primary);
   text-decoration: none;
-  border-bottom: 1px solid transparent;
+  /* ⚠️ 既定を transparent にしない。色だけでリンクを示すことになり WCAG 1.4.1 に反する
+     （本文との contrast は 3:1 に届かない）。editorial は下ボーダーを装飾言語に
+     持っているので、下線を被せずそれを既定から見せる。ホバーでは濃くする。 */
+  border-bottom: 1px solid color-mix(in srgb, var(--editorial-primary) 40%, transparent);
   transition: border-color 0.2s ease, color 0.2s ease;
 }
 
