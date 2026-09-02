@@ -8,7 +8,11 @@ export const SITE_ORIGIN = (
 
 export const SITE_NAME = 'RIDE JOB Media';
 export const OPERATOR_NAME = '株式会社PM Agent';
-const LOGO_URL = `${SITE_ORIGIN}${BASE_PATH}/media/OGP.png`;
+// ⚠️ BASE_PATH は既に "/media"。ここでさらに "/media/" を足すと
+//    https://ridejob.jp/media/media/OGP.png となり **404**（本番実測）。
+//    publisher.logo と、アイキャッチ無し記事の image フォールバックが
+//    全228記事で壊れたURLを指していた。
+const LOGO_URL = `${SITE_ORIGIN}${BASE_PATH}/OGP.png`;
 
 /** basePath(/media) を含む絶対URLを組み立てる（canonical / JSON-LD 用） */
 export function absoluteUrl(path: string): string {
@@ -18,11 +22,58 @@ export function absoluteUrl(path: string): string {
 }
 
 /** HTML本文から meta description を生成（タグ除去→空白正規化→トリム） */
+/**
+ * 見出しらしい短い断片。description の先頭に来ると検索結果が
+ * 「この記事の結論◯◯は…」のように読めなくなる。
+ * 実測(2026-08-24 無作為25本): 44%が「この記事の結論」始まりだった。
+ */
+const HEADING_LABELS = /^(この記事の(結論|要点|まとめ)|結論|まとめ|要点|はじめに|目次)/;
+
+/**
+ * HTML本文から meta description を作る。
+ *
+ * 旧実装は全タグを一括で除去してから先頭140字を切っていたため、
+ * 最初の見出しが本文と地続きになって出力されていた。実測の症状は2つ:
+ *   ・「この記事の結論移動式クレーンの資格は、…」  ← 見出し＋本文の連結（44%）
+ *   ・「荷役とは荷役とは、荷を積む・降ろす…」      ← 見出しと書き出しの重複（吃音）
+ * どちらも検索結果でそのまま読まれるので、CTRを直接損ねる。
+ *
+ * 対策はタグを消す前にブロック境界を区切ること。区切ったうえで、
+ * 先頭が「見出しラベル」か「直後の本文が同じ語で始まる見出し」なら捨てて、
+ * 最初の実質的な本文から書き始める。
+ */
 export function htmlToDescription(html?: string, fallback = '', max = 140): string {
-  const raw = (html || fallback || '')
+  const src = html || '';
+  if (!src) {
+    const f = fallback.replace(/\s+/g, ' ').trim();
+    return f.length <= max ? f : `${f.slice(0, max)}…`;
+  }
+
+  // ブロック要素の終わりを区切りに変えてから、残りのタグを落とす
+  const segments = src
+    .replace(/<\/(h[1-6]|p|li|div|section|article|tr|blockquote)>/gi, '\u0001')
+    .replace(/<br\s*\/?>/gi, '\u0001')
     .replace(/<[^>]*>/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+    .split('\u0001')
+    .map((t) => t.replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+
+  while (segments.length > 1) {
+    const head = segments[0];
+    const next = segments[1];
+    // ⚠️ 長さのガードが要る。無いと「結論から言うと、〜」で**始まる**リード文が
+    //    見出しラベルと誤判定され、記事の最良の要約（250字）が丸ごと捨てられる。
+    //    実測: senior-driver-jobs の description が「一方で、健康診断や深視力…」と
+    //    逆接から始まってしまっていた。
+    //    正当な見出しラベルの実測最長は20字なので、isEcho と同じ24字で切る。
+    const isLabel = head.length <= 24 && HEADING_LABELS.test(head);
+    // 「荷役とは」+「荷役とは、…」のように、見出しの語で本文が始まるケース
+    const isEcho = head.length <= 24 && next.startsWith(head.replace(/[はとのをがにで]*$/, '').slice(0, 6));
+    if (!isLabel && !isEcho) break;
+    segments.shift();
+  }
+
+  const raw = segments.join(' ').trim() || fallback.replace(/\s+/g, ' ').trim();
   if (raw.length <= max) return raw;
   return `${raw.slice(0, max)}…`;
 }
