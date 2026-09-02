@@ -167,3 +167,38 @@ export function entryUrlForBlog(
   });
   return `${base}?${params.toString()}`;
 }
+
+/**
+ * 「求人を探す」CTAの着地先。記事の職種に対応する求人ハブへ送る。
+ *
+ * 旧実装は BlogCTASection 内で `https://ridejob.jp/` にハードコードされており、
+ * 実測30本すべてがトップページ固定・UTM無しだった（相談CTAだけがUTM付きで、
+ * 求人CTAは計測から漏れていた）。読者は記事の職種に興味を持って押しているのに、
+ * 全職種混在のトップへ落ちるため、探し直しが発生していた。
+ *
+ * 着地先は本番で200を確認済み（2026-08-24）。`/jobs` 単体は404なので使わない。
+ * 職種を解決できない記事はトップに置く（誤爆で別職種のハブへ送らない。
+ * entryUrlForBlog と同じ「判定できないなら既定へ」の方針）。
+ */
+const JOBS_HUB_URLS: Record<EntryJob, string> = {
+  mechanic: 'https://ridejob.jp/jobs/category/car-mechanic',
+  truck: 'https://ridejob.jp/jobs/category/truck-driver',
+  bus: 'https://ridejob.jp/jobs/category/bus-driver',
+  taxi: 'https://ridejob.jp/jobs/category/taxi-driver',
+};
+
+/** 職種を解決できないときの着地先（＝これまでの挙動）。 */
+export const DEFAULT_JOBS_URL = 'https://ridejob.jp/';
+
+export function jobsUrlForBlog(
+  blog: Pick<Blog, 'id' | 'title'> & { slug?: string },
+): string {
+  const job = resolveEntryJob(blog);
+  const base = job && ENABLED_JOBS.has(job) ? JOBS_HUB_URLS[job] : DEFAULT_JOBS_URL;
+  const params = new URLSearchParams({
+    utm_source: 'ridejob_media',
+    utm_medium: 'article_jobs_cta',
+    utm_content: blog.slug || blog.id || 'unknown',
+  });
+  return `${base}?${params.toString()}`;
+}

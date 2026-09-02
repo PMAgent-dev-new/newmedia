@@ -11,7 +11,7 @@ import { Blog } from '@/types/microcms';
 import { getBlogBySlug, getBlogById, getLatestBlogs } from '@/lib/microcms';
 import { withBasePath } from '@/lib/basePath';
 import { getRelatedBlogs } from '@/lib/blogHelpers';
-import { entryUrlForBlog } from '@/lib/entryForm';
+import { entryUrlForBlog, jobsUrlForBlog } from '@/lib/entryForm';
 import {
   categoryHref,
   getBlogList,
@@ -152,6 +152,8 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   // ヘッダーと本文CTAで utm_medium を撃ち分け、Lark側でどちらが効いたか見られるようにする
   const entryUrl = entryUrlForBlog(blog);
   const headerEntryUrl = entryUrlForBlog(blog, 'header_cta');
+  // 「求人を探す」も記事の職種に対応するハブへ。旧実装はトップ固定・UTM無しだった。
+  const jobsUrl = jobsUrlForBlog(blog);
 
   const faqLd = faqPageLd(extractFaqFromHtml(blog.html || blog.content));
   const structuredData = [
@@ -215,7 +217,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       </main>
       
       {/* CTAセクション */}
-      <BlogCTASection entryUrl={entryUrl} />
+      <BlogCTASection entryUrl={entryUrl} jobsUrl={jobsUrl} />
       
       <Footer />
     </div>

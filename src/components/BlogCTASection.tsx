@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { withBasePath } from '@/lib/basePath';
-import { DEFAULT_ENTRY_URL } from '@/lib/entryForm';
+import { DEFAULT_ENTRY_URL, DEFAULT_JOBS_URL } from '@/lib/entryForm';
 
 interface BlogCTASectionProps {
   /**
@@ -8,9 +8,17 @@ interface BlogCTASectionProps {
    * 一覧・about・動画一覧のように記事コンテキストが無い面は既定（タクシー）のまま。
    */
   entryUrl?: string;
+  /**
+   * 「求人を探す」の着地先。記事の職種に対応するハブを渡す。
+   * 渡されない面（一覧・about・動画一覧）はトップのまま。
+   */
+  jobsUrl?: string;
 }
 
-export default function BlogCTASection({ entryUrl = DEFAULT_ENTRY_URL }: BlogCTASectionProps = {}) {
+export default function BlogCTASection({
+  entryUrl = DEFAULT_ENTRY_URL,
+  jobsUrl = DEFAULT_JOBS_URL,
+}: BlogCTASectionProps = {}) {
   return (
     <section className="py-12 sm:py-16 bg-[#FDEAB1] relative">
       
@@ -54,7 +62,7 @@ export default function BlogCTASection({ entryUrl = DEFAULT_ENTRY_URL }: BlogCTA
               希望条件に合う求人情報を掲載。<br />
               気になる仕事を見つけて応募できます。
             </p>
-            <a href="https://ridejob.jp/" target="_blank" rel="noopener noreferrer" className="w-full bg-[#2204db] hover:bg-[#1b03b8] text-white font-bold py-4 px-6 rounded-xl transition-colors duration-300 flex items-center justify-center gap-2 text-lg">
+            <a href={jobsUrl} target="_blank" rel="noopener noreferrer" className="w-full bg-[#2204db] hover:bg-[#1b03b8] text-white font-bold py-4 px-6 rounded-xl transition-colors duration-300 flex items-center justify-center gap-2 text-lg">
               求人を探す
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>

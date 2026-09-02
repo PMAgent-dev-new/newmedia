@@ -44,6 +44,21 @@ export function blogPostingLd(blog: Blog) {
     dateModified: blog.updatedAt || blog.revisedAt || blog.publishedAt,
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     url,
+    /**
+     * author は BlogPosting の必須プロパティ（Google「記事」構造化データ）だが、
+     * 実測で全221記事に存在しなかった。E-E-A-T の Author 信号が欠落した状態で、
+     * AI検索が「誰が書いたか」を判定できない。
+     *
+     * 個人名は置かない。実在しない執筆者を作るのは E-E-A-T を毀損するうえ、
+     * 記事ごとの実際の書き手をシステムが持っていない。運営法人を著者として
+     * 明示するのが事実に即している（有料職業紹介事業者としての一次情報が根拠）。
+     * 記事単位の監修者が入ったら、ここを Person + reviewedBy に差し替える。
+     */
+    author: {
+      '@type': 'Organization',
+      name: OPERATOR_NAME,
+      url: `${SITE_ORIGIN}/about`,
+    },
     publisher: {
       '@type': 'Organization',
       name: SITE_NAME,
