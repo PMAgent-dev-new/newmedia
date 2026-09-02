@@ -223,8 +223,16 @@ body {
   @apply pl-1;
 }
 
-.article-content a {
-  @apply text-blue-600 no-underline hover:underline hover:text-blue-800 transition-colors duration-200;
+/* 本文中のリンクは**色だけで示さない**。
+   WCAG 1.4.1（色の使用）は、色以外の手がかりも必要とする。色覚特性のある読者や
+   コントラストの低い画面では、青文字が本文と区別できない。
+   常時下線を引き、ホバーでは太さと色を変えて状態変化も色以外で示す。
+   ⚠️ 下線は文字に近すぎると濁点・半濁点や「ー」に被って読みにくくなるので、
+   `underline-offset` で離す。 */
+.article-content a,
+.article-content-html a {
+  @apply text-blue-700 underline decoration-blue-700/40 underline-offset-4
+         hover:text-blue-900 hover:decoration-blue-900 transition-colors duration-200;
 }
 
 .article-content blockquote {
@@ -286,8 +294,33 @@ body {
    ⚠️ こちらは microCMS の html フィールド由来（全224本中39本）で、
    content 型185本とは別系統。行長の上限だけは揃えて読書体験を分裂させない。 */
 .article-content-html {
-  line-height: 1.8;
+  /* ⚠️ 全224本のうち html 型は39本。以前はここだけ行間1.8・字間なしで、
+     content 型185本（行間1.9・字間0.02em）と読書体験が分裂していた。
+     同じメディアの記事なのに、どちらの形式で入稿されたかで読み味が変わる。
+     スケールのトークンに揃える。 */
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  letter-spacing: var(--text-base--letter-spacing);
   max-width: 42rem;
+}
+
+/* html 型の本文も content 型と同じ見出し階層・段落間隔にする。
+   ⚠️ `--chat` 形式（対話型記事）は独自の h2 装飾を持つので、そちらの指定を
+   打ち消さないよう、ここでは chat 以外にだけ効かせる。 */
+.article-content-html:not(.article-content-html--chat) p {
+  @apply mb-5 text-gray-800;
+}
+
+.article-content-html:not(.article-content-html--chat) h2 {
+  @apply text-2xl md:text-3xl font-bold text-gray-900 mt-14 mb-6 pb-3 border-b-[3px] border-blue-600;
+}
+
+.article-content-html:not(.article-content-html--chat) h3 {
+  @apply text-xl font-bold text-[#101828] bg-[#ffe9ab] px-4 py-2 rounded-md mt-9 mb-4;
+}
+
+.article-content-html:not(.article-content-html--chat) h4 {
+  @apply text-lg font-semibold text-gray-900 mt-6 mb-2;
 }
 
 .article-content-html img {
