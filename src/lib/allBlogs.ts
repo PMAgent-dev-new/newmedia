@@ -53,7 +53,7 @@ export const BODY_SCAN_PAGE = 25;
  * 本文走査に要るフィールドだけ。本文（content/html）とカードの表示項目のみ。
  * 容量への寄与は小さいが、`category` などの参照を展開させない意味はある。
  */
-export const BODY_SCAN_FIELDS = "id,title,slug,eyecatch,publishedAt,content,html";
+export const BODY_SCAN_FIELDS = "id,title,slug,eyecatch,publishedAt,revisedAt,content,html";
 
 /**
  * 本文を含まない呼び出し（一覧カード・sitemap）が使うページ幅。microCMS の limit 上限。
@@ -164,14 +164,25 @@ export async function fetchAllBlogsCached(opts: {
 
 /**
  * slug 重複を1本に畳む。同じ slug のレコードが複数あると同一URLを指すため、
- * 記事詳細が解決するのと同じ「publishedAt が新しい方」を残す（本番sitemapに3件の重複が出ていた）。
+ * 記事詳細が解決するのと同じレコードを残す（本番sitemapに3件の重複が出ていた）。
+ *
+ * 勝敗の付け方は microcms.ts の getBlogBySlug が microCMS へ渡す
+ * `orders=-publishedAt,-revisedAt` と1対1で対応させてある。publishedAt が同値でも
+ * 勝者が揺れないよう、第2キーの revisedAt まで見る。**片方だけ変えないこと。**
  */
 export function dedupeBySlug(blogs: Blog[]): Blog[] {
   const by = new Map<string, Blog>();
+  const rank = (b: Blog) => [b.publishedAt || "", b.revisedAt || ""] as const;
   for (const b of blogs) {
     const key = (b.slug || b.id) as string;
     const cur = by.get(key);
-    if (!cur || (b.publishedAt || "") > (cur.publishedAt || "")) by.set(key, b);
+    if (!cur) {
+      by.set(key, b);
+      continue;
+    }
+    const [bp, br] = rank(b);
+    const [cp, cr] = rank(cur);
+    if (bp > cp || (bp === cp && br > cr)) by.set(key, b);
   }
   return [...by.values()];
 }
