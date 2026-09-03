@@ -320,8 +320,13 @@ export async function getBlogBySlug(slug: string): Promise<Blog | null> {
 
   try {
     const filters = encodeURIComponent(`slug[equals]${slug}`);
-    // 同一slugが複数存在する場合（旧移行の重複レコード等）は最新の改訂を優先し、公開版へ解決する
-    const url = `${BASE_URL}/blogs?filters=${filters}&limit=1&orders=-revisedAt`;
+    // 同一slugが複数存在する場合（旧移行の重複レコード等）に、どのレコードへ解決するかを決める。
+    // 並び順は allBlogs.ts の dedupeBySlug と**必ず同じ**にすること。ここだけ変えると、
+    // 一覧カード（dedupeBySlug の勝者）と記事詳細（この問い合わせの勝者）が別レコードを指し、
+    // 同じURLで見出し・日付・本文がちぐはぐになる。
+    // 以前ここは -revisedAt だったため、旧レコードを1回公開し直すだけで詳細だけが旧本文へ
+    // 切り替わる状態だった（実測 2026-09-02: 3組の重複が現存）。
+    const url = `${BASE_URL}/blogs?filters=${filters}&limit=1&orders=-publishedAt,-revisedAt`;
     console.log('Fetching blog by slug from URL:', url);
 
     const res = await fetch(url, {
