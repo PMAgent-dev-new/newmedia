@@ -227,7 +227,7 @@ export default async function NewJobSection() {
             className="block no-underline"
           >
             <div
-              className="shadow-[4px_4px_0px_0px_rgba(19,19,19,0.3)] bg-[#04acdb] box-border content-stretch flex flex-row gap-4 items-center justify-center pl-4 md:pl-6 pr-3 md:pr-4 py-3 md:py-4 relative rounded-[58px] shrink-0 hover:opacity-90 transition-opacity duration-200 cursor-pointer"
+              className="shadow-[4px_4px_0px_0px_rgba(19,19,19,0.3)] bg-[#027a9c] box-border content-stretch flex flex-row gap-4 items-center justify-center pl-4 md:pl-6 pr-3 md:pr-4 py-3 md:py-4 relative rounded-[58px] shrink-0 hover:opacity-90 transition-opacity duration-200 cursor-pointer"
               data-name="Button"
               id="node-2161_307"
             >

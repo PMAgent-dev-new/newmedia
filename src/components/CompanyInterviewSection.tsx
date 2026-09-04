@@ -181,7 +181,7 @@ export default async function CompanyInterviewSection() {
             {/* Button */}
             <div className="flex flex-col items-center justify-center mt-4 md:mt-6 lg:mt-8">
               <Link href={categoryPathById(CATEGORY_IDS.COMPANY_INTERVIEW)} className="block">
-                <div className="bg-[#04acdb] box-border content-stretch flex flex-row gap-4 items-center justify-center pl-6 pr-4 py-4 relative rounded-[58px] shrink-0 cursor-pointer shadow-[4px_4px_0px_0px_rgba(19,19,19,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(19,19,19,0.3)] transition-shadow">
+                <div className="bg-[#027a9c] box-border content-stretch flex flex-row gap-4 items-center justify-center pl-6 pr-4 py-4 relative rounded-[58px] shrink-0 cursor-pointer shadow-[4px_4px_0px_0px_rgba(19,19,19,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(19,19,19,0.3)] transition-shadow">
                   <div
                     aria-hidden="true"
                     className="absolute border-[#333333] border-[1.5px] border-solid inset-0 pointer-events-none rounded-[58px]"

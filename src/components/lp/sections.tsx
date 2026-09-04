@@ -2,7 +2,7 @@
  * LP専用セクション群。
  * 配色・字組みは /about のコンポーネント（CeoMessage / Achievements / MediaCoverage）に統一。
  *   見出し青: #0a6bb3 / #1569a7   テキスト紺: #0b2a44 / #0d2233 / #101828
- *   セクション背景(淡青): #f3f9ff   CTA: #04acdb(相談) / #115df2
+ *   セクション背景(淡青): #f3f9ff   CTA: #027a9c(相談) / #115df2
  */
 
 // 各導線の遷移先（実データ）
@@ -39,10 +39,10 @@ function PhoneIcon() {
   );
 }
 
-/** Web面談予約（メインCTA・水色 #04acdb） */
+/** Web面談予約（メインCTA・水色 #027a9c） */
 export function BookButton({ label = '無料で相談する', sub = '1分で完了・履歴書不要' }: { label?: string; sub?: string }) {
   return (
-    <a href={BOOK_URL} target="_blank" rel="noopener noreferrer" className={`${BTN_BASE} bg-[#04acdb] text-white shadow-[0_8px_20px_rgba(4,172,219,0.3)] hover:bg-[#0398c0]`}>
+    <a href={BOOK_URL} target="_blank" rel="noopener noreferrer" className={`${BTN_BASE} bg-[#027a9c] text-white shadow-[0_8px_20px_rgba(4,172,219,0.3)] hover:bg-[#026278]`}>
       <span className="inline-flex items-center gap-2">{label}<ArrowIcon className="transition-transform group-hover:translate-x-1" /></span>
       <span className="mt-0.5 text-xs font-bold opacity-90">{sub}</span>
     </a>
@@ -568,7 +568,7 @@ export function LpStickyCta() {
         href={BOOK_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-[#04acdb] text-white font-extrabold py-3.5 text-sm"
+        className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-[#027a9c] text-white font-extrabold py-3.5 text-sm"
       >
         <ArrowIcon />無料相談
       </a>

@@ -114,7 +114,7 @@ export default function Header({ entryUrl = DEFAULT_ENTRY_URL }: HeaderProps = {
                 href={entryUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-[#04acdb] text-white px-4 py-2 rounded-[10px] font-bold text-sm shadow-sm hover:bg-[#0398c0] transition-colors whitespace-nowrap"
+                className="bg-[#027a9c] text-white px-4 py-2 rounded-[10px] font-bold text-sm shadow-sm hover:bg-[#026278] transition-colors whitespace-nowrap"
                 aria-label="まずお話を聞く"
               >
                 まずお話を聞く
