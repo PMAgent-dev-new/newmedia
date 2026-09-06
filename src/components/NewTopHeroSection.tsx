@@ -27,14 +27,6 @@ function BlogCard({ blog }: { blog: Blog }) {
     });
   };
 
-  // タイトルが20文字を超える場合は省略記号を追加
-  const truncateTitle = (title: string, maxLength: number = 20) => {
-    if (title.length > maxLength) {
-      return title.substring(0, maxLength) + "…";
-    }
-    return title;
-  };
-
   // スラッグがない場合はIDを使用、どちらもない場合は無効なリンクを防ぐ
   const linkHref = blog.slug ? `/blog/${blog.slug}` : (blog.id ? `/blog/${blog.id}` : '#');
 
@@ -77,7 +69,7 @@ function BlogCard({ blog }: { blog: Blog }) {
           </div>
           <div className="basis-0 box-border content-stretch flex flex-col grow items-start justify-start min-h-px min-w-px p-0 relative shrink-0 w-full">
             <div className="flex flex-col font-bold justify-center relative shrink-0 text-[#101828] text-sm md:text-base text-left">
-              <p className="block leading-[1.4] line-clamp-2">{truncateTitle(blog.title)}</p>
+              <p className="block leading-[1.4] line-clamp-2">{blog.title}</p>
             </div>
           </div>
         </div>
@@ -118,7 +110,7 @@ function BlogCard({ blog }: { blog: Blog }) {
         </div>
         <div className="basis-0 box-border content-stretch flex flex-col grow items-start justify-start min-h-px min-w-px p-0 relative shrink-0 w-full">
           <div className="flex flex-col font-bold justify-center relative shrink-0 text-[#101828] text-sm md:text-base text-left">
-            <p className="block leading-[1.4] line-clamp-2">{truncateTitle(blog.title)}</p>
+            <p className="block leading-[1.4] line-clamp-2">{blog.title}</p>
           </div>
         </div>
       </div>

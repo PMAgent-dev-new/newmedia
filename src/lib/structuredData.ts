@@ -42,11 +42,50 @@ const HEADING_LABELS = /^(この記事の(結論|要点|まとめ)|結論|まと
  * 先頭が「見出しラベル」か「直後の本文が同じ語で始まる見出し」なら捨てて、
  * 最初の実質的な本文から書き始める。
  */
+/**
+ * 指定字数に収まるよう切り詰める。
+ *
+ * 単純な slice は語の途中で切れる。実測（2026-09-06）で全240記事の meta description が
+ * 「…転職を考えている方に向けて、この記事では実際の年収デ…」のように
+ * 名詞の途中で終わっていた。検索結果に出るのはこの文字列そのものなので、
+ * 意味が壊れたまま読者の目に触れる。
+ *
+ * 句点 → 読点・括弧閉じ の順に切断位置を探し、見つからない場合のみ字数で切る。
+ * 句点で終われた場合は文として完結しているので「…」は付けない。
+ * （jobmadley の truncateForDescription と同じ考え方。両サービスで挙動を揃える）
+ */
+export function truncateForDescription(text: string, maxLength: number): string {
+  // 「…」で1字使うため、2字未満の予算しか無ければ何も入れない
+  if (!text || maxLength < 2) return '';
+  const chars = Array.from(text);
+  if (chars.length <= maxLength) return text;
+
+  // 末尾の「…」1字ぶんを空けて候補を切り出す
+  const head = chars.slice(0, maxLength - 1).join('');
+  // 極端に短く切れるのを避けるため、切断位置は候補の後半にある場合のみ採用する
+  const minCut = head.length / 2;
+  const sentenceEnd = Math.max(
+    head.lastIndexOf('。'),
+    head.lastIndexOf('！'),
+    head.lastIndexOf('？'),
+  );
+  if (sentenceEnd >= minCut) return head.slice(0, sentenceEnd + 1);
+
+  const softBreak = Math.max(
+    head.lastIndexOf('、'),
+    head.lastIndexOf('，'),
+    head.lastIndexOf('）'),
+    head.lastIndexOf(' '),
+  );
+  const cut = softBreak >= minCut ? softBreak + 1 : head.length;
+  return `${head.slice(0, cut).replace(/[、，\s]+$/, '')}…`;
+}
+
 export function htmlToDescription(html?: string, fallback = '', max = 140): string {
   const src = html || '';
   if (!src) {
     const f = fallback.replace(/\s+/g, ' ').trim();
-    return f.length <= max ? f : `${f.slice(0, max)}…`;
+    return truncateForDescription(f, max);
   }
 
   // ブロック要素の終わりを区切りに変えてから、残りのタグを落とす
@@ -74,8 +113,7 @@ export function htmlToDescription(html?: string, fallback = '', max = 140): stri
   }
 
   const raw = segments.join(' ').trim() || fallback.replace(/\s+/g, ' ').trim();
-  if (raw.length <= max) return raw;
-  return `${raw.slice(0, max)}…`;
+  return truncateForDescription(raw, max);
 }
 
 /** 記事の正規パス（slug優先で id アクセスとの重複を集約） */
