@@ -99,7 +99,14 @@ export function fitDescription(text: string, maxWidth: number = DESCRIPTION_MAX_
     width += w
     chars += 1
   }
-  return truncateForDescription(trimmed, chars)
+  // ⚠️ 字数を渡すだけでは幅を保証できない。
+  //    truncateForDescription は末尾の「…」に**1文字**を見込むが、「…」の幅は2。
+  //    半角だけの本文では幅が1だけ溢れる。出来上がりの幅で確かめて詰める。
+  for (let n = chars; n >= 2; n--) {
+    const out = truncateForDescription(trimmed, n)
+    if (displayWidth(out) <= maxWidth) return out
+  }
+  return ''
 }
 
 export function truncateForDescription(text: string, maxLength: number): string {

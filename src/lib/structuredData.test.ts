@@ -89,3 +89,13 @@ test('構造化データ用の広い幅も指定できる', () => {
   assert.ok(displayWidth(out) <= 320)
   assert.ok(displayWidth(out) > 140, `広い幅が効いていない: ${displayWidth(out)}`)
 })
+
+test('★半角のみの長文でも幅を1も超えない（「…」の幅は2）', () => {
+  assert.ok(displayWidth(fitDescription('a'.repeat(300))) <= 140)
+  assert.ok(displayWidth(fitDescription('※'.repeat(200))) <= 140)
+})
+
+test('全角記号を半角と数えない', () => {
+  for (const [c, w] of [['※', 2], ['★', 2], ['…', 2], ['①', 2], ['Ａ', 2], ['🚕', 2], ['ｱ', 1]] as const)
+    assert.equal(displayWidth(c as string), w, `${c} の幅`)
+})
