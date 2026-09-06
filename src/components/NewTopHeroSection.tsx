@@ -168,10 +168,13 @@ export default async function NewTopHeroSection() {
                 検索エンジンのアウトライン抽出でも「CTAが2つあるだけのページ」に見えていた。
                 見た目を変えないため、既存のロゴ画像を h1 で包むだけにする。
                 ⚠️ モバイル用とPC用の2枚がCSSで出し分けられ**両方DOMに出る**ので、
-                h1 が2本にならないよう、包むのは1枚だけ。もう1枚は alt="" + aria-hidden。 */}
+                h1 が2本にならないよう、包むのは1枚だけ。もう1枚は alt="" + aria-hidden。
+                ⚠️ h1 の中身は phrasing content でなければならない。div を入れると
+                HTMLのコンテンツモデル違反になるので span で包む
+                （Tailwind の block / hidden が display を決めるので見た目は変わらない）。 */}
             <h1 className="w-full">
               {/* モバイル専用画像 */}
-              <div className="block md:hidden">
+              <span className="block md:hidden">
                 <Image
                   src={withBasePath(imgMobileLogo)}
                   alt=""
@@ -182,9 +185,9 @@ export default async function NewTopHeroSection() {
                   priority
                   sizes="(max-width: 768px) 100vw"
                 />
-              </div>
+              </span>
               {/* タブレット以上で統合画像 */}
-              <div className="hidden md:block">
+              <span className="hidden md:block">
                 <Image
                   src={withBasePath(imgCombinedLogo)}
                   alt="RIDE JOB Media｜タクシー・トラック・整備士の仕事と転職がわかるメディア"
@@ -194,7 +197,7 @@ export default async function NewTopHeroSection() {
                   priority
                   sizes="(max-width: 1024px) 100vw"
                 />
-              </div>
+              </span>
               {/* 画像のaltは検索エンジンには届くが、モバイルでは非表示側に付くため
                   読み上げ用のテキストも持たせる（視覚的には隠すが、内容は画像と同一） */}
               <span className="sr-only md:hidden">

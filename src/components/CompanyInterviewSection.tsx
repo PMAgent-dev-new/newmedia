@@ -80,9 +80,11 @@ function InterviewCard({ blog }: { blog: Blog }) {
               <div className="flex flex-col font-normal justify-center relative shrink-0 text-[#4a5565] text-sm md:text-xs lg:text-base text-justify w-full">
                 {/* 切る位置は行数（line-clamp）に任せる。
                     文字数で切ると文の途中で切れて意味を成さないため、
-                    getExcerpt は DOM に載せる量の上限としてだけ使う。 */}
+                    getExcerpt は DOM に載せる量の上限としてだけ使う。
+                    lg の line-clamp-4 が畳むのは160字前後なので、それより広く取らないと
+                    CSSが畳む前に「...」が付いて二重の省略になる。 */}
                 <p className="leading-[1.5] line-clamp-2 md:line-clamp-3 lg:line-clamp-4">
-                  {getExcerpt(120)}
+                  {getExcerpt(200)}
                 </p>
               </div>
             </div>

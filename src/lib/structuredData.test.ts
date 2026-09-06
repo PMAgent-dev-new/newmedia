@@ -5,7 +5,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { truncateForDescription, htmlToDescription } from './structuredData'
+import { truncateForDescription, htmlToDescription, fitDescription, displayWidth } from './structuredData'
 
 test('上限以下ならそのまま返す', () => {
   assert.equal(truncateForDescription('短い文です。', 140), '短い文です。')
@@ -52,17 +52,40 @@ test('htmlToDescription も文の区切りで終わる', () => {
 })
 
 test('本文が無いときは title を文境界で切る（回帰）', () => {
-  // 句点は19字目。上限30字なら候補29字の後半（15字目以降）に入るので採用される
+  // 第3引数は**表示幅**。幅40＝全角20字ぶん。句点までが幅38なので、そこで終われる
   const title = 'タクシー運転手の年収は本当に低いのか。' + 'あ'.repeat(200)
-  assert.equal(htmlToDescription('', title, 30), 'タクシー運転手の年収は本当に低いのか。')
+  assert.equal(htmlToDescription('', title, 40), 'タクシー運転手の年収は本当に低いのか。')
 })
 
 test('句点が候補の前半にしか無いときは字数で切る（ガードの回帰）', () => {
-  // 同じ title を上限40字で見ると、句点(19字目)は候補39字の後半（20字目以降）に入らない。
-  // ここで句点を採用すると 19字しか残らず、40字の予算に対して短すぎる。
-  // 極端に短い description を作らないための意図的な挙動。
-  const title = 'タクシー運転手の年収は本当に低いのか。' + 'あ'.repeat(200)
+  // 句点が候補の35%より前にあると、そこで切ると極端に短くなるので採用しない。
+  const title = 'です。' + 'あ'.repeat(200)
   const out = htmlToDescription('', title, 40)
   assert.ok(out.endsWith('…'), out)
-  assert.equal(Array.from(out).length, 40)
+  assert.ok(displayWidth(out) > 30, `短く切られすぎ: ${out}`)
+})
+
+test('★htmlToDescription の第3引数は文字数ではなく表示幅', () => {
+  const html = '<p>' + 'タクシー運転手の平均年収は約400万円です。'.repeat(20) + '</p>'
+  const out = htmlToDescription(html, 'タイトル', 140)
+  assert.ok(displayWidth(out) <= 140, `幅超過: ${displayWidth(out)}`)
+})
+
+test('★ブランド名の途中で切らない（半角スペースを切断点にしない）', () => {
+  const text = '全国のタクシードライバー求人・転職情報をお探しの方へ。未経験からの挑戦もキャリアアップも、RIDE JOBが専任アドバイザーとして無料でサポートします。'
+  const out = fitDescription(text)
+  assert.ok(!out.endsWith('RIDE…'), out)
+  assert.ok(!/RIDE\s*…$/.test(out), out)
+})
+
+test('本文が無いときの fallback も幅に収まる', () => {
+  const out = htmlToDescription('', 'あ'.repeat(300), 140)
+  assert.ok(displayWidth(out) <= 140, `幅超過: ${displayWidth(out)}`)
+})
+
+test('構造化データ用の広い幅も指定できる', () => {
+  const html = '<p>' + 'タクシー運転手の平均年収は約400万円です。'.repeat(30) + '</p>'
+  const out = htmlToDescription(html, 'タイトル', 320)
+  assert.ok(displayWidth(out) <= 320)
+  assert.ok(displayWidth(out) > 140, `広い幅が効いていない: ${displayWidth(out)}`)
 })

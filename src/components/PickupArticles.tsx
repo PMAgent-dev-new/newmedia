@@ -17,7 +17,6 @@ export default function PickupArticles({ articles }: PickupArticlesProps) {
     });
   };
 
-  // タイトルが20文字を超える場合は省略記号を追加
   return (
     <div className="bg-white rounded-[12px] p-4 shadow-sm">
       <h3 className="text-[#333333] font-bold text-lg mb-4">ピックアップ記事</h3>

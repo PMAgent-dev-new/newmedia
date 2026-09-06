@@ -54,6 +54,54 @@ const HEADING_LABELS = /^(この記事の(結論|要点|まとめ)|結論|まと
  * 句点で終われた場合は文として完結しているので「…」は付けない。
  * （jobmadley の truncateForDescription と同じ考え方。両サービスで挙動を揃える）
  */
+export const displayWidth = (text: string): number =>
+  Array.from(text).reduce((w, c) => {
+    const cp = c.codePointAt(0)!
+    // 全角として数える範囲。CJK（0x2E80〜）だけを見ていたときは
+    // 「※」(U+203B)「★」(U+2605)「…」(U+2026) を半角と数え、上限をわずかに超えていた。
+    const wide =
+      (cp >= 0x1100 && cp <= 0x115f) || // ハングル字母
+      cp === 0x2026 || cp === 0x203b || // … ※
+      (cp >= 0x2460 && cp <= 0x24ff) || // ①などの囲み数字
+      (cp >= 0x25a0 && cp <= 0x27bf) || // ■ ★ ▲ などの記号・装飾
+      (cp >= 0x2e80 && cp <= 0xa4cf) || // CJK・かな・部首
+      (cp >= 0xac00 && cp <= 0xd7a3) || // ハングル音節
+      (cp >= 0xf900 && cp <= 0xfaff) || // CJK互換漢字
+      (cp >= 0xfe30 && cp <= 0xfe6f) || // CJK互換記号
+      (cp >= 0xff00 && cp <= 0xff60) || // 全角英数・記号
+      (cp >= 0xffe0 && cp <= 0xffe6) || // 全角通貨記号
+      (cp >= 0x1f300 && cp <= 0x1faff)  // 絵文字
+    // ⚠️ 半角カナ（U+FF61〜U+FF9F）は上の 0xff00-0xff60 に入らないので半角のまま。
+    return w + (wide ? 2 : 1)
+  }, 0)
+
+/**
+ * meta description の表示幅の上限。
+ *
+ * ⚠️ **文字数ではなく表示幅**（全角=2・半角=1）。検索結果の切り詰めはこの単位で起きる。
+ * 以前はここに「140」を**文字数**として渡していた。日本語では幅280＝上限の倍で、
+ * 実測（2026-09-06 本番）でも /media/blog/word-nieki が幅271、mobility_5 が幅266だった。
+ * jobmadley 側（DESCRIPTION_MAX_WIDTH）と同じ値・同じ単位にしてある。
+ */
+export const DESCRIPTION_MAX_WIDTH = 140
+
+/**
+ * 表示幅の上限に収まるよう整える。収まっていればそのまま返す。
+ */
+export function fitDescription(text: string, maxWidth: number = DESCRIPTION_MAX_WIDTH): string {
+  const trimmed = text.replace(/\s+/g, ' ').trim()
+  if (displayWidth(trimmed) <= maxWidth) return trimmed
+  let width = 0
+  let chars = 0
+  for (const c of Array.from(trimmed)) {
+    const w = displayWidth(c)
+    if (width + w > maxWidth) break
+    width += w
+    chars += 1
+  }
+  return truncateForDescription(trimmed, chars)
+}
+
 export function truncateForDescription(text: string, maxLength: number): string {
   // 「…」で1字使うため、2字未満の予算しか無ければ何も入れない
   if (!text || maxLength < 2) return '';
@@ -63,29 +111,40 @@ export function truncateForDescription(text: string, maxLength: number): string 
   // 末尾の「…」1字ぶんを空けて候補を切り出す
   const head = chars.slice(0, maxLength - 1).join('');
   // 極端に短く切れるのを避けるため、切断位置は候補の後半にある場合のみ採用する
-  const minCut = head.length / 2;
+  // 句点は候補の35%以降にあれば採用する（jobmadley と同じ基準）。
   const sentenceEnd = Math.max(
     head.lastIndexOf('。'),
     head.lastIndexOf('！'),
     head.lastIndexOf('？'),
   );
-  if (sentenceEnd >= minCut) return head.slice(0, sentenceEnd + 1);
+  if (sentenceEnd >= head.length * 0.35) return head.slice(0, sentenceEnd + 1);
 
+  const minCut = head.length / 2;
+
+  // ⚠️ 半角スペースを切断点にしない。「RIDE JOB」の間で切れてブランド名が壊れる。
   const softBreak = Math.max(
     head.lastIndexOf('、'),
     head.lastIndexOf('，'),
     head.lastIndexOf('）'),
-    head.lastIndexOf(' '),
+    head.lastIndexOf('】'),
+    head.lastIndexOf('・'),
   );
   const cut = softBreak >= minCut ? softBreak + 1 : head.length;
-  return `${head.slice(0, cut).replace(/[、，\s]+$/, '')}…`;
+  return `${head.slice(0, cut).replace(/[、，・\s]+$/, '')}…`;
 }
 
-export function htmlToDescription(html?: string, fallback = '', max = 140): string {
+/**
+ * 本文（HTML）から meta description を作る。
+ * @param maxWidth **表示幅**の上限（文字数ではない）。既定は DESCRIPTION_MAX_WIDTH。
+ */
+export function htmlToDescription(
+  html?: string,
+  fallback = '',
+  maxWidth: number = DESCRIPTION_MAX_WIDTH,
+): string {
   const src = html || '';
   if (!src) {
-    const f = fallback.replace(/\s+/g, ' ').trim();
-    return truncateForDescription(f, max);
+    return fitDescription(fallback, maxWidth);
   }
 
   // ブロック要素の終わりを区切りに変えてから、残りのタグを落とす
@@ -113,7 +172,7 @@ export function htmlToDescription(html?: string, fallback = '', max = 140): stri
   }
 
   const raw = segments.join(' ').trim() || fallback.replace(/\s+/g, ' ').trim();
-  return truncateForDescription(raw, max);
+  return fitDescription(raw, maxWidth);
 }
 
 /** 記事の正規パス（slug優先で id アクセスとの重複を集約） */
@@ -127,7 +186,10 @@ export function blogPostingLd(blog: Blog) {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     headline: blog.title,
-    description: htmlToDescription(blog.content || blog.html, blog.title, 160),
+    // 構造化データの description は検索結果のスニペットではなく、
+    // 検索エンジンやAI検索が記事の内容を把握するために読む。SERPの幅制限は掛からないので、
+    // meta description（幅140）より広く取る。従来の「160文字」＝およそ幅320に相当。
+    description: htmlToDescription(blog.content || blog.html, blog.title, 320),
     image: blog.eyecatch?.url ? [blog.eyecatch.url] : [LOGO_URL],
     datePublished: blog.publishedAt,
     dateModified: blog.updatedAt || blog.revisedAt || blog.publishedAt,
