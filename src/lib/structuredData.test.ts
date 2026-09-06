@@ -99,3 +99,16 @@ test('全角記号を半角と数えない', () => {
   for (const [c, w] of [['※', 2], ['★', 2], ['…', 2], ['①', 2], ['Ａ', 2], ['🚕', 2], ['ｱ', 1]] as const)
     assert.equal(displayWidth(c as string), w, `${c} の幅`)
 })
+
+test('★予算を大きく余らせるくらいなら節の区切りまで伸ばす', () => {
+  const lead =
+    '全国のタクシードライバー求人・転職情報をお探しの方へ。未経験からの挑戦もキャリアアップも、RIDE JOBが専任アドバイザーとして無料でサポートします。二種免許の取得支援や給与保証のある求人も多数掲載しています。'
+  const out = fitDescription(lead)
+  assert.ok(displayWidth(out) >= 80, `予算を使えていない: 幅${displayWidth(out)} ${out}`)
+  assert.ok(displayWidth(out) <= 140)
+})
+
+test('次の文が予算に収まるなら文で終わる（節へ伸ばさない）', () => {
+  const lead = '大阪府でドライバー・整備士として働きたい方へ。物流・運送から自動車整備まで、幅広い求人が見つかります。' + 'あ'.repeat(100)
+  assert.ok(fitDescription(lead).endsWith('。'))
+})
