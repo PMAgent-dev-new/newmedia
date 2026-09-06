@@ -27,14 +27,6 @@ function BlogCard({ blog }: { blog: Blog }) {
     });
   };
 
-  // タイトルが20文字を超える場合は省略記号を追加
-  const truncateTitle = (title: string, maxLength: number = 20) => {
-    if (title.length > maxLength) {
-      return title.substring(0, maxLength) + "…";
-    }
-    return title;
-  };
-
   // スラッグがない場合はIDを使用、どちらもない場合は無効なリンクを防ぐ
   const linkHref = blog.slug ? `/blog/${blog.slug}` : (blog.id ? `/blog/${blog.id}` : '#');
 
@@ -77,7 +69,7 @@ function BlogCard({ blog }: { blog: Blog }) {
           </div>
           <div className="basis-0 box-border content-stretch flex flex-col grow items-start justify-start min-h-px min-w-px p-0 relative shrink-0 w-full">
             <div className="flex flex-col font-bold justify-center relative shrink-0 text-[#101828] text-sm md:text-base text-left">
-              <p className="block leading-[1.4] line-clamp-2">{truncateTitle(blog.title)}</p>
+              <p className="block leading-[1.4] line-clamp-2">{blog.title}</p>
             </div>
           </div>
         </div>
@@ -118,7 +110,7 @@ function BlogCard({ blog }: { blog: Blog }) {
         </div>
         <div className="basis-0 box-border content-stretch flex flex-col grow items-start justify-start min-h-px min-w-px p-0 relative shrink-0 w-full">
           <div className="flex flex-col font-bold justify-center relative shrink-0 text-[#101828] text-sm md:text-base text-left">
-            <p className="block leading-[1.4] line-clamp-2">{truncateTitle(blog.title)}</p>
+            <p className="block leading-[1.4] line-clamp-2">{blog.title}</p>
           </div>
         </div>
       </div>
@@ -170,33 +162,48 @@ export default async function NewTopHeroSection() {
           />
 
           <div className="flex flex-col gap-5 items-start justify-start w-full relative z-10">
-            {/* タイトルロゴとイラスト */}
-            <div className="w-full">
+            {/* タイトルロゴとイラスト。
+                ⚠️ ここが h1。以前このページには **h1 も h2 も1つも無く**、最初の見出しが
+                ページ下部のCTAカードの h3 だった。スクリーンリーダーの見出しジャンプでも
+                検索エンジンのアウトライン抽出でも「CTAが2つあるだけのページ」に見えていた。
+                見た目を変えないため、既存のロゴ画像を h1 で包むだけにする。
+                ⚠️ モバイル用とPC用の2枚がCSSで出し分けられ**両方DOMに出る**ので、
+                h1 が2本にならないよう、包むのは1枚だけ。もう1枚は alt="" + aria-hidden。
+                ⚠️ h1 の中身は phrasing content でなければならない。div を入れると
+                HTMLのコンテンツモデル違反になるので span で包む
+                （Tailwind の block / hidden が display を決めるので見た目は変わらない）。 */}
+            <h1 className="w-full">
               {/* モバイル専用画像 */}
-              <div className="block md:hidden">
+              <span className="block md:hidden">
                 <Image
                   src={withBasePath(imgMobileLogo)}
-                  alt="モバイル用ロゴ"
+                  alt=""
+                  aria-hidden="true"
                   width={202}
                   height={329}
                   className="w-full h-auto"
                   priority
                   sizes="(max-width: 768px) 100vw"
                 />
-              </div>
+              </span>
               {/* タブレット以上で統合画像 */}
-              <div className="hidden md:block">
+              <span className="hidden md:block">
                 <Image
                   src={withBasePath(imgCombinedLogo)}
-                  alt="タブレット用ロゴ"
+                  alt="RIDE JOB Media｜タクシー・トラック・整備士の仕事と転職がわかるメディア"
                   width={665}
                   height={266}
                   className="w-full h-auto"
                   priority
                   sizes="(max-width: 1024px) 100vw"
                 />
-              </div>
-            </div>
+              </span>
+              {/* 画像のaltは検索エンジンには届くが、モバイルでは非表示側に付くため
+                  読み上げ用のテキストも持たせる（視覚的には隠すが、内容は画像と同一） */}
+              <span className="sr-only md:hidden">
+                RIDE JOB Media｜タクシー・トラック・整備士の仕事と転職がわかるメディア
+              </span>
+            </h1>
 
             {/* ピックアップ記事一覧 */}
             <div className="flex flex-col gap-4 w-full p-4 bg-white border-2 border-black rounded-3xl max-h-[380px] overflow-y-auto" style={{ pointerEvents: 'auto' }}>
@@ -243,18 +250,25 @@ export default async function NewTopHeroSection() {
 
           <div className="flex flex-row gap-5 items-start justify-start w-full relative z-10">
             <div className="flex-1 max-w-[50%]">
-              {/* タイトルロゴとイラスト */}
-              <div className="w-full mb-5">
+              {/* タイトルロゴとイラスト。
+                  ⚠️ h1 はモバイル用ブロック（lg:hidden）とこちらの両方に置く。
+                  この2ブロックは CSS で排他表示されるため、DOM には2つあっても
+                  実際に描画・読み上げされる h1 は常に1つ。片方にしか置かないと、
+                  そのブレークポイントでは h1 が display:none になり
+                  スクリーンリーダーの見出しジャンプから消える。
+                  （Googleはモバイルファーストで巡回するのでモバイル側が主だが、
+                    デスクトップ利用者のために両方必要） */}
+              <h1 className="w-full mb-5">
                 <Image
                   src={withBasePath(imgCombinedLogo)}
-                  alt="PC用ロゴ"
+                  alt="RIDE JOB Media｜タクシー・トラック・整備士の仕事と転職がわかるメディア"
                   width={665}
                   height={266}
                   className="w-full h-auto"
                   priority
                   sizes="50vw"
                 />
-              </div>
+              </h1>
 
               {/* ピックアップ記事一覧 */}
               <div className="w-full bg-white border-2 border-black rounded-3xl p-6">

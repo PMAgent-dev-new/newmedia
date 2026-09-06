@@ -25,12 +25,6 @@ function InterviewCard({ blog }: { blog: Blog }) {
     });
   };
 
-  // タイトルを20文字で省略
-  const truncateTitle = (title: string, maxLength: number = 20) => {
-    if (title.length <= maxLength) return title;
-    return title.substring(0, maxLength) + '...';
-  };
-
   // 本文からプレーンテキストの抜粋を生成（content > html の優先順）
   const getExcerpt = (maxLength: number = 100) => {
     const source = blog.content || blog.html || '';
@@ -79,18 +73,18 @@ function InterviewCard({ blog }: { blog: Blog }) {
             </div>
             <div className="box-border content-stretch flex flex-col gap-2 lg:gap-3 items-start justify-start leading-[0] p-0 relative shrink-0 w-full">
               <div className="flex flex-col font-bold justify-center relative shrink-0 text-[#101828] text-lg md:text-base lg:text-xl text-left w-full">
-                <p className="block leading-[20px] lg:leading-[24px] group-hover:text-[#2204db] transition-colors duration-200">
-                  {truncateTitle(blog.title)}
+                <p className="block leading-[20px] lg:leading-[24px] line-clamp-3 group-hover:text-[#2204db] transition-colors duration-200">
+                  {blog.title}
                 </p>
               </div>
               <div className="flex flex-col font-normal justify-center relative shrink-0 text-[#4a5565] text-sm md:text-xs lg:text-base text-justify w-full">
-                {/* Mobile: 20文字に省略 */}
-                <p className="block md:hidden leading-[1.5]">
-                  {getExcerpt(20)}
-                </p>
-                {/* Tablet and up: 100文字相当 + 行数制限 */}
-                <p className="hidden md:block leading-[1.5] line-clamp-3 lg:line-clamp-4">
-                  {getExcerpt(100)}
+                {/* 切る位置は行数（line-clamp）に任せる。
+                    文字数で切ると文の途中で切れて意味を成さないため、
+                    getExcerpt は DOM に載せる量の上限としてだけ使う。
+                    lg の line-clamp-4 が畳むのは160字前後なので、それより広く取らないと
+                    CSSが畳む前に「...」が付いて二重の省略になる。 */}
+                <p className="leading-[1.5] line-clamp-2 md:line-clamp-3 lg:line-clamp-4">
+                  {getExcerpt(200)}
                 </p>
               </div>
             </div>
@@ -145,6 +139,10 @@ export default async function CompanyInterviewSection() {
           {/* Title and Character Section */}
           <div className="flex flex-col gap-6 md:gap-8 lg:gap-10 items-center lg:items-start justify-start shrink-0">
             {/* 見出し画像をImageで最適化 */}
+            {/* ⚠️ 見出し画像は h2 で包む。包まないと、このページの見出し階層が
+                h1 の次にいきなり h3（下部のCTAカード）へ飛び、本文の構造が
+                スクリーンリーダーにも検索エンジンにも見えない。見た目は変えない。 */}
+            <h2 className="m-0">
             <Image
               src={withBasePath(imgHeading021)}
               alt="企業取材"
@@ -154,6 +152,7 @@ export default async function CompanyInterviewSection() {
               loading="lazy"
               sizes="(max-width: 768px) 320px, (max-width: 1024px) 300px, 300px"
             />
+            </h2>
             {/* キャラクター画像をImageで最適化 */}
             <Image
               src={withBasePath(imgDsgf1)}
