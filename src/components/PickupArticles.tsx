@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { Blog } from '@/types/microcms';
 
 interface PickupArticlesProps {
@@ -17,13 +18,6 @@ export default function PickupArticles({ articles }: PickupArticlesProps) {
   };
 
   // タイトルが20文字を超える場合は省略記号を追加
-  const truncateTitle = (title: string, maxLength: number = 20) => {
-    if (title.length > maxLength) {
-      return title.substring(0, maxLength) + "…";
-    }
-    return title;
-  };
-
   return (
     <div className="bg-white rounded-[12px] p-4 shadow-sm">
       <h3 className="text-[#333333] font-bold text-lg mb-4">ピックアップ記事</h3>
@@ -31,7 +25,15 @@ export default function PickupArticles({ articles }: PickupArticlesProps) {
       <div className="space-y-3">
         {articles.length > 0 ? (
           articles.map((article) => (
-            <div key={article.id} className="flex gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
+            // ⚠️ Link にすること。以前は cursor-pointer の div で、**押しても何も起きなかった**
+            //    （SSR HTML に href が1本も無く、253ページのサイドバーが全て死んだリンク）。
+            //    href に /media を自分で書かないこと。next.config.ts の basePath が付いて
+            //    /media/media/... になり404する。
+            <Link
+              key={article.id}
+              href={`/blog/${article.slug || article.id}`}
+              className="flex gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors"
+            >
               {/* 画像 */}
               <div className="relative w-16 h-12 flex-shrink-0 rounded overflow-hidden">
                 {article.eyecatch?.url ? (
@@ -51,13 +53,16 @@ export default function PickupArticles({ articles }: PickupArticlesProps) {
               {/* 記事情報 */}
               <div className="flex-1 min-w-0">
                 <h4 className="text-[#333333] text-sm font-medium line-clamp-2 leading-heading mb-1">
-                  {truncateTitle(article.title)}
+                  {/* ⚠️ サーバー側で切らないこと。CSS の line-clamp-2 が見た目を整えるので、
+                      HTML から文字を削ると検索エンジンとスクリーンリーダーが全文を読めなくなる
+                      （旧: 21文字＋「…」で固定。img alt には全文が入っていた） */}
+                  {article.title}
                 </h4>
                 <span className="text-[#666666] text-xs">
                   {formatDate(article.publishedAt)}
                 </span>
               </div>
-            </div>
+            </Link>
           ))
         ) : (
           <div className="text-center py-4">

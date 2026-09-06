@@ -145,6 +145,10 @@ export default async function CompanyInterviewSection() {
           {/* Title and Character Section */}
           <div className="flex flex-col gap-6 md:gap-8 lg:gap-10 items-center lg:items-start justify-start shrink-0">
             {/* 見出し画像をImageで最適化 */}
+            {/* ⚠️ 見出し画像は h2 で包む。包まないと、このページの見出し階層が
+                h1 の次にいきなり h3（下部のCTAカード）へ飛び、本文の構造が
+                スクリーンリーダーにも検索エンジンにも見えない。見た目は変えない。 */}
+            <h2 className="m-0">
             <Image
               src={withBasePath(imgHeading021)}
               alt="企業取材"
@@ -154,6 +158,7 @@ export default async function CompanyInterviewSection() {
               loading="lazy"
               sizes="(max-width: 768px) 320px, (max-width: 1024px) 300px, 300px"
             />
+            </h2>
             {/* キャラクター画像をImageで最適化 */}
             <Image
               src={withBasePath(imgDsgf1)}

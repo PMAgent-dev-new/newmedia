@@ -53,15 +53,20 @@ export default function NewCategorySection({ categories }: NewCategorySectionPro
               id="node-2151_200"
             >
               {/* 見出し画像をImageで最適化 */}
+              {/* ⚠️ 見出し画像は h2 で包む。包まないと、このページの見出し階層が
+                  h1 の次にいきなり h3（下部のCTAカード）へ飛び、本文の構造が
+                  スクリーンリーダーにも検索エンジンにも見えない。見た目は変えない。 */}
+              <h2 className="m-0">
               <Image
                 src={withBasePath(imgFrame683)}
-                alt="カテゴリー見出し"
+                alt="カテゴリーから記事を探す"
                 width={280}
                 height={180}
                 className="w-[280px] md:w-[320px] lg:w-[376px] h-[180px] md:h-[240px] lg:h-[273px] object-contain"
                 loading="lazy"
                 sizes="(max-width: 768px) 280px, (max-width: 1024px) 320px, 376px"
               />
+              </h2>
             </div>
           </div>
           <div

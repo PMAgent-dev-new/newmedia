@@ -170,13 +170,20 @@ export default async function NewTopHeroSection() {
           />
 
           <div className="flex flex-col gap-5 items-start justify-start w-full relative z-10">
-            {/* タイトルロゴとイラスト */}
-            <div className="w-full">
+            {/* タイトルロゴとイラスト。
+                ⚠️ ここが h1。以前このページには **h1 も h2 も1つも無く**、最初の見出しが
+                ページ下部のCTAカードの h3 だった。スクリーンリーダーの見出しジャンプでも
+                検索エンジンのアウトライン抽出でも「CTAが2つあるだけのページ」に見えていた。
+                見た目を変えないため、既存のロゴ画像を h1 で包むだけにする。
+                ⚠️ モバイル用とPC用の2枚がCSSで出し分けられ**両方DOMに出る**ので、
+                h1 が2本にならないよう、包むのは1枚だけ。もう1枚は alt="" + aria-hidden。 */}
+            <h1 className="w-full">
               {/* モバイル専用画像 */}
               <div className="block md:hidden">
                 <Image
                   src={withBasePath(imgMobileLogo)}
-                  alt="モバイル用ロゴ"
+                  alt=""
+                  aria-hidden="true"
                   width={202}
                   height={329}
                   className="w-full h-auto"
@@ -188,7 +195,7 @@ export default async function NewTopHeroSection() {
               <div className="hidden md:block">
                 <Image
                   src={withBasePath(imgCombinedLogo)}
-                  alt="タブレット用ロゴ"
+                  alt="RIDE JOB Media｜タクシー・トラック・整備士の仕事と転職がわかるメディア"
                   width={665}
                   height={266}
                   className="w-full h-auto"
@@ -196,7 +203,12 @@ export default async function NewTopHeroSection() {
                   sizes="(max-width: 1024px) 100vw"
                 />
               </div>
-            </div>
+              {/* 画像のaltは検索エンジンには届くが、モバイルでは非表示側に付くため
+                  読み上げ用のテキストも持たせる（視覚的には隠すが、内容は画像と同一） */}
+              <span className="sr-only md:hidden">
+                RIDE JOB Media｜タクシー・トラック・整備士の仕事と転職がわかるメディア
+              </span>
+            </h1>
 
             {/* ピックアップ記事一覧 */}
             <div className="flex flex-col gap-4 w-full p-4 bg-white border-2 border-black rounded-3xl max-h-[380px] overflow-y-auto" style={{ pointerEvents: 'auto' }}>
@@ -243,18 +255,25 @@ export default async function NewTopHeroSection() {
 
           <div className="flex flex-row gap-5 items-start justify-start w-full relative z-10">
             <div className="flex-1 max-w-[50%]">
-              {/* タイトルロゴとイラスト */}
-              <div className="w-full mb-5">
+              {/* タイトルロゴとイラスト。
+                  ⚠️ h1 はモバイル用ブロック（lg:hidden）とこちらの両方に置く。
+                  この2ブロックは CSS で排他表示されるため、DOM には2つあっても
+                  実際に描画・読み上げされる h1 は常に1つ。片方にしか置かないと、
+                  そのブレークポイントでは h1 が display:none になり
+                  スクリーンリーダーの見出しジャンプから消える。
+                  （Googleはモバイルファーストで巡回するのでモバイル側が主だが、
+                    デスクトップ利用者のために両方必要） */}
+              <h1 className="w-full mb-5">
                 <Image
                   src={withBasePath(imgCombinedLogo)}
-                  alt="PC用ロゴ"
+                  alt="RIDE JOB Media｜タクシー・トラック・整備士の仕事と転職がわかるメディア"
                   width={665}
                   height={266}
                   className="w-full h-auto"
                   priority
                   sizes="50vw"
                 />
-              </div>
+              </h1>
 
               {/* ピックアップ記事一覧 */}
               <div className="w-full bg-white border-2 border-black rounded-3xl p-6">
