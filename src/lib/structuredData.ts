@@ -117,17 +117,19 @@ export function truncateForDescription(text: string, maxLength: number): string 
 
   // 末尾の「…」1字ぶんを空けて候補を切り出す
   const head = chars.slice(0, maxLength - 1).join('');
-  // 極端に短く切れるのを避けるため、切断位置は候補の後半にある場合のみ採用する
-  // 句点は候補の35%以降にあれば採用する（jobmadley と同じ基準）。
+
+  // 切断点は「句点」と「節の区切り（読点など）」の2種類。
+  // 句点で終われれば文として完結して読みやすいが、次の文が予算に入らないと
+  // 予算を大きく余らせる。節の区切りの方が SOFT_BREAK_GAIN 以上ぶん予算を使えるときだけ
+  // 節を採る（jobmadley の truncateForDescription と同じ基準）。
+  const SOFT_BREAK_GAIN = 30; // 幅30＝全角15字ぶん
+
+  // 句点は候補の35%以降にあれば採用する（前すぎると極端に短くなる）
   const sentenceEnd = Math.max(
     head.lastIndexOf('。'),
     head.lastIndexOf('！'),
     head.lastIndexOf('？'),
   );
-  if (sentenceEnd >= head.length * 0.35) return head.slice(0, sentenceEnd + 1);
-
-  const minCut = head.length / 2;
-
   // ⚠️ 半角スペースを切断点にしない。「RIDE JOB」の間で切れてブランド名が壊れる。
   const softBreak = Math.max(
     head.lastIndexOf('、'),
@@ -136,7 +138,17 @@ export function truncateForDescription(text: string, maxLength: number): string 
     head.lastIndexOf('】'),
     head.lastIndexOf('・'),
   );
-  const cut = softBreak >= minCut ? softBreak + 1 : head.length;
+
+  const sentenceOk = sentenceEnd >= head.length * 0.35;
+  const softOk = softBreak >= head.length / 2;
+  const sentenceWidth = sentenceOk ? displayWidth(head.slice(0, sentenceEnd + 1)) : -1;
+  // 節で切ると末尾に「…」（幅2）が付く
+  const softWidth = softOk ? displayWidth(head.slice(0, softBreak + 1)) + 2 : -1;
+
+  if (sentenceOk && !(softOk && softWidth - sentenceWidth >= SOFT_BREAK_GAIN)) {
+    return head.slice(0, sentenceEnd + 1);
+  }
+  const cut = softOk ? softBreak + 1 : head.length;
   return `${head.slice(0, cut).replace(/[、，・\s]+$/, '')}…`;
 }
 
