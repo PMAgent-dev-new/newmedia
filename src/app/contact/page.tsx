@@ -49,7 +49,7 @@ export default function ContactPage() {
       const res = await fetch(withBasePath('/api/contact'), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, company, email, message }),
+        body: JSON.stringify({ name, company, email, message, honeypot }),
       });
 
       const data = await res.json().catch(() => ({}));

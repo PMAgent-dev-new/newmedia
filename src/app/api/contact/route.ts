@@ -5,6 +5,7 @@ type ContactPayload = {
   company?: string;
   email: string;
   message: string;
+  honeypot?: string;
 };
 
 const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -19,12 +20,20 @@ const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
  */
 export async function GET() {
   const configured = Boolean(process.env.LARK_WEBHOOK_URL);
-  return NextResponse.json({ ok: configured, configured }, { status: configured ? 200 : 503 });
+  return NextResponse.json(
+    { ok: configured, configured },
+    { status: configured ? 200 : 503, headers: { "X-Robots-Tag": "noindex" } },
+  );
 }
 
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as Partial<ContactPayload>;
+
+    // honeypot はクライアント側だけだと API 直叩きの bot に効かない。同じ判定をここでも行う
+    if (body.honeypot) {
+      return NextResponse.json({ ok: true });
+    }
 
     const name = (body.name || "").toString().trim();
     const company = (body.company || "").toString().trim();
@@ -47,12 +56,13 @@ export async function POST(req: Request) {
     }
 
     const textLines: string[] = [
-      "お問い合わせが届きました",
+      "お問い合わせが届きました（RIDE JOBメディア /media/contact）",
       `お名前: ${name}`,
       company ? `会社名: ${company}` : undefined,
       `メール: ${email}`,
       "内容:",
-      message,
+      // Lark の text 本文には上限がある。超えると送信失敗＝問い合わせが失われるので求人サイト側と同じ 2000 字で切る
+      message.slice(0, 2000),
     ].filter((line): line is string => typeof line === "string");
 
     const payload = {
