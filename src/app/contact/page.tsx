@@ -35,6 +35,8 @@ export default function ContactPage() {
     e.preventDefault();
     setServerMessage(null);
     setServerError(null);
+    // 未入力のまま送信ボタンを押した場合もエラーを見せる
+    setHasInteracted(true);
 
     if (honeypot) {
       // ボットとみなして静かに成功扱い
@@ -61,6 +63,9 @@ export default function ContactPage() {
         setCompany("");
         setEmail("");
         setMessage("");
+        // 入力を空に戻すと必須チェックが再び真になるため、フラグも戻さないと
+        // 完了メッセージの上に赤いエラーが残る（2026-09-21 実測）
+        setHasInteracted(false);
       }
     } catch {
       setServerError("ネットワークエラーが発生しました。接続状況をご確認ください。");
