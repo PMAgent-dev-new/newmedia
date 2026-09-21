@@ -5,13 +5,35 @@ type ContactPayload = {
   company?: string;
   email: string;
   message: string;
+  honeypot?: string;
 };
 
 const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
+/**
+ * 設定欠落の検知用。本番の /media/api/contact に GET すると、送信せずに
+ * Webhook が設定されているかだけを返す。
+ *
+ * 経緯: LARK_WEBHOOK_URL が Vercel に一度も設定されないまま公開されており、
+ * フォームは表示されるのに送信だけが 500 で落ちていた（2026-09-21 実測）。
+ * 表示側にエラーが出ないため誰も気づけなかった。週次ウォッチから叩いて監視する。
+ */
+export async function GET() {
+  const configured = Boolean(process.env.LARK_WEBHOOK_URL);
+  return NextResponse.json(
+    { ok: configured, configured },
+    { status: configured ? 200 : 503, headers: { "X-Robots-Tag": "noindex" } },
+  );
+}
+
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as Partial<ContactPayload>;
+
+    // honeypot はクライアント側だけだと API 直叩きの bot に効かない。同じ判定をここでも行う
+    if (body.honeypot) {
+      return NextResponse.json({ ok: true });
+    }
 
     const name = (body.name || "").toString().trim();
     const company = (body.company || "").toString().trim();
@@ -34,12 +56,13 @@ export async function POST(req: Request) {
     }
 
     const textLines: string[] = [
-      "お問い合わせが届きました",
+      "お問い合わせが届きました（RIDE JOBメディア /media/contact）",
       `お名前: ${name}`,
       company ? `会社名: ${company}` : undefined,
       `メール: ${email}`,
       "内容:",
-      message,
+      // Lark の text 本文には上限がある。超えると送信失敗＝問い合わせが失われるので求人サイト側と同じ 2000 字で切る
+      message.slice(0, 2000),
     ].filter((line): line is string => typeof line === "string");
 
     const payload = {
@@ -69,23 +92,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "不正なリクエストです。" }, { status: 400 });
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
