@@ -9,6 +9,19 @@ type ContactPayload = {
 
 const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
+/**
+ * 設定欠落の検知用。本番の /media/api/contact に GET すると、送信せずに
+ * Webhook が設定されているかだけを返す。
+ *
+ * 経緯: LARK_WEBHOOK_URL が Vercel に一度も設定されないまま公開されており、
+ * フォームは表示されるのに送信だけが 500 で落ちていた（2026-09-21 実測）。
+ * 表示側にエラーが出ないため誰も気づけなかった。週次ウォッチから叩いて監視する。
+ */
+export async function GET() {
+  const configured = Boolean(process.env.LARK_WEBHOOK_URL);
+  return NextResponse.json({ ok: configured, configured }, { status: configured ? 200 : 503 });
+}
+
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as Partial<ContactPayload>;
@@ -69,23 +82,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "不正なリクエストです。" }, { status: 400 });
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
