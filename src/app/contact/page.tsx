@@ -17,6 +17,13 @@ export default function ContactPage() {
   const [honeypot, setHoneypot] = useState("");
   const [hasInteracted, setHasInteracted] = useState(false);
 
+  // 入力を始めたらエラー表示を有効にし、前回の完了メッセージは消す
+  // （残したままだと2通目の入力中に「完了」と「必須です」が同時に出る）
+  const touch = () => {
+    setHasInteracted(true);
+    setServerMessage(null);
+  };
+
   const isValidEmail = (value: string) => {
     // RFC5322に完全準拠ではないが、実用的な簡易バリデーション
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -35,8 +42,6 @@ export default function ContactPage() {
     e.preventDefault();
     setServerMessage(null);
     setServerError(null);
-    // 未入力のまま送信ボタンを押した場合もエラーを見せる
-    setHasInteracted(true);
 
     if (honeypot) {
       // ボットとみなして静かに成功扱い
@@ -129,7 +134,7 @@ export default function ContactPage() {
                 <input
                   type="text"
                   value={name}
-                  onChange={(e) => { setHasInteracted(true); setName(e.target.value); }}
+                  onChange={(e) => { touch(); setName(e.target.value); }}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder:text-gray-600 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                   placeholder="山田 太郎"
                   required
@@ -141,7 +146,7 @@ export default function ContactPage() {
                 <input
                   type="text"
                   value={company}
-                  onChange={(e) => { setHasInteracted(true); setCompany(e.target.value); }}
+                  onChange={(e) => { touch(); setCompany(e.target.value); }}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder:text-gray-600 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                   placeholder="株式会社PM Agent"
                 />
@@ -154,7 +159,7 @@ export default function ContactPage() {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => { setHasInteracted(true); setEmail(e.target.value); }}
+                  onChange={(e) => { touch(); setEmail(e.target.value); }}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder:text-gray-600 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                   placeholder="taro@example.com"
                   required
@@ -167,7 +172,7 @@ export default function ContactPage() {
                 </label>
                 <textarea
                   value={message}
-                  onChange={(e) => { setHasInteracted(true); setMessage(e.target.value); }}
+                  onChange={(e) => { touch(); setMessage(e.target.value); }}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 h-40 resize-y text-gray-900 placeholder:text-gray-600 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                   placeholder="お問い合わせ内容をご記入ください"
                   required
