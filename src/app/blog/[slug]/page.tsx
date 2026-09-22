@@ -10,17 +10,6 @@ import BlogCTASection from '@/components/BlogCTASection';
 import RelatedArticlesSection from '@/components/RelatedArticlesSection';
 import { Blog } from '@/types/microcms';
 import { getBlogBySlug, getBlogById, getLatestBlogs } from '@/lib/microcms';
-
-/**
- * 記事の取得は generateMetadata と本体の2箇所から呼ばれる。両方 no-store のため
- * Next の fetch メモ化が効かず、**1ページの描画で本文（最長52KB）を2回**取っていた
- * （2026-09-23 ローカル実測。開発サーバのログに同じ slug のクエリが2本並ぶ）。
- * microCMS のデータ転送量は 20GB/月 を超えるとAPIが停止するので、
- * React の cache() で同一リクエスト内は1回に畳む。
- */
-const getBlogForRequest = cache(
-  async (slug: string) => (await getBlogBySlug(slug)) ?? (await getBlogById(slug))
-);
 import { withBasePath } from '@/lib/basePath';
 import { getRelatedBlogs } from '@/lib/blogHelpers';
 import { entryUrlForBlog, jobsUrlForBlog } from '@/lib/entryForm';
@@ -39,6 +28,17 @@ import {
   htmlToDescription,
   ldJson,
 } from '@/lib/structuredData';
+
+/**
+ * 記事の取得は generateMetadata と本体の2箇所から呼ばれる。両方 no-store のため
+ * Next の fetch メモ化が効かず、**1ページの描画で本文（最長52KB）を2回**取っていた
+ * （2026-09-23 ローカル実測。開発サーバのログに同じ slug のクエリが2本並ぶ）。
+ * microCMS のデータ転送量は 20GB/月 を超えるとAPIが停止するので、
+ * React の cache() で同一リクエスト内は1回に畳む。
+ */
+const getBlogForRequest = cache(
+  async (slug: string) => (await getBlogBySlug(slug)) ?? (await getBlogById(slug))
+);
 
 interface BlogDetailPageProps {
   params: Promise<{
