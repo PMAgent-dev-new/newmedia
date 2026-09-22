@@ -15,6 +15,21 @@ const API_KEY = getEnvVar('MICROCMS_API_KEY') || getEnvVar('NEXT_PUBLIC_MICROCMS
 const SERVICE_DOMAIN = getEnvVar('MICROCMS_SERVICE_DOMAIN') || getEnvVar('NEXT_PUBLIC_MICROCMS_SERVICE_DOMAIN');
 const BASE_URL = SERVICE_DOMAIN ? `https://${SERVICE_DOMAIN}.microcms.io/api/v1` : '';
 
+/**
+ * 一覧カード（BlogCard / PickupArticles）が使うフィールドだけ。
+ *
+ * ⚠️ これを省くと microCMS は**本文込みの全フィールド**を返す。実測 2026-09-23:
+ * 最新3件 86KB・同カテゴリ6件 181KB → fields 指定で 1.9KB・3.7KB（98%減）。
+ * 記事1ページの表示で 293KB → 32KB。
+ * Hobbyプランはデータ転送量 20GB/月を超えると**APIが停止しサイトが表示できなくなる**
+ * （2026-09-23 に「今月10GB到達」の通知が届いたのが発端）。
+ * 本文が要る面（CompanyInterviewSection の抜粋）だけ fields を明示的に渡すこと。
+ */
+export const CARD_FIELDS = "id,title,slug,eyecatch,publishedAt,category";
+
+/** 一覧系の再取得間隔。記事の公開は1日1〜2本なので1時間で足りる。 */
+export const LIST_REVALIDATE = 3600;
+
 // 求人専用のmicroCMS設定
 const JOB_API_KEY = getEnvVar('MICROCMS_API_KEY_2');
 const JOB_SERVICE_DOMAIN = getEnvVar('MICROCMS_SERVICE_DOMAIN_2');
@@ -35,7 +50,10 @@ console.log('MicroCMS Configuration:', {
  * @param limit 取得件数（デフォルト: 6）
  * @returns BlogsResponse
  */
-export async function getLatestBlogs(limit: number = 6): Promise<BlogsResponse> {
+export async function getLatestBlogs(
+  limit: number = 6,
+  fields: string = CARD_FIELDS
+): Promise<BlogsResponse> {
   // 環境変数の検証
   if (!API_KEY || !SERVICE_DOMAIN) {
     console.error('MicroCMS environment variables are not properly configured');
@@ -53,7 +71,7 @@ export async function getLatestBlogs(limit: number = 6): Promise<BlogsResponse> 
     BASE_URL
   });
 
-  const url = `${BASE_URL}/blogs?limit=${limit}&orders=-publishedAt`;
+  const url = `${BASE_URL}/blogs?limit=${limit}&orders=-publishedAt&fields=${encodeURIComponent(fields)}`;
   console.log('Fetching from URL:', url);
 
   try {
@@ -61,7 +79,9 @@ export async function getLatestBlogs(limit: number = 6): Promise<BlogsResponse> 
       headers: {
         "X-MICROCMS-API-KEY": API_KEY,
       },
-      cache: "no-store",
+      // 毎リクエスト取り直すと転送量が訪問数に比例する（上限20GB/月・超過でAPI停止）。
+      // 一覧カードは1時間古くても実害がないのでキャッシュに載せる。
+      next: { revalidate: LIST_REVALIDATE },
     });
 
     console.log('Response status:', res.status);
@@ -92,7 +112,8 @@ export async function getLatestBlogs(limit: number = 6): Promise<BlogsResponse> 
  */
 export async function getBlogsByCategory(
   categoryId: string,
-  limit: number = 6
+  limit: number = 6,
+  fields: string = CARD_FIELDS
 ): Promise<BlogsResponse> {
   // 環境変数の検証
   if (!API_KEY || !SERVICE_DOMAIN) {
@@ -107,14 +128,14 @@ export async function getBlogsByCategory(
 
   try {
     const filters = encodeURIComponent(`category[equals]${categoryId}`);
-    const url = `${BASE_URL}/blogs?filters=${filters}&limit=${limit}&orders=-publishedAt`;
+    const url = `${BASE_URL}/blogs?filters=${filters}&limit=${limit}&orders=-publishedAt&fields=${encodeURIComponent(fields)}`;
     console.log('Fetching category blogs from URL:', url);
 
     const res = await fetch(url, {
       headers: {
         "X-MICROCMS-API-KEY": API_KEY,
       },
-      cache: "no-store",
+      next: { revalidate: LIST_REVALIDATE },
     });
 
     console.log('Category blogs response status:', res.status);
