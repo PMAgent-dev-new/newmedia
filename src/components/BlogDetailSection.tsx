@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Blog } from '@/types/microcms';
 import TableOfContents from './TableOfContents';
 import { upgradeYouTubeLinks } from '@/lib/youtubeEmbed';
+import { optimizeBodyImages } from '@/lib/mediaImages';
 
 interface BlogDetailSectionProps {
   blog: Blog;
@@ -122,12 +123,12 @@ export default function BlogDetailSection({ blog }: BlogDetailSectionProps) {
         {blog.html ? (
           <div 
             className={`article-content-html ${htmlVariantClass} text-gray-900`}
-            dangerouslySetInnerHTML={{ __html: upgradeYouTubeLinks(blog.html) }}
+            dangerouslySetInnerHTML={{ __html: optimizeBodyImages(upgradeYouTubeLinks(blog.html)) }}
           />
         ) : blog.content ? (
           <div 
             className="article-content text-gray-900"
-            dangerouslySetInnerHTML={{ __html: upgradeYouTubeLinks(blog.content) }}
+            dangerouslySetInnerHTML={{ __html: optimizeBodyImages(upgradeYouTubeLinks(blog.content)) }}
           />
         ) : (
           <p className="text-gray-500">記事の内容が見つかりません。</p>

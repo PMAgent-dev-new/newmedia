@@ -4,6 +4,7 @@ import { withBasePath } from '@/lib/basePath';
 import Link from 'next/link';
 import { Blog } from '@/types/microcms';
 import { fetchBlogsWithFallback } from '@/lib/blogHelpers';
+import { CARD_FIELDS } from '@/lib/microcms';
 import { CATEGORY_IDS, categoryPathById } from '@/constants/categories';
 
 const imgSection2CompanyInterview = "/figma/company-interview-bg.png";
@@ -118,7 +119,13 @@ function EmptyCard() {
  * 企業インタビューセクション - 企業取材記事を動的表示
  */
 export default async function CompanyInterviewSection() {
-  const blogs = await fetchBlogsWithFallback(CATEGORY_IDS.COMPANY_INTERVIEW, 4);
+  // この面だけは抜粋（getExcerpt）に本文が要るので content/html を明示的に足す。
+  // 他の面は既定の CARD_FIELDS（本文なし）で取る＝転送量を98%削る（microcms.ts 参照）
+  const blogs = await fetchBlogsWithFallback(
+    CATEGORY_IDS.COMPANY_INTERVIEW,
+    4,
+    `${CARD_FIELDS},content,html`
+  );
 
   return (
     <div className="box-border content-stretch flex flex-col items-center justify-center pb-12 md:pb-16 lg:pb-24 pt-16 md:pt-24 lg:pt-[140px] px-4 md:px-8 lg:px-[170px] relative w-full min-h-screen">

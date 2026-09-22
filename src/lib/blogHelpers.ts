@@ -1,5 +1,5 @@
 import { Blog } from "@/types/microcms";
-import { getBlogsByCategory, getLatestBlogs } from "./microcms";
+import { CARD_FIELDS, getBlogsByCategory, getLatestBlogs } from "./microcms";
 
 /**
  * カテゴリでブログを取得し、取得できない場合はフォールバックする
@@ -9,17 +9,24 @@ import { getBlogsByCategory, getLatestBlogs } from "./microcms";
  */
 export async function fetchBlogsWithFallback(
   categoryId: string,
-  limit: number = 6
+  limit: number = 6,
+  // 既定は一覧カード用のフィールドだけ。本文が要る面（抜粋を出す CompanyInterviewSection）
+  // だけが content/html を足して呼ぶ。既定で本文まで取ると転送量が跳ねる（microcms.ts の CARD_FIELDS 参照）
+  fields: string = CARD_FIELDS
 ): Promise<Blog[]> {
   try {
     // 1. APIフィルタリングを試行
-    const response = await getBlogsByCategory(categoryId, limit);
+    const response = await getBlogsByCategory(categoryId, limit, fields);
     if (response.contents && response.contents.length > 0) {
       return response.contents;
     }
 
     // 2. クライアントサイドフィルタリングを試行
-    const allResponse = await getLatestBlogs(50);
+    // 本文込みで呼ばれた場合に50件取ると 1.16MB 前後になり、Next のデータキャッシュ上限
+    // （1エントリ2MB）に触れて「警告だけ出してキャッシュしない」状態になりうる
+    // （allBlogs.ts の実測参照）。その場合だけ件数を絞る。
+    const scanLimit = fields === CARD_FIELDS ? 50 : 20;
+    const allResponse = await getLatestBlogs(scanLimit, fields);
     const filteredBlogs = allResponse.contents?.filter(blog => 
       blog.category?.id === categoryId
     ) || [];
@@ -29,13 +36,13 @@ export async function fetchBlogsWithFallback(
     }
 
     // 3. 最新記事をフォールバック
-    const latestResponse = await getLatestBlogs(limit);
+    const latestResponse = await getLatestBlogs(limit, fields);
     return latestResponse.contents || [];
     
   } catch {
     // エラー時は最新記事を返す
     try {
-      const latestResponse = await getLatestBlogs(limit);
+      const latestResponse = await getLatestBlogs(limit, fields);
       return latestResponse.contents || [];
     } catch {
       return [];

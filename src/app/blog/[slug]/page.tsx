@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Header from '@/components/Header';
@@ -28,6 +29,17 @@ import {
   ldJson,
 } from '@/lib/structuredData';
 
+/**
+ * 記事の取得は generateMetadata と本体の2箇所から呼ばれる。両方 no-store のため
+ * Next の fetch メモ化が効かず、**1ページの描画で本文（最長52KB）を2回**取っていた
+ * （2026-09-23 ローカル実測。開発サーバのログに同じ slug のクエリが2本並ぶ）。
+ * microCMS のデータ転送量は 20GB/月 を超えるとAPIが停止するので、
+ * React の cache() で同一リクエスト内は1回に畳む。
+ */
+const getBlogForRequest = cache(
+  async (slug: string) => (await getBlogBySlug(slug)) ?? (await getBlogById(slug))
+);
+
 interface BlogDetailPageProps {
   params: Promise<{
     slug: string;
@@ -37,7 +49,7 @@ interface BlogDetailPageProps {
 // メタデータ生成
 export async function generateMetadata({ params }: BlogDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const blog = await getBlogBySlug(slug) || await getBlogById(slug);
+  const blog = await getBlogForRequest(slug);
 
   if (!blog) {
     return {
@@ -87,7 +99,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   // 記事の取得は try の外で行う。notFound() は例外を投げて Next に 404 を出させる仕組みなので、
   // try の中で呼ぶと下の catch が制御例外を飲み込み、HTTP 200 で「エラーが発生しました」を返す
   // ソフト404になる（実測: 存在しない記事URLも /media/blog/page も本番で200だった）。
-  blog = (await getBlogBySlug(slug)) ?? (await getBlogById(slug));
+  blog = await getBlogForRequest(slug);
   if (!blog) {
     notFound();
   }
