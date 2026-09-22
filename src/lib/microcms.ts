@@ -35,6 +35,12 @@ export const CARD_FIELDS = "id,title,slug,eyecatch,publishedAt,category";
 export const LIST_REVALIDATE = 3600;
 
 /**
+ * 広告LPが出す「最高給与の求人」の再取得間隔。
+ * 掲載が終わった求人を好条件として出し続けないよう、一覧より短くする。
+ */
+export const TOP_SALARY_REVALIDATE = 900;
+
+/**
  * 求人カード（NewJobSection / lp の Jobs）が使うフィールドだけ。
  *
  * ⚠️ blogs と同じ話で、fields を省くと募集要項の長文（descriptionWork / descriptionOther 等）
@@ -242,7 +248,7 @@ export async function getTopSalaryJobs(
       "X-MICROCMS-API-KEY": JOB_API_KEY,
     },
     // 求人の増減が1時間遅れて出ても実害は無い。訪問ごとの取得をやめて転送量を抑える。
-    next: { revalidate: LIST_REVALIDATE },
+    next: { revalidate: TOP_SALARY_REVALIDATE },
   });
 
   if (!res.ok) {
