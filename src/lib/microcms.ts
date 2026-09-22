@@ -34,6 +34,23 @@ export const CARD_FIELDS = "id,title,slug,eyecatch,publishedAt,category";
 /** 一覧系の再取得間隔。記事の公開は1日1〜2本なので1時間で足りる。 */
 export const LIST_REVALIDATE = 3600;
 
+/**
+ * 広告LPが出す「最高給与の求人」の再取得間隔。
+ * 掲載が終わった求人を好条件として出し続けないよう、一覧より短くする。
+ */
+export const TOP_SALARY_REVALIDATE = 900;
+
+/**
+ * 求人カード（NewJobSection / lp の Jobs）が使うフィールドだけ。
+ *
+ * ⚠️ blogs と同じ話で、fields を省くと募集要項の長文（descriptionWork / descriptionOther 等）
+ * まで返る。実測 2026-09-23: 最新4件 39,489B → fields 指定で 5,845B（85%減）。
+ * 求人CMS（MICROCMS_SERVICE_DOMAIN_2）はメディアとは別サービス＝別の転送量枠だが、
+ * 上限（20GB/月）を超えるとAPIが止まるのは同じ。
+ */
+export const JOB_CARD_FIELDS =
+  "id,jobName,title,companyName,employmentType,wageType,salaryMin,salaryMax,addressPrefMuni,municipality,tags,images";
+
 // 求人専用のmicroCMS設定
 const JOB_API_KEY = getEnvVar('MICROCMS_API_KEY_2');
 const JOB_SERVICE_DOMAIN = getEnvVar('MICROCMS_SERVICE_DOMAIN_2');
@@ -192,13 +209,14 @@ export async function getAllMembers(limit: number = 10): Promise<MembersResponse
  * @returns JobsResponse
  */
 export async function getLatestJobs(limit: number = 4): Promise<JobsResponse> {
-  const url = `${JOB_BASE_URL}/jobs?limit=${limit}&orders=-publishedAt`;
+  const url = `${JOB_BASE_URL}/jobs?limit=${limit}&orders=-publishedAt&fields=${encodeURIComponent(JOB_CARD_FIELDS)}`;
 
   const res = await fetch(url, {
     headers: {
       "X-MICROCMS-API-KEY": JOB_API_KEY,
     },
-    cache: "no-store",
+    // 求人の増減が1時間遅れて出ても実害は無い。訪問ごとの取得をやめて転送量を抑える。
+    next: { revalidate: LIST_REVALIDATE },
   });
 
   if (!res.ok) {
@@ -219,7 +237,7 @@ export async function getTopSalaryJobs(
   limit: number = 3,
   categoryIds?: string[],
 ): Promise<JobsResponse> {
-  let url = `${JOB_BASE_URL}/jobs?limit=${limit}&orders=-salaryMax`;
+  let url = `${JOB_BASE_URL}/jobs?limit=${limit}&orders=-salaryMax&fields=${encodeURIComponent(JOB_CARD_FIELDS)}`;
   if (categoryIds && categoryIds.length > 0) {
     const filter = categoryIds.map((id) => `jobCategory[equals]${id}`).join("[or]");
     url += `&filters=${encodeURIComponent(filter)}`;
@@ -229,7 +247,8 @@ export async function getTopSalaryJobs(
     headers: {
       "X-MICROCMS-API-KEY": JOB_API_KEY,
     },
-    cache: "no-store",
+    // 求人の増減が1時間遅れて出ても実害は無い。訪問ごとの取得をやめて転送量を抑える。
+    next: { revalidate: TOP_SALARY_REVALIDATE },
   });
 
   if (!res.ok) {
