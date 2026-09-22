@@ -22,7 +22,11 @@ export async function fetchBlogsWithFallback(
     }
 
     // 2. クライアントサイドフィルタリングを試行
-    const allResponse = await getLatestBlogs(50, fields);
+    // 本文込みで呼ばれた場合に50件取ると 1.16MB 前後になり、Next のデータキャッシュ上限
+    // （1エントリ2MB）に触れて「警告だけ出してキャッシュしない」状態になりうる
+    // （allBlogs.ts の実測参照）。その場合だけ件数を絞る。
+    const scanLimit = fields === CARD_FIELDS ? 50 : 20;
+    const allResponse = await getLatestBlogs(scanLimit, fields);
     const filteredBlogs = allResponse.contents?.filter(blog => 
       blog.category?.id === categoryId
     ) || [];

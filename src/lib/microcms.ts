@@ -18,9 +18,13 @@ const BASE_URL = SERVICE_DOMAIN ? `https://${SERVICE_DOMAIN}.microcms.io/api/v1`
 /**
  * 一覧カード（BlogCard / PickupArticles）が使うフィールドだけ。
  *
- * ⚠️ これを省くと microCMS は**本文込みの全フィールド**を返す。実測 2026-09-23:
- * 最新3件 86KB・同カテゴリ6件 181KB → fields 指定で 1.9KB・3.7KB（98%減）。
- * 記事1ページの表示で 293KB → 32KB。
+ * ⚠️ これを省くと microCMS は**本文込みの全フィールド**を返す。実測 2026-09-23
+ * （数値は記事の長さで変わるので、測った対象を必ず併記すること）:
+ *   最新3件（カテゴリ指定なし）      88,000B → fields 指定で 1,904B
+ *   最新6件（カテゴリ指定なし）     185,067B → fields 指定で 3,788B
+ *   企業取材カテゴリ6件              98,815B（レビュー時の実測）
+ * この2本と記事本文27KBを足した記事ページ1回ぶんが 294KB → 32KB（ページ全体で約89%減。
+ * 98%減は一覧2本に対する比率で、記事本文は no-store のまま毎回27KB流れる）。
  * Hobbyプランはデータ転送量 20GB/月を超えると**APIが停止しサイトが表示できなくなる**
  * （2026-09-23 に「今月10GB到達」の通知が届いたのが発端）。
  * 本文が要る面（CompanyInterviewSection の抜粋）だけ fields を明示的に渡すこと。
@@ -170,7 +174,9 @@ export async function getAllMembers(limit: number = 10): Promise<MembersResponse
     headers: {
       "X-MICROCMS-API-KEY": API_KEY,
     },
-    cache: "no-store",
+    // member は年単位でしか変わらないのに訪問ごとに取り直していた。
+    // microCMS のデータ転送量（20GB/月・超過でAPI停止）を訪問数に比例させない。
+    next: { revalidate: LIST_REVALIDATE },
   });
 
   if (!res.ok) {
@@ -239,6 +245,7 @@ export async function getTopSalaryJobs(
  * @param offset 取得開始位置（デフォルト: 0）
  * @returns BlogsResponse
  */
+/** @deprecated 呼び出し元なし。全件走査が要るなら `allBlogs.ts` の fetchAllBlogsCached を使う（no-store・fields無しで全文を取るため転送量が跳ねる）。 */
 export async function getAllBlogs(
   limit: number = 10,
   offset: number = 0
@@ -306,7 +313,9 @@ export async function getLogos(limit: number = 20): Promise<LogosResponse> {
       headers: {
         "X-MICROCMS-API-KEY": API_KEY,
       },
-      cache: "no-store",
+      // logo は年単位でしか変わらないのに訪問ごとに取り直していた。
+      // microCMS のデータ転送量（20GB/月・超過でAPI停止）を訪問数に比例させない。
+      next: { revalidate: LIST_REVALIDATE },
     });
 
     if (!res.ok) {
