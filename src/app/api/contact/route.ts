@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { saveToSubmissionVault } from "@/lib/submissionVault";
 
 type ContactPayload = {
   name: string;
@@ -20,9 +21,14 @@ const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
  */
 export async function GET() {
   const configured = Boolean(process.env.LARK_WEBHOOK_URL);
+  // 退避先も同じ経路で見る。未設定だと「Webhook が落ちた問い合わせ」がどこにも残らない。
+  const vaultConfigured = Boolean(
+    process.env.SUBMISSION_VAULT_URL && process.env.SUBMISSION_VAULT_SERVICE_KEY,
+  );
+  const ok = configured && vaultConfigured;
   return NextResponse.json(
-    { ok: configured, configured },
-    { status: configured ? 200 : 503, headers: { "X-Robots-Tag": "noindex" } },
+    { ok, configured, vaultConfigured },
+    { status: ok ? 200 : 503, headers: { "X-Robots-Tag": "noindex" } },
   );
 }
 
@@ -80,7 +86,17 @@ export async function POST(req: Request) {
     const larkData = await larkRes.json().catch(() => ({}));
 
     if (!larkRes.ok || (larkData && typeof larkData.code !== "undefined" && larkData.code !== 0)) {
-      // Larkは {code:0, msg:"ok"} が成功。その他は失敗扱い
+      // Larkは {code:0, msg:"ok"} が成功。その他は失敗扱い。
+      // この通知が唯一の記録なので、落ちた時点で問い合わせは消える。退避に残してから返す。
+      await saveToSubmissionVault({
+        source: "newmedia/contact",
+        kind: "contact",
+        reason: `lark webhook failed: http=${larkRes.status} code=${
+          typeof larkData?.code === "undefined" ? "" : String(larkData.code)
+        }`,
+        notified: false,
+        payload: { name, company, email, message: message.slice(0, 2000) },
+      });
       return NextResponse.json(
         { error: "外部送信に失敗しました。時間をおいて再度お試しください。" },
         { status: 502 }
