@@ -58,6 +58,15 @@ export async function POST(req: Request) {
 
     const webhookUrl = process.env.LARK_WEBHOOK_URL;
     if (!webhookUrl) {
+      // 2026-09-21 に実際に起きた形（未設定のまま公開）。ここを空けたままだと、
+      // 「退避先はその最後の受け皿」と言いながら、いちばん必要な場面で1件も残らない。
+      await saveToSubmissionVault({
+        source: "newmedia/contact",
+        kind: "contact",
+        reason: "LARK_WEBHOOK_URL not configured",
+        notified: false,
+        payload: { name, company, email, message: message.slice(0, 2000) },
+      });
       return NextResponse.json({ error: "サーバー設定が不足しています。(WEBHOOK)" }, { status: 500 });
     }
 
@@ -76,12 +85,33 @@ export async function POST(req: Request) {
       content: { text: textLines.join("\n") },
     };
 
-    const larkRes = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-      // 5秒程度でタイムアウト（Next.jsの標準fetchにsignalは渡さないが、runtime側で十分短い）
-    });
+    const saved = { name, company, email, message: message.slice(0, 2000) };
+
+    // ⚠️ ここは生の fetch なので、DNS失敗・接続断・TLSエラーは**例外**になる。
+    // 下の catch は 400「不正なリクエストです」を返すので、そこまで落とすと
+    // Lark 側の到達性障害＝退避がいちばん必要な場面で1件も残らない。ここで捕まえる。
+    let larkRes: Response;
+    try {
+      larkRes = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(8000),
+      });
+    } catch (sendError) {
+      const detail = sendError instanceof Error ? `${sendError.name}: ${sendError.message}` : "unknown";
+      await saveToSubmissionVault({
+        source: "newmedia/contact",
+        kind: "contact",
+        reason: `lark webhook unreachable: ${detail}`,
+        notified: false,
+        payload: saved,
+      });
+      return NextResponse.json(
+        { error: "外部送信に失敗しました。時間をおいて再度お試しください。" },
+        { status: 502 }
+      );
+    }
 
     const larkData = await larkRes.json().catch(() => ({}));
 
@@ -95,7 +125,7 @@ export async function POST(req: Request) {
           typeof larkData?.code === "undefined" ? "" : String(larkData.code)
         }`,
         notified: false,
-        payload: { name, company, email, message: message.slice(0, 2000) },
+        payload: saved,
       });
       return NextResponse.json(
         { error: "外部送信に失敗しました。時間をおいて再度お試しください。" },

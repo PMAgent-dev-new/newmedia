@@ -58,15 +58,51 @@ describe("/media/api/contact", () => {
 
   it("退避先が落ちても応答は変わらない（退避のせいで挙動を変えない）", async () => {
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async (input: unknown) => {
-        if (String(input).includes("/rest/v1/submission_vault")) throw new Error("boom");
-        return Response.json({ code: 19001, msg: "param invalid" });
-      }),
-    );
+    const fetchSpy = vi.fn(async (input: unknown, _init: RequestInit | undefined) => {
+      if (String(input).includes("/rest/v1/submission_vault")) throw new Error("boom");
+      return Response.json({ code: 19001, msg: "param invalid" });
+    });
+    vi.stubGlobal("fetch", fetchSpy);
     const { POST } = await import("./route");
     expect((await POST(makeRequest())).status).toBe(502);
+    // 退避を呼んでいることまで見ないと、配線が外れても pass する
+    expect(
+      fetchSpy.mock.calls.filter(([t]) => String(t).includes("submission_vault")).length,
+    ).toBe(1);
+    errorSpy.mockRestore();
+  });
+
+  // レビュー②の指摘: PR もテストも 2026-09-21 の「未設定のまま公開」を根拠にしているのに、
+  // まさにその分岐では退避が呼ばれていなかった。
+  it("Webhook が未設定でも問い合わせを退避先へ残す", async () => {
+    vi.stubEnv("LARK_WEBHOOK_URL", "");
+    const fetchSpy = vi.fn(async (_input: unknown, _init: RequestInit | undefined) =>
+      new Response(null, { status: 201 }),
+    );
+    vi.stubGlobal("fetch", fetchSpy);
+    const { POST } = await import("./route");
+    expect((await POST(makeRequest())).status).toBe(500);
+    const posts = fetchSpy.mock.calls.filter(([t]) => String(t).includes("submission_vault"));
+    expect(posts.length, "設定漏れで問い合わせを捨てないこと").toBe(1);
+    expect(JSON.parse(String(posts[0][1]?.body ?? "{}")).reason).toContain("not configured");
+  });
+
+  // レビュー②の指摘: 生 fetch なので到達性障害は例外になり、catch で 400 に落ちていた。
+  it("Lark へ到達できない（例外）ときも退避へ残す", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const fetchSpy = vi.fn(async (input: unknown, _init: RequestInit | undefined) => {
+      if (String(input).includes("/rest/v1/submission_vault")) {
+        return new Response(null, { status: 201 });
+      }
+      throw new TypeError("fetch failed");
+    });
+    vi.stubGlobal("fetch", fetchSpy);
+    const { POST } = await import("./route");
+    const res = await POST(makeRequest());
+    expect(res.status, "400『不正なリクエスト』に落とさないこと").toBe(502);
+    const posts = fetchSpy.mock.calls.filter(([t]) => String(t).includes("submission_vault"));
+    expect(posts.length).toBe(1);
+    expect(JSON.parse(String(posts[0][1]?.body ?? "{}")).reason).toContain("unreachable");
     errorSpy.mockRestore();
   });
 

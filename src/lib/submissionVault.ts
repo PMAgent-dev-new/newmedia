@@ -2,10 +2,10 @@
  * 応募・問い合わせの退避先（Supabase submission_vault）。
  *
  * 経緯: 2026-09-17〜09-23、Lark Base への保存が失敗すると HTTP 500 で即 return する
- * 実装（PR #89）により、自社LP経由の応募が5日間まるごと失われた（推定 約90件）。
+ * 実装（PMAgent-dev-new/form_applicant#89）により、自社LP経由の応募が5日間まるごと失われた（推定 約90件）。
  * 通知もメールもSMSも走らず、応募者の氏名・電話・メールがどこにも残らなかった。
  *
- * PR #93 で「Base に入らなくても Lark 通知だけは出す」ところまでは直したが、
+ * PMAgent-dev-new/form_applicant#93 で「Base に入らなくても Lark 通知だけは出す」ところまでは直したが、
  * 通知は流れて埋もれる。**構造化された受け皿を1つ持たせる**のがこのモジュール。
  *
  * 原則:
@@ -87,7 +87,7 @@ export async function saveToSubmissionVault(entry: VaultEntry): Promise<boolean>
     }
     if (!resp.ok) {
       // ⚠️ レスポンス本文をログに出さない。Postgres の制約違反は details に
-      // `Failing row contains (...)` で行の値をそのまま含むため、#91/#92 で
+      // `Failing row contains (...)` で行の値をそのまま含むため、PMAgent-dev-new/form_applicant#91 / #92 で
       // ログから外したはずの個人情報が戻ってくる経路になる。
       const code = await resp.json().then((b) => String((b as { code?: string })?.code ?? '')).catch(() => '');
       console.error('[vault] 退避に失敗:', `source=${entry.source} http=${resp.status} code=${code}`);
