@@ -55,19 +55,39 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "サーバー設定が不足しています。(WEBHOOK)" }, { status: 500 });
     }
 
-    const textLines: string[] = [
-      "お問い合わせが届きました（RIDE JOBメディア /media/contact）",
-      `お名前: ${name}`,
-      company ? `会社名: ${company}` : undefined,
-      `メール: ${email}`,
-      "内容:",
-      // Lark の text 本文には上限がある。超えると送信失敗＝問い合わせが失われるので求人サイト側と同じ 2000 字で切る
-      message.slice(0, 2000),
-    ].filter((line): line is string => typeof line === "string");
+    const receivedAt = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
+
+    // 利用者の入力がマークダウンやリンクとして解釈されないよう、記号は HTML 実体参照にしてから lark_md に埋める
+    const escapeMd = (value: string) => value.replace(/[&*_~`[\]()<>#]/g, (c) => `&#${c.charCodeAt(0)};`);
+    const field = (label: string, value: string) => ({
+      is_short: true,
+      text: { tag: "lark_md", content: `**${label}**\n${escapeMd(value)}` },
+    });
 
     const payload = {
-      msg_type: "text",
-      content: { text: textLines.join("\n") },
+      msg_type: "interactive",
+      card: {
+        config: { wide_screen_mode: true },
+        header: {
+          template: "blue",
+          title: { tag: "plain_text", content: "📩 新しいお問い合わせ（RIDE JOBメディア）" },
+        },
+        elements: [
+          {
+            tag: "div",
+            fields: [field("お名前", name), field("会社名", company || "（未入力）")],
+          },
+          { tag: "div", fields: [field("メール", email)] },
+          { tag: "hr" },
+          { tag: "div", text: { tag: "lark_md", content: "**お問い合わせ内容**" } },
+          // Lark の本文には上限がある。超えると送信失敗＝問い合わせが失われるので求人サイト側と同じ 2000 字で切る
+          { tag: "div", text: { tag: "plain_text", content: message.slice(0, 2000) } },
+          {
+            tag: "note",
+            elements: [{ tag: "plain_text", content: `受信: ${receivedAt} ／ ridejob.jp/media/contact` }],
+          },
+        ],
+      },
     };
 
     const larkRes = await fetch(webhookUrl, {
