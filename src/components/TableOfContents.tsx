@@ -33,6 +33,8 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
       return { id, text, level };
     });
 
+    // DOMParser はブラウザにしか無いので、描画後の effect で目次を作る（SSR と初回描画は空のまま）
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTocItems(items);
 
     // 実際のDOMの見出しにIDを設定（h2とh3のみ）
