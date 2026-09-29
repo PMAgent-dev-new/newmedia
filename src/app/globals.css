@@ -301,7 +301,8 @@ body {
    見出しの中央揃え・聞き手の吹き出しの右寄せが列幅いっぱいを前提にしている。
    2026-09-01 にここへ上限を付けたところ、会話が列の左672pxに押し込まれ
    「左寄せに崩れている」と指摘を受けた（2026-09-29）。会話形式の行長は
-   吹き出しの max-width: 70% で抑えられている。文章主体の --editorial には上限を残す。 */
+   吹き出しの max-width: 70% で抑えられている。文章主体の --editorial（現在0本）は、
+   下の --editorial ブロックにある既存の max-width: 720px・中央寄せが効く（今回は変えていない）。 */
 .article-content-html {
   /* ⚠️ 全234本のうち html 型は39本（2026-09-29）。以前はここだけ行間1.8・字間なしで、
      content 型195本（行間1.9・字間0.02em）と読書体験が分裂していた。
@@ -454,8 +455,6 @@ body {
 
 /* HTML入力用: editorial（解説型） */
 .article-content-html--editorial {
-  /* 文章主体なので content 型と同じ行長の上限（約41字/行）を付ける */
-  max-width: 42rem;
   --editorial-primary: #2563eb;
   --editorial-primary-dark: #1d4ed8;
   --editorial-text: #1a1a2e;
