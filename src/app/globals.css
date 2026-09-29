@@ -176,7 +176,11 @@ body {
      ⚠️ 中央寄せ(margin-inline:auto)にしないこと。ページ見出し(h1)は
      このコンテナの外にあり幅832pxのままなので、中央寄せると本文だけ
      左に80pxインデントされたように見える（実測: h1 left=48 / 本文 left=128）。
-     左揃えのまま右に余白を残す。 */
+     左揃えのまま右に余白を残す。
+     ⚠️ 右の余白は列幅で決まる。以前は 1536px 以上で列が1088pxに広がり、
+     右に416px空いて「左寄せに崩れている」と見えた（2026-09-29 指摘）。
+     記事ページの外枠（blog/[slug]/page.tsx・blog/preview/page.tsx）で
+     1536px 以上も列を832pxに抑え、余白を160pxにしている。 */
   max-width: 42rem;
 }
 
@@ -291,8 +295,13 @@ body {
 }
 
 /* HTML入力用スタイル。
-   ⚠️ こちらは microCMS の html フィールド由来（全224本中39本）で、
-   content 型185本とは別系統。行長の上限だけは揃えて読書体験を分裂させない。 */
+   ⚠️ こちらは microCMS の html フィールド由来（全234本中39本・2026-09-29）で、
+   content 型195本とは別系統。
+   ⚠️ 行長の上限（42rem）はここに付けないこと。html 型は実質すべて会話形式（--chat）で、
+   見出しの中央揃え・聞き手の吹き出しの右寄せが列幅いっぱいを前提にしている。
+   2026-09-01 にここへ上限を付けたところ、会話が列の左672pxに押し込まれ
+   「左寄せに崩れている」と指摘を受けた（2026-09-29）。会話形式の行長は
+   吹き出しの max-width: 70% で抑えられている。文章主体の --editorial には上限を残す。 */
 .article-content-html {
   /* ⚠️ 全224本のうち html 型は39本。以前はここだけ行間1.8・字間なしで、
      content 型185本（行間1.9・字間0.02em）と読書体験が分裂していた。
@@ -301,7 +310,6 @@ body {
   font-size: var(--text-base);
   line-height: var(--text-base--line-height);
   letter-spacing: var(--text-base--letter-spacing);
-  max-width: 42rem;
 }
 
 /* ⚠️ かつてここに `.article-content-html:not(--chat)` の p/h2/h3/h4 を書いていたが削除した。
@@ -446,6 +454,8 @@ body {
 
 /* HTML入力用: editorial（解説型） */
 .article-content-html--editorial {
+  /* 文章主体なので content 型と同じ行長の上限（約41字/行）を付ける */
+  max-width: 42rem;
   --editorial-primary: #2563eb;
   --editorial-primary-dark: #1d4ed8;
   --editorial-text: #1a1a2e;

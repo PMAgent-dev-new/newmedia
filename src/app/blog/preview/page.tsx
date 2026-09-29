@@ -85,7 +85,8 @@ export default async function BlogPreviewPage({ searchParams }: PreviewPageProps
           backgroundPosition: 'top left',
         }}
       >
-        <div className="container mx-auto md:px-4 py-8">
+        {/* 本番の記事ページと同じ外枠（1536px 以上も 1280px に抑える） */}
+        <div className="container mx-auto md:px-4 py-8 2xl:max-w-7xl">
           <div className="bg-white rounded-2xl shadow-lg px-2 py-4 sm:p-8">
             <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
               <div className="flex-1 lg:order-first">
