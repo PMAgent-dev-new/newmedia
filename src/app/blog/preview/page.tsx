@@ -40,7 +40,12 @@ export default async function BlogPreviewPage({ searchParams }: PreviewPageProps
     );
   }
 
-  const blog = await getBlogById(contentId, draftKey);
+  // プレビューは編集者向けで検索結果には出ない。取得の失敗も従来どおり「見つかりません」の案内にして、
+  // contentId・draftKey の誤りを障害と読み違えないようにする（公開の記事ページは失敗を 500 にする）
+  const blog = await getBlogById(contentId, draftKey).catch((error) => {
+    console.error('プレビュー記事の取得に失敗しました:', error);
+    return null;
+  });
 
   if (!blog) {
     return (

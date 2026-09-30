@@ -99,6 +99,11 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   // 記事の取得は try の外で行う。notFound() は例外を投げて Next に 404 を出させる仕組みなので、
   // try の中で呼ぶと下の catch が制御例外を飲み込み、HTTP 200 で「エラーが発生しました」を返す
   // ソフト404になる（実測: 存在しない記事URLも /media/blog/page も本番で200だった）。
+  // 取得の失敗（microCMS の障害・制限など）は null ではなく throw で上がってくるので、
+  // ここでは捕まえずに 500（blog/error.tsx）にする。404 にすると実在の記事が検索結果から外れていく。
+  // 404・500 を状態コードで返せるのは、このページを包む Suspense の境界（loading.tsx など）が無いから。
+  // 置くと先に 200 で送り始め、どちらも 200 になる（`npm run test:unit` の blog/status.test.ts で検知する。
+  // ビルドでは走らない）。
   blog = await getBlogForRequest(slug);
   if (!blog) {
     notFound();
