@@ -20,6 +20,8 @@ const buildBaseUrl = () => {
 const buildUrl = (path: string) => {
   const { origin, basePath } = buildBaseUrl();
   const normalized = path.startsWith("/") ? path : `/${path}`;
+  // トップは末尾スラッシュなし。/media/ は /media へ 308 するため、サイトマップに載せるとリダイレクト扱いになる
+  if (normalized === "/" && basePath) return `${origin}${basePath}`;
   return `${origin}${basePath}${normalized}`;
 };
 

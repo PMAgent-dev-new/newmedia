@@ -1,16 +1,14 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+// eslint-config-next 16 はフラット設定をそのまま export する。以前の FlatCompat 経由の読み込みは
+// "Converting circular structure to JSON" で落ち、lint が一度も走っていなかった（jobmadley と同じ形に揃える）
+import nextConfig from "eslint-config-next/core-web-vitals";
+import nextTypescript from "eslint-config-next/typescript";
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  ...nextConfig,
+  ...nextTypescript,
+  {
+    ignores: [".next/**", "node_modules/**", "public/**"],
+  },
 ];
 
 export default eslintConfig;

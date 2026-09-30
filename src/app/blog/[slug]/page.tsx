@@ -205,8 +205,9 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           backgroundPosition: 'top left',
         }}
       >
-        {/* 白い背景のコンテナ */}
-        <div className="container mx-auto md:px-4 py-8">
+        {/* 白い背景のコンテナ。1536px 以上でも 1280px に抑え、本文列を832px に保つ
+            （広げると本文の行長の上限 42rem の右に416px空き、左寄せに見える） */}
+        <div className="container mx-auto md:px-4 py-8 2xl:max-w-7xl">
           <div className="bg-white rounded-2xl shadow-lg px-4 py-5 sm:p-8">
             <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
               {/* メインコンテンツエリア */}
