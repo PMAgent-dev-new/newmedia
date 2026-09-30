@@ -356,96 +356,124 @@ export async function getLogos(limit: number = 20): Promise<LogosResponse> {
 }
 
 /**
+ * URL から来た記事の slug・ID を microCMS へ渡してよいか。渡せないものは問い合わせずに「記事なし」とする。
+ * 取得の失敗は 500 にするので、ありえない値で microCMS にエラーを返させないことが要る。
+ * - slug はフィルタ（slug[equals]…）の値になる。角括弧はフィルタの演算子（`[or]` など）として読まれて
+ *   別の記事に一致し、`../` を含むと JSON でない応答が返る（2026-09-30 実測）。
+ *   そのため URL にそのまま書ける英数字と `-` `_` `.` `~` に限る
+ * - ID はパスの一部になる。microCMS の ID は英数字・`-`・`_` だけで、`.` を含むと 400 が返る
+ * 現存の記事（2026-09-30 時点 234件）の slug・ID はすべてこの形。
+ * slug をこれ以外の文字（日本語・空白・記号など）で付けると、その記事の URL は 404 になる。
+ */
+const BLOG_SLUG_PATTERN = /^[A-Za-z0-9._~-]+$/;
+const BLOG_ID_PATTERN = /^[A-Za-z0-9_-]+$/;
+
+export function isBlogSlug(value: string): boolean {
+  return BLOG_SLUG_PATTERN.test(value);
+}
+
+export function isBlogId(value: string): boolean {
+  return BLOG_ID_PATTERN.test(value);
+}
+
+/**
  * スラッグで単一ブログ記事を取得
+ * 記事が無ければ null。取得に失敗したとき（通信・microCMS のエラー応答・設定なし）は throw する。
+ * 失敗まで null にすると、呼び出し側は「記事が無い」と区別できず、実在の記事を 404 にしてしまう。
  * @param slug 記事のスラッグ
  * @returns Blog | null
  */
 export async function getBlogBySlug(slug: string): Promise<Blog | null> {
   // 環境変数の検証
   if (!API_KEY || !SERVICE_DOMAIN) {
-    console.error('MicroCMS environment variables are not properly configured');
+    throw new Error('MicroCMS environment variables are not properly configured');
+  }
+
+  if (!isBlogSlug(slug)) {
     return null;
   }
 
-  try {
-    const filters = encodeURIComponent(`slug[equals]${slug}`);
-    // 同一slugが複数存在する場合（旧移行の重複レコード等）に、どのレコードへ解決するかを決める。
-    // 並び順は allBlogs.ts の dedupeBySlug と**必ず同じ**にすること。ここだけ変えると、
-    // 一覧カード（dedupeBySlug の勝者）と記事詳細（この問い合わせの勝者）が別レコードを指し、
-    // 同じURLで見出し・日付・本文がちぐはぐになる。
-    // 以前ここは -revisedAt だったため、旧レコードを1回公開し直すだけで詳細だけが旧本文へ
-    // 切り替わる状態だった（実測 2026-09-02: 3組の重複が現存）。
-    const url = `${BASE_URL}/blogs?filters=${filters}&limit=1&orders=-publishedAt,-revisedAt`;
-    console.log('Fetching blog by slug from URL:', url);
+  const filters = encodeURIComponent(`slug[equals]${slug}`);
+  // 同一slugが複数存在する場合（旧移行の重複レコード等）に、どのレコードへ解決するかを決める。
+  // 並び順は allBlogs.ts の dedupeBySlug と**必ず同じ**にすること。ここだけ変えると、
+  // 一覧カード（dedupeBySlug の勝者）と記事詳細（この問い合わせの勝者）が別レコードを指し、
+  // 同じURLで見出し・日付・本文がちぐはぐになる。
+  // 以前ここは -revisedAt だったため、旧レコードを1回公開し直すだけで詳細だけが旧本文へ
+  // 切り替わる状態だった（実測 2026-09-02: 3組の重複が現存）。
+  const url = `${BASE_URL}/blogs?filters=${filters}&limit=1&orders=-publishedAt,-revisedAt`;
+  console.log('Fetching blog by slug from URL:', url);
 
-    const res = await fetch(url, {
-      headers: {
-        "X-MICROCMS-API-KEY": API_KEY,
-      },
-      cache: "no-store",
-    });
+  const res = await fetch(url, {
+    headers: {
+      "X-MICROCMS-API-KEY": API_KEY,
+    },
+    cache: "no-store",
+  });
 
-    console.log('Blog by slug response status:', res.status);
+  console.log('Blog by slug response status:', res.status);
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error('Blog by slug API Error Response:', errorText);
-      throw new Error(`Failed to fetch blog by slug: ${res.status} - ${errorText}`);
-    }
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error('Blog by slug API Error Response:', errorText);
+    throw new Error(`Failed to fetch blog by slug: ${res.status} - ${errorText}`);
+  }
 
-    const data = await res.json();
-    const blogs = data.contents || [];
-    
-    if (blogs.length === 0) {
-      console.log(`No blog found with slug: ${slug}`);
-      return null;
-    }
+  const data = await res.json();
+  if (!Array.isArray(data?.contents)) {
+    throw new Error('Unexpected response for blog by slug: contents is not an array');
+  }
 
-    return blogs[0];
-  } catch (error) {
-    console.error('Blog by slug Network or parsing error:', error);
+  if (data.contents.length === 0) {
+    console.log(`No blog found with slug: ${slug}`);
     return null;
   }
+
+  return data.contents[0];
 }
 
 /**
  * IDで単一ブログ記事を取得
+ * 記事が無ければ（microCMS が 404）null。それ以外の失敗は getBlogBySlug と同じく throw する。
  * @param id 記事のID
  * @returns Blog | null
  */
 export async function getBlogById(id: string, draftKey?: string): Promise<Blog | null> {
   // 環境変数の検証
   if (!API_KEY || !SERVICE_DOMAIN) {
-    console.error('MicroCMS environment variables are not properly configured');
+    throw new Error('MicroCMS environment variables are not properly configured');
+  }
+
+  if (!isBlogId(id)) {
     return null;
   }
 
-  try {
-    const url = `${BASE_URL}/blogs/${id}${draftKey ? `?draftKey=${encodeURIComponent(draftKey)}` : ''}`;
-    console.log('Fetching blog by ID from URL:', url);
+  const url = `${BASE_URL}/blogs/${encodeURIComponent(id)}${draftKey ? `?draftKey=${encodeURIComponent(draftKey)}` : ''}`;
+  console.log('Fetching blog by ID from URL:', url);
 
-    const res = await fetch(url, {
-      headers: {
-        "X-MICROCMS-API-KEY": API_KEY,
-      },
-      cache: "no-store",
-    });
+  const res = await fetch(url, {
+    headers: {
+      "X-MICROCMS-API-KEY": API_KEY,
+    },
+    cache: "no-store",
+  });
 
-    console.log('Blog by ID response status:', res.status);
+  console.log('Blog by ID response status:', res.status);
 
-    if (!res.ok) {
-      if (res.status === 404) {
-        console.log(`Blog not found with ID: ${id}`);
-        return null;
-      }
-      const errorText = await res.text();
-      console.error('Blog by ID API Error Response:', errorText);
-      throw new Error(`Failed to fetch blog by ID: ${res.status} - ${errorText}`);
-    }
-
-    return res.json();
-  } catch (error) {
-    console.error('Blog by ID Network or parsing error:', error);
+  if (res.status === 404) {
+    console.log(`Blog not found with ID: ${id}`);
     return null;
   }
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error('Blog by ID API Error Response:', errorText);
+    throw new Error(`Failed to fetch blog by ID: ${res.status} - ${errorText}`);
+  }
+
+  const data = await res.json();
+  if (typeof data?.id !== 'string') {
+    throw new Error('Unexpected response for blog by ID: id is not a string');
+  }
+
+  return data;
 }
