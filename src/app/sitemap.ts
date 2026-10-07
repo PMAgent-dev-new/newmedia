@@ -9,6 +9,23 @@ import {
 } from "@/lib/blogList";
 import { BASE_PATH } from "@/lib/basePath";
 
+/**
+ * サイトマップはリクエストのたびに作る（ビルド時に作らせない）。
+ *
+ * Next 16 の Deployment Adapter（Vercel のビルドが使う）は、ビルド時に作った /sitemap.xml を
+ * revalidate を見ずに静的ファイルとして出し、作り直す関数を出さない。fetch の revalidate から
+ * `next build` の表示は「1h」になるが、本番はデプロイするまで 9/30 のビルドのままで、10/7 公開の記事が載らなかった。
+ * `export const revalidate` を足しても出力は同じ（手元で確認）なので、ISR では直らない。
+ *
+ * microCMS へは getBlogList の fetch キャッシュ（ALL_BLOGS_REVALIDATE＝1時間）を通る。
+ * force-dynamic でも、revalidate を明示した fetch はキャッシュされる（トップページと同じ）ので、
+ * 取得のたびに CMS を叩くことはない。新しい記事が載るまでの遅れはこのキャッシュの分
+ * （期限が切れたあとの最初の1回は古い内容を返し、裏で取り直す）。
+ * ⚠️ cache も revalidate も指定しない fetch は、force-dynamic の下では毎回取り直しになる。
+ * ここから呼ぶ取得を足すときは、必ず revalidate を付けること。
+ */
+export const dynamic = "force-dynamic";
+
 const buildBaseUrl = () => {
   const raw = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const { origin, pathname } = new URL(raw);
