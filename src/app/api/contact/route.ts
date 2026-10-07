@@ -60,13 +60,15 @@ export async function POST(req: Request) {
     if (!webhookUrl) {
       // 2026-09-21 に実際に起きた形（未設定のまま公開）。ここを空けたままだと、
       // 「退避先はその最後の受け皿」と言いながら、いちばん必要な場面で1件も残らない。
-      await saveToSubmissionVault({
+      const vaulted = await saveToSubmissionVault({
         source: "newmedia/contact",
         kind: "contact",
         reason: "LARK_WEBHOOK_URL not configured",
         notified: false,
         payload: { name, company, email, message: message.slice(0, 2000) },
       });
+      // 退避に残せたなら受付は済んでいる。通知は監視が退避から再送する。
+      if (vaulted) return NextResponse.json({ ok: true });
       return NextResponse.json({ error: "サーバー設定が不足しています。(WEBHOOK)" }, { status: 500 });
     }
 
@@ -120,13 +122,15 @@ export async function POST(req: Request) {
       });
     } catch (sendError) {
       const detail = sendError instanceof Error ? `${sendError.name}: ${sendError.message}` : "unknown";
-      await saveToSubmissionVault({
+      const vaulted = await saveToSubmissionVault({
         source: "newmedia/contact",
         kind: "contact",
         reason: `lark webhook unreachable: ${detail}`,
         notified: false,
         payload: saved,
       });
+      // 退避に残せたなら、利用者にはエラーを見せない（送り直してもらっても通知は直らない）。
+      if (vaulted) return NextResponse.json({ ok: true });
       return NextResponse.json(
         { error: "外部送信に失敗しました。時間をおいて再度お試しください。" },
         { status: 502 }
@@ -138,7 +142,7 @@ export async function POST(req: Request) {
     if (!larkRes.ok || (larkData && typeof larkData.code !== "undefined" && larkData.code !== 0)) {
       // Larkは {code:0, msg:"ok"} が成功。その他は失敗扱い。
       // この通知が唯一の記録なので、落ちた時点で問い合わせは消える。退避に残してから返す。
-      await saveToSubmissionVault({
+      const vaulted = await saveToSubmissionVault({
         source: "newmedia/contact",
         kind: "contact",
         reason: `lark webhook failed: http=${larkRes.status} code=${
@@ -147,6 +151,7 @@ export async function POST(req: Request) {
         notified: false,
         payload: saved,
       });
+      if (vaulted) return NextResponse.json({ ok: true });
       return NextResponse.json(
         { error: "外部送信に失敗しました。時間をおいて再度お試しください。" },
         { status: 502 }

@@ -44,7 +44,7 @@ describe("/media/api/contact", () => {
 
     const { POST } = await import("./route");
     const res = await POST(makeRequest());
-    expect(res.status).toBe(502);
+    expect(res.status, "退避に残っているので利用者に送り直させない").toBe(200);
 
     const vaultPosts = fetchSpy.mock.calls.filter(([target]) =>
       String(target).includes("/rest/v1/submission_vault"),
@@ -56,7 +56,7 @@ describe("/media/api/contact", () => {
     errorSpy.mockRestore();
   });
 
-  it("退避先が落ちても応答は変わらない（退避のせいで挙動を変えない）", async () => {
+  it("通知も退避も落ちたら 502（どこにも残らないため）", async () => {
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const fetchSpy = vi.fn(async (input: unknown, _init: RequestInit | undefined) => {
       if (String(input).includes("/rest/v1/submission_vault")) throw new Error("boom");
@@ -81,10 +81,22 @@ describe("/media/api/contact", () => {
     );
     vi.stubGlobal("fetch", fetchSpy);
     const { POST } = await import("./route");
-    expect((await POST(makeRequest())).status).toBe(500);
+    expect((await POST(makeRequest())).status, "設定漏れを利用者のエラーにしない").toBe(200);
     const posts = fetchSpy.mock.calls.filter(([t]) => String(t).includes("submission_vault"));
     expect(posts.length, "設定漏れで問い合わせを捨てないこと").toBe(1);
     expect(JSON.parse(String(posts[0][1]?.body ?? "{}")).reason).toContain("not configured");
+  });
+
+  it("Webhook が未設定で退避にも残せなければ 500", async () => {
+    vi.stubEnv("LARK_WEBHOOK_URL", "");
+    const fetchSpy = vi.fn(async (_input: unknown, _init: RequestInit | undefined) =>
+      new Response("boom", { status: 503 }),
+    );
+    vi.stubGlobal("fetch", fetchSpy);
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { POST } = await import("./route");
+    expect((await POST(makeRequest())).status).toBe(500);
+    errorSpy.mockRestore();
   });
 
   // レビュー②の指摘: 生 fetch なので到達性障害は例外になり、catch で 400 に落ちていた。
@@ -99,7 +111,7 @@ describe("/media/api/contact", () => {
     vi.stubGlobal("fetch", fetchSpy);
     const { POST } = await import("./route");
     const res = await POST(makeRequest());
-    expect(res.status, "400『不正なリクエスト』に落とさないこと").toBe(502);
+    expect(res.status, "400『不正なリクエスト』に落とさず、退避できたら受付済みにする").toBe(200);
     const posts = fetchSpy.mock.calls.filter(([t]) => String(t).includes("submission_vault"));
     expect(posts.length).toBe(1);
     expect(JSON.parse(String(posts[0][1]?.body ?? "{}")).reason).toContain("unreachable");
