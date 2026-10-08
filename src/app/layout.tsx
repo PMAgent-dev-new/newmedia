@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import ApplicationContextCapture from '@/components/ApplicationContextCapture';
 import { organizationLd, webSiteLd, ldJson } from "@/lib/structuredData";
 
 const geistSans = Geist({
@@ -68,6 +69,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ApplicationContextCapture />
         {/* サイト共通の構造化データ（エンティティ確立） */}
         <script
           type="application/ld+json"
