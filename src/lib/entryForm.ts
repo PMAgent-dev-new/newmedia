@@ -164,6 +164,9 @@ export function entryUrlForBlog(
     utm_medium: placement,
     // slug が空のレコードが9件実在するので id にフォールバックする
     utm_content: blog.slug || blog.id || 'unknown',
+    rj_article_id: blog.slug || blog.id || 'unknown',
+    rj_article_title: blog.title.slice(0, 180),
+    rj_article_url: `https://ridejob.jp/media/blog/${encodeURIComponent(blog.slug || blog.id)}`,
   });
   return `${base}?${params.toString()}`;
 }
