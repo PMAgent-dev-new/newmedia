@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+// 受付台帳（submissions）への記録は route.ledger.test.ts で見る。ここでは差し替えて、退避と通知の確認を変えない
+vi.mock("@/lib/submissionLedger", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/submissionLedger")>()),
+  recordSubmissionAfterResponse: vi.fn(),
+}));
+
 /**
  * 問い合わせは Lark 通知が唯一の記録なので、通知が落ちた時点で内容が消える。
  * 2026-09-21 には LARK_WEBHOOK_URL が未設定のまま公開され、フォームは表示されるのに

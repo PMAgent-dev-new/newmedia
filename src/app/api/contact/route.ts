@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { saveToSubmissionVault } from "@/lib/submissionVault";
+import {
+  derivedSubmissionId,
+  recordSubmissionAfterResponse,
+  type SubmissionRecord,
+} from "@/lib/submissionLedger";
 
 type ContactPayload = {
   name: string;
@@ -33,6 +38,12 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  // 受付台帳（Supabase submissions）。入力の不備（400）と bot を除き、成否に関わらず1件1行で残す（応答のあとに書く）
+  let ledger: SubmissionRecord | null = null;
+  const respond = (res: NextResponse) => {
+    if (ledger) ledger.outcome = { ...ledger.outcome, http_status: res.status };
+    return res;
+  };
   try {
     const body = (await req.json()) as Partial<ContactPayload>;
 
@@ -56,20 +67,36 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: errors.join(" ") }, { status: 400 });
     }
 
+    ledger = {
+      source: "newmedia/contact",
+      kind: "contact",
+      submissionId: derivedSubmissionId("contact", [email.toLowerCase(), message]),
+      applicant: { name, company, email, message: message.slice(0, 10000) },
+      context: {
+        request: {
+          user_agent: req.headers.get("user-agent") ?? "",
+          referer: req.headers.get("referer") ?? "",
+        },
+      },
+      outcome: {},
+    };
+
     const webhookUrl = process.env.LARK_WEBHOOK_URL;
     if (!webhookUrl) {
       // 2026-09-21 に実際に起きた形（未設定のまま公開）。ここを空けたままだと、
       // 「退避先はその最後の受け皿」と言いながら、いちばん必要な場面で1件も残らない。
+      const reason = "LARK_WEBHOOK_URL not configured";
       const vaulted = await saveToSubmissionVault({
         source: "newmedia/contact",
         kind: "contact",
-        reason: "LARK_WEBHOOK_URL not configured",
+        reason,
         notified: false,
         payload: { name, company, email, message: message.slice(0, 2000) },
       });
+      ledger.outcome = { notified: false, vault: { saved: vaulted, reason } };
       // 退避に残せたなら受付は済んでいる。通知は監視が退避から再送する。
-      if (vaulted) return NextResponse.json({ ok: true });
-      return NextResponse.json({ error: "サーバー設定が不足しています。(WEBHOOK)" }, { status: 500 });
+      if (vaulted) return respond(NextResponse.json({ ok: true }));
+      return respond(NextResponse.json({ error: "サーバー設定が不足しています。(WEBHOOK)" }, { status: 500 }));
     }
 
     const receivedAt = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
@@ -108,6 +135,7 @@ export async function POST(req: Request) {
     };
 
     const saved = { name, company, email, message: message.slice(0, 2000) };
+    ledger.notification = { text: JSON.stringify(payload.card), sent: false, via: "webhook" };
 
     // ⚠️ ここは生の fetch なので、DNS失敗・接続断・TLSエラーは**例外**になる。
     // 下の catch は 400「不正なリクエストです」を返すので、そこまで落とすと
@@ -122,18 +150,22 @@ export async function POST(req: Request) {
       });
     } catch (sendError) {
       const detail = sendError instanceof Error ? `${sendError.name}: ${sendError.message}` : "unknown";
+      const reason = `lark webhook unreachable: ${detail}`;
       const vaulted = await saveToSubmissionVault({
         source: "newmedia/contact",
         kind: "contact",
-        reason: `lark webhook unreachable: ${detail}`,
+        reason,
         notified: false,
         payload: saved,
       });
+      ledger.outcome = { notified: false, webhook_status: 0, vault: { saved: vaulted, reason } };
       // 退避に残せたなら、利用者にはエラーを見せない（送り直してもらっても通知は直らない）。
-      if (vaulted) return NextResponse.json({ ok: true });
-      return NextResponse.json(
-        { error: "外部送信に失敗しました。時間をおいて再度お試しください。" },
-        { status: 502 }
+      if (vaulted) return respond(NextResponse.json({ ok: true }));
+      return respond(
+        NextResponse.json(
+          { error: "外部送信に失敗しました。時間をおいて再度お試しください。" },
+          { status: 502 }
+        )
       );
     }
 
@@ -142,24 +174,39 @@ export async function POST(req: Request) {
     if (!larkRes.ok || (larkData && typeof larkData.code !== "undefined" && larkData.code !== 0)) {
       // Larkは {code:0, msg:"ok"} が成功。その他は失敗扱い。
       // この通知が唯一の記録なので、落ちた時点で問い合わせは消える。退避に残してから返す。
+      const reason = `lark webhook failed: http=${larkRes.status} code=${
+        typeof larkData?.code === "undefined" ? "" : String(larkData.code)
+      }`;
       const vaulted = await saveToSubmissionVault({
         source: "newmedia/contact",
         kind: "contact",
-        reason: `lark webhook failed: http=${larkRes.status} code=${
-          typeof larkData?.code === "undefined" ? "" : String(larkData.code)
-        }`,
+        reason,
         notified: false,
         payload: saved,
       });
-      if (vaulted) return NextResponse.json({ ok: true });
-      return NextResponse.json(
-        { error: "外部送信に失敗しました。時間をおいて再度お試しください。" },
-        { status: 502 }
+      ledger.outcome = { notified: false, webhook_status: larkRes.status, vault: { saved: vaulted, reason } };
+      if (vaulted) return respond(NextResponse.json({ ok: true }));
+      return respond(
+        NextResponse.json(
+          { error: "外部送信に失敗しました。時間をおいて再度お試しください。" },
+          { status: 502 }
+        )
       );
     }
 
-    return NextResponse.json({ ok: true });
+    ledger.notification.sent = true;
+    ledger.outcome = { notified: true, webhook_status: larkRes.status };
+    return respond(NextResponse.json({ ok: true }));
   } catch (err) {
+    if (ledger) {
+      ledger.outcome = {
+        ...ledger.outcome,
+        http_status: 400,
+        error: err instanceof Error ? err.name : "error",
+      };
+    }
     return NextResponse.json({ error: "不正なリクエストです。" }, { status: 400 });
+  } finally {
+    if (ledger) recordSubmissionAfterResponse(ledger);
   }
 }
