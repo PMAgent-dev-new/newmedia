@@ -56,7 +56,15 @@ export interface BlogListPage {
 const RESERVED_SLUGS = new Set(["page", "category", "preview"]);
 
 /**
- * 一覧に出す全記事（公開日降順）。
+ * 別の記事に統合し、next.config.ts の redirects() で 301 転送している記事の slug。
+ * 一覧・カテゴリ・サイトマップに出さない（転送先と二重に並び、サイトマップに転送つきのURLが載るため）。
+ * このサービスの API キーは下書きも返すので、CMS で下書きに戻しても一覧からは消えない。
+ * 転送を足したらここにも足す（揃っているかは src/app/sitemap.test.ts で見ている）。
+ */
+export const MERGED_SLUGS: ReadonlySet<string> = new Set(["robotaxi-taxi-driver-future"]);
+
+/**
+ * 一覧に出す全記事（公開日降順）。統合して転送した記事（MERGED_SLUGS）は除く。
  *
  * slug重複のレコードは同一URLを指すのでsitemapと同じ規則で畳む。ここが揃っていないと
  * 「sitemapにあるのに一覧から辿れない記事」が出る。
@@ -66,7 +74,7 @@ export async function getBlogList(): Promise<Blog[]> {
   // （既定は本文つきでも安全な BODY_SCAN_PAGE=25 にしてある）。
   const blogs = dedupeBySlug(
     await fetchAllBlogsCached({ fields: LIST_FIELDS, pageSize: NO_BODY_PAGE }),
-  );
+  ).filter((blog) => !(blog.slug && MERGED_SLUGS.has(blog.slug)));
   for (const blog of blogs) {
     if (blog.slug && RESERVED_SLUGS.has(blog.slug)) {
       console.warn(`[blogList] slug "${blog.slug}" はルートの予約語です。記事URLが開けません（id=${blog.id}）`);
