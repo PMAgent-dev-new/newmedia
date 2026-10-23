@@ -46,6 +46,12 @@ const nextConfig: NextConfig = {
         permanent: false,
         basePath: false,
       },
+      // 記事の統合（2026-10）: 同じ問いを扱う記事を柱の記事へ寄せる。basePath が付くので実際は /media/blog/...
+      {
+        source: '/blog/robotaxi-taxi-driver-future',
+        destination: '/blog/taxi-autonomous-driving',
+        statusCode: 301,
+      },
     ];
   },
 };
