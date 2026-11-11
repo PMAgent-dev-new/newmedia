@@ -79,7 +79,9 @@ async function page(
   const qs = new URLSearchParams({
     limit: String(pageSize),
     offset: String(offset),
-    orders: "-publishedAt",
+    // publishedAt が同じ記事どうしの順は microCMS では決まらず、offset で分けて取ると重複・欠けが出る。
+    // 最後に system:default を足して並びを一意にする。
+    orders: "-publishedAt,system:default",
   });
   if (fields) qs.set("fields", fields);
   const res = await fetch(`https://${SERVICE_DOMAIN}.microcms.io/api/v1/blogs?${qs}`, {
