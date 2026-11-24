@@ -10,4 +10,9 @@ export function withBasePath(path: string): string {
   return `${BASE_PATH}/${path}`;
 }
 
-
+// CSS 背景や unoptimized 画像は Next.js の画像ローダーを経由しない。
+export function publicImageUrl(path: string): string {
+  const local = withBasePath(path);
+  if (!local.startsWith(BASE_PATH + '/') || !process.env.NEXT_PUBLIC_IMAGE_ASSET_PREFIX) return local;
+  return process.env.NEXT_PUBLIC_IMAGE_ASSET_PREFIX + local.slice(BASE_PATH.length);
+}

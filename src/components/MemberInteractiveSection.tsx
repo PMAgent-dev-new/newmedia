@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { withBasePath } from '@/lib/basePath';
+import { publicImageUrl } from '@/lib/basePath';
 import { Member } from '@/types/microcms';
 
 const imgGroup2091 = "/figma/interview-staff-photos.png"; // フォールバック用
@@ -31,7 +31,7 @@ function ClickableMemberIcon({
         isSelected ? 'ring-4 ring-blue-500 scale-105' : 'hover:scale-105 hover:ring-2 hover:ring-blue-300'
       }`}
       style={{
-        backgroundImage: `url('${withBasePath(member.icon?.url || imgGroup2091)}')`,
+        backgroundImage: `url('${publicImageUrl(member.icon?.url || imgGroup2091)}')`,
       }}
       title={member.name || `メンバー ${index + 1}`}
       onClick={onClick}
@@ -49,7 +49,7 @@ function MemberDetail({ member }: { member: Member }) {
       <div
         className="bg-center bg-cover bg-no-repeat h-[200px] md:h-[260px] shrink-0 w-[200px] md:w-[260px] rounded-lg overflow-hidden"
         style={{ 
-          backgroundImage: `url('${withBasePath(member.icon?.url || imgGroup2071)}')` 
+          backgroundImage: `url('${publicImageUrl(member.icon?.url || imgGroup2071)}')`
         }}
       />
       

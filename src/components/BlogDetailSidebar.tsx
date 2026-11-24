@@ -1,7 +1,7 @@
 import { Blog } from '@/types/microcms';
 import type { CategorySummary } from '@/lib/blogList';
 import PickupArticles from './PickupArticles';
-import { withBasePath } from '@/lib/basePath';
+import { publicImageUrl } from '@/lib/basePath';
 import Image from 'next/image';
 import CategoryNav from './CategoryNav';
 
@@ -49,17 +49,17 @@ export default function BlogDetailSidebar({
         <div className="space-y-3">
           <a href="https://ridejob.jp/ssw/ja" target="_blank" rel="noopener noreferrer" aria-label="RIDE JOB FOR SSW">
             <div className="relative w-full h-24 sm:h-28 rounded-[8px] overflow-hidden">
-              <Image src={withBasePath('/ssw.png')} alt="LINEで相談" fill className="object-contain" unoptimized />
+              <Image src={publicImageUrl('/ssw.png')} alt="LINEで相談" fill className="object-contain" unoptimized />
             </div>
           </a>
           <a href="https://www.tiktok.com/@ride.job" target="_blank" rel="noopener noreferrer" aria-label="RIDE JOB TikTok">
             <div className="relative w-full h-24 sm:h-28 rounded-[8px] overflow-hidden">
-              <Image src={withBasePath('/Tiltok.png')} alt="RIDE JOB TikTok" fill className="object-contain" unoptimized />
+              <Image src={publicImageUrl('/Tiltok.png')} alt="RIDE JOB TikTok" fill className="object-contain" unoptimized />
             </div>
           </a>
           <a href="https://www.youtube.com/@RIDEJOB%E3%83%81%E3%83%A3%E3%83%B3%E3%83%8D%E3%83%AB" target="_blank" rel="noopener noreferrer" aria-label="RIDE JOB YouTube">
             <div className="relative w-full h-24 sm:h-28 rounded-[8px] overflow-hidden">
-              <Image src={withBasePath('/youtube.png')} alt="RIDE JOB YouTube" fill className="object-contain" unoptimized />
+              <Image src={publicImageUrl('/youtube.png')} alt="RIDE JOB YouTube" fill className="object-contain" unoptimized />
             </div>
           </a>
         </div>

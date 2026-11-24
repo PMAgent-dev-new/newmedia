@@ -10,7 +10,7 @@ import BlogCTASection from '@/components/BlogCTASection';
 import RelatedArticlesSection from '@/components/RelatedArticlesSection';
 import { Blog } from '@/types/microcms';
 import { getBlogBySlug, getBlogById, getLatestBlogs } from '@/lib/microcms';
-import { withBasePath } from '@/lib/basePath';
+import { publicImageUrl } from '@/lib/basePath';
 import { getRelatedBlogs } from '@/lib/blogHelpers';
 import { entryUrlForBlog, jobsUrlForBlog } from '@/lib/entryForm';
 import {
@@ -204,7 +204,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       <main
         className="min-h-screen"
         style={{
-          backgroundImage: `url('${withBasePath('/figma/blue-bg.png')}')`,
+          backgroundImage: `url('${publicImageUrl('/figma/blue-bg.png')}')`,
           backgroundSize: 'auto',
           backgroundRepeat: 'repeat',
           backgroundPosition: 'top left',

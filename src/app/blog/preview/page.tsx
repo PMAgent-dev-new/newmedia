@@ -7,7 +7,7 @@ import BlogDetailSidebar from '@/components/BlogDetailSidebar';
 import BlogCTASection from '@/components/BlogCTASection';
 import RelatedArticlesSection from '@/components/RelatedArticlesSection';
 import { getBlogById, getLatestBlogs } from '@/lib/microcms';
-import { withBasePath } from '@/lib/basePath';
+import { publicImageUrl } from '@/lib/basePath';
 import { getRelatedBlogs } from '@/lib/blogHelpers';
 import { getBlogList, summarizeCategories } from '@/lib/blogList';
 import { entryUrlForBlog, jobsUrlForBlog } from '@/lib/entryForm';
@@ -84,7 +84,7 @@ export default async function BlogPreviewPage({ searchParams }: PreviewPageProps
       <main
         className="min-h-screen"
         style={{
-          backgroundImage: `url('${withBasePath('/figma/blue-bg.png')}')`,
+          backgroundImage: `url('${publicImageUrl('/figma/blue-bg.png')}')`,
           backgroundSize: 'auto',
           backgroundRepeat: 'repeat',
           backgroundPosition: 'top left',

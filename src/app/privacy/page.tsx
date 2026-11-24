@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Footer from "@/components/Footer";
-import { withBasePath } from "@/lib/basePath";
+import { publicImageUrl } from "@/lib/basePath";
 
 export const metadata: Metadata = {
   title: "プライバシーポリシー",
@@ -25,7 +25,7 @@ export default function PrivacyPage() {
 
       <main
         className="min-h-screen bg-repeat"
-        style={{ backgroundImage: `url('${withBasePath('/figma/blue-bg.png')}')` }}
+        style={{ backgroundImage: `url('${publicImageUrl('/figma/blue-bg.png')}')` }}
       >
         <div className="container mx-auto px-4 py-8">
           <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">

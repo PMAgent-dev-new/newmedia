@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { withBasePath } from '@/lib/basePath';
+import { withBasePath, publicImageUrl } from '@/lib/basePath';
 import Link from 'next/link';
 import { Blog } from '@/types/microcms';
 import { fetchBlogsWithFallback } from '@/lib/blogHelpers';
@@ -133,7 +133,7 @@ export default async function CompanyInterviewSection() {
       <div
         className="-z-10 absolute inset-0"
         style={{
-          backgroundImage: `url(${withBasePath(imgSection2CompanyInterview)})`,
+          backgroundImage: `url(${publicImageUrl(imgSection2CompanyInterview)})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Blog } from "@/types/microcms";
 import { fetchBlogsWithFallback } from "@/lib/blogHelpers";
 import { CATEGORY_IDS } from "@/constants/categories";
-import { withBasePath } from "@/lib/basePath";
+import { withBasePath, publicImageUrl } from "@/lib/basePath";
 import HeroEyecatchSlider from "@/components/HeroEyecatchSlider";
 import LogoMarquee from "@/components/LogoMarquee";
 
@@ -154,7 +154,7 @@ export default async function NewTopHeroSection() {
           <div
             className="-z-10 absolute inset-0"
             style={{
-              backgroundImage: `url(${withBasePath(imgHero)})`,
+              backgroundImage: `url(${publicImageUrl(imgHero)})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
@@ -241,7 +241,7 @@ export default async function NewTopHeroSection() {
           <div
             className="-z-10 absolute inset-0"
             style={{
-              backgroundImage: `url(${withBasePath(imgHero)})`,
+              backgroundImage: `url(${publicImageUrl(imgHero)})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
