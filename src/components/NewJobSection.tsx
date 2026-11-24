@@ -1,5 +1,5 @@
 import { getLatestJobs } from "@/lib/microcms";
-import { withBasePath } from "@/lib/basePath";
+import { withBasePath, publicImageUrl } from "@/lib/basePath";
 import { Job } from "@/types/microcms";
 import Image from "next/image";
 
@@ -159,7 +159,7 @@ export default async function NewJobSection() {
       <div
         className="-z-10 absolute inset-0"
         style={{
-          backgroundImage: `url(${withBasePath(imgSection4Job)})`,
+          backgroundImage: `url(${publicImageUrl(imgSection4Job)})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

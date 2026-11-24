@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { withBasePath } from '@/lib/basePath';
+import { publicImageUrl } from '@/lib/basePath';
 import Header from '@/components/Header';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import Footer from '@/components/Footer';
@@ -22,7 +22,7 @@ export default function BlogError() {
       {/* メインコンテンツ - 背景画像付きセクション */}
       <main
         className="min-h-screen bg-repeat"
-        style={{ backgroundImage: `url('${withBasePath('/figma/blue-bg.png')}')` }}
+        style={{ backgroundImage: `url('${publicImageUrl('/figma/blue-bg.png')}')` }}
       >
         {/* 白い背景のコンテナ */}
         <div className="container mx-auto px-4 py-8">

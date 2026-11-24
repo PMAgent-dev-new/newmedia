@@ -12,12 +12,14 @@ const nextConfig: NextConfig = {
   // Production では https://newmedia-eight.vercel.app/media を指定する。
   // 未設定の開発・Preview は既存の basePath から配信する。
   assetPrefix: process.env.ASSET_PREFIX || undefined,
+  env: { NEXT_PUBLIC_IMAGE_ASSET_PREFIX: process.env.ASSET_PREFIX || '' },
   poweredByHeader: false,
   async headers() {
     // basePath が付くので実際は /media/:path*（/media 自体も含む）
     return [{ source: '/:path*', headers: securityHeaders }];
   },
   images: {
+    ...(process.env.ASSET_PREFIX && { path: `${process.env.ASSET_PREFIX}/_next/image` }),
     remotePatterns: [
       {
         protocol: 'https',

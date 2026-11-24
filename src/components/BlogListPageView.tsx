@@ -4,7 +4,7 @@ import Footer from '@/components/Footer';
 import BlogListSection from '@/components/BlogListSection';
 import BlogSidebar from '@/components/BlogSidebar';
 import BlogCTASection from '@/components/BlogCTASection';
-import { withBasePath } from '@/lib/basePath';
+import { publicImageUrl } from '@/lib/basePath';
 import { BLOG_BASE_HREF, BLOG_PAGE_SIZE, blogListHeading, type BlogListPage } from '@/lib/blogList';
 import { absoluteUrl, blogPath, breadcrumbLd, ldJson } from '@/lib/structuredData';
 
@@ -51,7 +51,7 @@ export default function BlogListPageView({ data }: { data: BlogListPage }) {
       <main
         className="min-h-screen"
         style={{
-          backgroundImage: `url('${withBasePath('/figma/blue-bg.png')}')`,
+          backgroundImage: `url('${publicImageUrl('/figma/blue-bg.png')}')`,
           backgroundSize: 'auto',
           backgroundRepeat: 'repeat',
           backgroundPosition: 'top left',

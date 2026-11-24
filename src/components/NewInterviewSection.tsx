@@ -1,5 +1,5 @@
 import { getAllMembers } from "@/lib/microcms";
-import { withBasePath } from "@/lib/basePath";
+import { publicImageUrl } from "@/lib/basePath";
 import { Member } from "@/types/microcms";
 import { InterviewStaffSection } from "./about/InterviewStaffSection";
 import { InterviewVideoSection } from "./about/InterviewVideoSection";
@@ -23,7 +23,7 @@ export default async function NewInterviewSection() {
       <div
         className="-z-10 absolute inset-0"
         style={{
-          backgroundImage: `url(${withBasePath(img)})`,
+          backgroundImage: `url(${publicImageUrl(img)})`,
           backgroundSize: 'auto',
           backgroundRepeat: 'repeat',
         }}

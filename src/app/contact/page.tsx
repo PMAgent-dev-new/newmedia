@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Footer from "@/components/Footer";
-import { withBasePath } from "@/lib/basePath";
+import { withBasePath, publicImageUrl } from "@/lib/basePath";
 
 export default function ContactPage() {
   const [name, setName] = useState("");
@@ -86,7 +86,7 @@ export default function ContactPage() {
 
       <main
         className="min-h-screen bg-repeat"
-        style={{ backgroundImage: `url('${withBasePath('/figma/blue-bg.png')}')` }}
+        style={{ backgroundImage: `url('${publicImageUrl('/figma/blue-bg.png')}')` }}
       >
         <div className="container mx-auto px-4 py-8">
           <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">

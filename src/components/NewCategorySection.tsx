@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { withBasePath } from '@/lib/basePath';
+import { withBasePath, publicImageUrl } from '@/lib/basePath';
 import { Category } from '@/types/microcms';
 import { categoryPathById } from '@/constants/categories';
 
@@ -28,7 +28,7 @@ export default function NewCategorySection({ categories }: NewCategorySectionPro
       <div
         className="-z-10 absolute inset-0"
         style={{
-          backgroundImage: `url(${withBasePath(imgSection3Category)})`,
+          backgroundImage: `url(${publicImageUrl(imgSection3Category)})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
