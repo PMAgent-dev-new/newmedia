@@ -2,6 +2,14 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+### JS・CSS の Worker バイパス
+
+Vercel の Production 環境に `ASSET_PREFIX=https://newmedia-eight.vercel.app/media` を設定して再ビルド・デプロイすると、Next.js の静的ファイル（JS・CSS・生成フォント等）を Vercel から直接配信します。既存の `basePath: '/media'` は維持し、ASSET_PREFIX にも `/media` を含めます。Development / Preview では未設定にします。
+
+画像最適化、public 配下の画像、ページ、API の配信経路は変更しません。Cloudflare の既存ルートは維持します。反映後はブラウザの Network で `/media/_next/static/…` の配信先・HTTP 200・CORS・ページ遷移を確認してください。HTML と静的ファイルのデプロイが一致すること、更新前から開いている画面の遅延読み込みも確認します。
+
+戻す場合は `ASSET_PREFIX` を削除して再ビルド・再デプロイします。
+
 First, run the development server:
 
 ```bash
